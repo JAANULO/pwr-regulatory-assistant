@@ -1,5 +1,15 @@
-Flask==3.0.0
-psycopg2-binary==2.9.10
-gunicorn==21.2.0
-python-dotenv==1.0.1
-ruff==0.1.5
+# requirements.txt – Asystent Regulaminowy PWr v2
+# Instalacja: pip install -r requirements.txt
+
+# ── Serwer webowy ───────────────────────────────────────────────
+Flask==3.1.3
+gunicorn==21.2.0          # produkcja (Linux); na Windows użyj: waitress
+
+# ── Zmienne środowiskowe ────────────────────────────────────────
+python-dotenv==1.2.2
+
+# ── Narzędzia deweloperskie ─────────────────────────────────────
+ruff==0.15.10             # linter + formatter (zastępuje flake8 + black)
+
+# ── Opcjonalne: baza PostgreSQL zamiast SQLite ──────────────────
+# psycopg2-binary==2.9.11

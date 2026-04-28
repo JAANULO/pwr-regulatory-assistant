@@ -1,27 +1,41 @@
-name: Analiza CI/CD Asystenta PWr
-on: [push]
+name: CI – Asystent Regulaminowy PWr
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   test_and_lint:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Konfiguracja srodowiska (Python 3.13)
+      - name: Checkout kodu
+        uses: actions/checkout@v4
+
+      - name: Konfiguracja Python 3.13
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-          
-      - name: Ladowanie pakietow zewnetrznych PWr
+
+      - name: Cache zależności pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('v2/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Instalacja zależności
         run: |
           python -m pip install --upgrade pip
-          pip install ruff python-dotenv
-          if [ -f v2/requirements.txt ]; then pip install -r v2/requirements.txt; fi
-          
-      - name: LINTER (Inspekcja formatowania i usterk PEP8)
-        run: ruff check .
-          
-      - name: AUTOTESTY (Sprawdzenie regulem BM25 - test.py)
+          pip install -r v2/requirements.txt
+
+      - name: Linter – ruff (PEP8 + błędy składni)
+        run: ruff check v2/
+
+      - name: Testy jednostkowe – BM25 (test.py)
         run: |
           cd v2
           python tests/test.py
