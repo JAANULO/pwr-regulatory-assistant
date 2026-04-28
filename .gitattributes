@@ -1,2 +1,37 @@
-*.pkl filter=lfs diff=lfs merge=lfs -text
-*.pt filter=lfs diff=lfs merge=lfs -text
+# .gitattributes – Asystent Regulaminowy PWr
+# Dokumentacja: https://git-scm.com/docs/gitattributes
+
+# ── Automatyczna normalizacja końców linii ──────────────────────
+* text=auto eol=lf
+
+# ── Pliki tekstowe – wymuś LF ──────────────────────────────────
+*.py    text eol=lf
+*.html  text eol=lf
+*.js    text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf
+*.txt   text eol=lf
+*.cfg   text eol=lf
+*.ini   text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.toml  text eol=lf
+*.env   text eol=lf
+
+# ── Pliki binarne – Git LFS (duże pliki ML) ────────────────────
+*.pkl   filter=lfs diff=lfs merge=lfs -text
+*.pt    filter=lfs diff=lfs merge=lfs -text
+*.pth   filter=lfs diff=lfs merge=lfs -text
+*.bin   filter=lfs diff=lfs merge=lfs -text
+
+# ── Bazy danych – binarne, bez diff ────────────────────────────
+*.db    binary
+*.sqlite binary
+*.sqlite3 binary
+
+# ── Pozostałe binarne ───────────────────────────────────────────
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.ico   binary
+*.pdf   binary
