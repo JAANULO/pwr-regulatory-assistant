@@ -523,7 +523,7 @@ if __name__ == "__main__":
     print("═" * 55 + "\n")
 
     temperatura = 0.1
-    historia = []
+    historia: list = []
     ostatnie_pid = None  # ID ostatniego pytania w SQLite (do feedbacku)
 
     # ── pętla rozmowy ──────────────────────────────────────────

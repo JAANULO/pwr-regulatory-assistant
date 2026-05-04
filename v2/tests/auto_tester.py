@@ -25,8 +25,9 @@ except ImportError:
 
 try:
     from dotenv import load_dotenv
+    HAS_DOTENV = True
 except ImportError:
-    load_dotenv = None
+    HAS_DOTENV = False
 
 from infrastructure.knowledge_loader import utworz_wyszukiwarke
 
@@ -38,7 +39,7 @@ PROJECT_ROOT = (
 )
 sys.path.insert(0, PROJECT_ROOT)
 
-if load_dotenv:
+if HAS_DOTENV:
     load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 
 # ── konfiguracja ──────────────────────────────────────────────
@@ -94,6 +95,7 @@ def zapytaj_gemini(prompt: str, proba=4) -> str:
                     time.sleep(60)
             else:
                 raise
+    raise RuntimeError("Nieoczekiwany koniec funkcji zapytaj_gemini")
 
 
 def parsuj_json(tekst: str):

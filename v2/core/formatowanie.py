@@ -115,12 +115,6 @@ def _score_zdanie(zdanie: str, tokeny_pytania: list) -> int:
     return sum(1 for t in tokeny_pytania if t in zdanie_lower)
 
 
-def _score_zdanie(zdanie, tokeny_pytania):
-    """Liczy ile tokenów pytania pojawia się w zdaniu."""
-    zdanie_lower = zdanie.lower()
-    return sum(1 for t in tokeny_pytania if t in zdanie_lower)
-
-
 def wyciagnij_zdania(tresc, max_zdan=3, szukaj=None, pytanie_tokeny=None):
     tresc = re.sub(r"^§\s*\d+\.\s*\S[^\n\.]{0,60}\.?\s*", "", tresc).strip()
     tresc_split = re.sub(

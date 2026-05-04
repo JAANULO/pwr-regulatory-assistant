@@ -16,7 +16,7 @@ try:
         tokenizuj,
     )
 except ImportError:
-    from wyszukiwarka import (
+    from wyszukiwarka import (  # type: ignore
         oblicz_tf,
         podobienstwo_cosinusowe,
         tokenizuj,
@@ -75,7 +75,7 @@ class IndeksZdan:
         try:
             from .wyszukiwarka import usun_polskie_znaki, popraw_literowke
         except ImportError:
-            from wyszukiwarka import usun_polskie_znaki, popraw_literowke
+            from wyszukiwarka import usun_polskie_znaki, popraw_literowke  # type: ignore
 
         tokeny = tokenizuj(pytanie)
         if not tokeny:

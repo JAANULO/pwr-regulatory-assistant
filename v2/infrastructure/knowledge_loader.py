@@ -24,8 +24,8 @@ def utworz_wyszukiwarke(plik_bazy: str):
     aktywne_pliki = []
     for sciezka in json_files:
         try:
-            with open(sciezka, "r", encoding="utf-8") as f:
-                dane = json.load(f)
+            with open(sciezka, "r", encoding="utf-8") as f_json:
+                dane = json.load(f_json)
         except (OSError, json.JSONDecodeError):
             continue
 
@@ -55,8 +55,8 @@ def utworz_wyszukiwarke(plik_bazy: str):
     baza_mtime = max(os.path.getmtime(p) for p in aktywne_pliki)
     if os.path.exists(cache) and os.path.getmtime(cache) > baza_mtime:
         print("Wczytywanie indeksu z cache...")
-        with open(cache, "rb") as f:
-            idf, wektory, wszystkie_tokeny = pickle.load(f)
+        with open(cache, "rb") as f_pkl:
+            idf, wektory, wszystkie_tokeny = pickle.load(f_pkl)
     else:
         print("Budowanie indeksu TF-IDF...")
         wszystkie_tokeny = []
@@ -67,8 +67,8 @@ def utworz_wyszukiwarke(plik_bazy: str):
         idf = oblicz_idf(wszystkie_tokeny)
         wektory = zbuduj_wektory(wszystkie_tokeny, idf)
         try:
-            with open(cache, "wb") as f:
-                pickle.dump((idf, wektory, wszystkie_tokeny), f)
+            with open(cache, "wb") as f_out:
+                pickle.dump((idf, wektory, wszystkie_tokeny), f_out)
             print("   Zapisano cache")
         except Exception as e:
             print(f"   Nie udalo sie zapisac cache (tryb read-only?): {e}")
@@ -96,8 +96,8 @@ def utworz_indeks_zdan(plik_bazy: str):
     aktywne_pliki = []
     for sciezka in json_files:
         try:
-            with open(sciezka, encoding="utf-8") as f:
-                dane = json.load(f)
+            with open(sciezka, encoding="utf-8") as f_json:
+                dane = json.load(f_json)
         except (OSError, json.JSONDecodeError):
             continue
 
@@ -126,8 +126,8 @@ def utworz_indeks_zdan(plik_bazy: str):
 
     baza_mtime = max(os.path.getmtime(p) for p in aktywne_pliki)
     if os.path.exists(cache) and os.path.getmtime(cache) > baza_mtime:
-        with open(cache, "rb") as f:
-            zdania, idf, wektory = pickle.load(f)
+        with open(cache, "rb") as f_pkl:
+            zdania, idf, wektory = pickle.load(f_pkl)
         print(f"  Indeks zdań: {len(zdania)} zdań (z cache)")
         return IndeksZdan(zdania, idf, wektory)
 
@@ -148,8 +148,8 @@ def utworz_indeks_zdan(plik_bazy: str):
     wektory = zbuduj_wektory(wszystkie_tokeny, idf)
 
     try:
-        with open(cache, "wb") as f:
-            pickle.dump((zdania, idf, wektory), f)
+        with open(cache, "wb") as f_out:
+            pickle.dump((zdania, idf, wektory), f_out)
     except Exception as e:
         print(f"  Nie udalo sie zapisac cache (tryb read-only?): {e}")
 

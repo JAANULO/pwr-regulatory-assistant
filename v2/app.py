@@ -29,20 +29,20 @@ try:
     from .core.slowniki import ROZSZERZENIA, SYNONIMY
     from .core.wyszukiwarka import Wyszukiwarka
 except ImportError:
-    from core.settings import (
+    from core.settings import (  # type: ignore
         ADMIN_TOKEN,
         FLASK_DEBUG,
         FLASK_HOST,
         FLASK_PORT,
         LOG_LEVEL,
     )
-    from core.bd import (
+    from core.bd import (  # type: ignore
         inicjalizuj,
         pobierz_ostatnie_pytania,
         pobierz_statystyki,
     )
-    from core.slowniki import ROZSZERZENIA, SYNONIMY
-    from core.wyszukiwarka import Wyszukiwarka
+    from core.slowniki import ROZSZERZENIA, SYNONIMY  # type: ignore
+    from core.wyszukiwarka import Wyszukiwarka  # type: ignore
 
 
 app = Flask(__name__)
@@ -51,7 +51,7 @@ if TYPE_CHECKING:
     try:
         from .core.indeks_zdan import IndeksZdan
     except ImportError:
-        from core.indeks_zdan import IndeksZdan
+        from core.indeks_zdan import IndeksZdan  # type: ignore
 
 
 def _znajdz_rozszerzenie(pytanie_lower: str) -> str:
@@ -100,7 +100,7 @@ MAPA_ZNAKOW = str.maketrans("ąćęłńóśźż", "acelnoszz")
 
 CACHE_TTL_SECONDS = 60 * 60
 CACHE_MAX_SIZE = 500
-CACHE_ODPOWIEDZI = OrderedDict()
+CACHE_ODPOWIEDZI: OrderedDict[str, dict] = OrderedDict()
 
 logger = logging.getLogger("asystent")
 logger.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
