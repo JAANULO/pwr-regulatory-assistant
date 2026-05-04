@@ -18,9 +18,11 @@ if v2_dir not in sys.path:
     sys.path.insert(0, v2_dir)
 
 try:
+    from core.bd import inicjalizuj
     from infrastructure.knowledge_loader import utworz_wyszukiwarke
     from tests.test import TESTY
 except ImportError:
+    from core.bd import inicjalizuj
     from .test import TESTY
 
 BASELINE_FILE = os.path.join(os.path.dirname(__file__), "baseline.json")
@@ -58,6 +60,9 @@ def main():
     if not os.path.exists(PLIK_BAZY):
         print(f"Blad: Nie znaleziono pliku bazy w {PLIK_BAZY}")
         return
+
+    # Inicjalizacja DB (wymagana w CI dla tabeli feedback)
+    inicjalizuj()
 
     w = utworz_wyszukiwarke(PLIK_BAZY)
 

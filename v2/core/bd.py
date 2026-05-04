@@ -156,8 +156,12 @@ def pobierz_wspolczynniki_zbiorczo():
             _LOG.warning("Nie udalo sie pobrac wspolczynnikow (postgres): %s", e)
             return {}
     else:
-        with polacz() as conn:
-            wyniki = conn.execute(zapytanie).fetchall()
+        try:
+            with polacz() as conn:
+                wyniki = conn.execute(zapytanie).fetchall()
+        except sqlite3.OperationalError:
+            # Tabela feedback może nie istnieć przy pierwszym uruchomieniu lub w CI
+            return {}
 
     slownik = {}
     for w in wyniki:
