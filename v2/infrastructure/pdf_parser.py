@@ -31,35 +31,36 @@ def wczytaj_pdf(sciezka):
 
 def wyczysc_tekst(tekst):
     """usuwa naglowki stron i nadmiarowe biale znaki"""
-    tekst = re.sub(r'Strona \d+ z \d+', '', tekst)
+    tekst = re.sub(r"Strona \d+ z \d+", "", tekst)
     # usun linie z samymi kropkami lub cyframi (pozostalosci spisu tresci)
-    linie = tekst.split('\n')
-    linie = [l for l in linie if not re.match(r'^[\s.\d]+$', l)]
-    tekst = '\n'.join(linie)
-    tekst = re.sub(r'[ \t]+', ' ', tekst)
-    tekst = re.sub(r'\n{3,}', '\n\n', tekst)
+    linie = tekst.split("\n")
+    linie = [l for l in linie if not re.match(r"^[\s.\d]+$", l)]
+    tekst = "\n".join(linie)
+    tekst = re.sub(r"[ \t]+", " ", tekst)
+    tekst = re.sub(r"\n{3,}", "\n\n", tekst)
     return tekst.strip()
 
 
 def podziel_na_fragmenty(tekst):
     """dzieli tekst na fragmenty wedlug paragralow regulaminu"""
     fragmenty = []
-    wzorzec = r'(?:(?<=\n)|(?<=\n\n))(?=§\s*\d+\.\s+(?!ust\.|pkt)\S)'
+    wzorzec = r"(?:(?<=\n)|(?<=\n\n))(?=§\s*\d+\.\s+(?!ust\.|pkt)\S)"
     czesci = re.split(wzorzec, tekst)
 
     for czesc in czesci:
         czesc = czesc.strip()
         if len(czesc) < 80:
             continue
-        linie = czesc.split('\n')
+        linie = czesc.split("\n")
         tytul = linie[0].strip()
 
         # akceptuj tylko paragrafy z nazwą własną
-        if not re.match(r'^§\s*\d+\.\s+(?!ust\.|pkt|ust$)\S', tytul) and \
-           not re.match(r'^Rozdział\s+[IVX]+', tytul):
+        if not re.match(r"^§\s*\d+\.\s+(?!ust\.|pkt|ust$)\S", tytul) and not re.match(
+            r"^Rozdział\s+[IVX]+", tytul
+        ):
             continue
 
-        tresc = re.sub(r'\s+', ' ', ' '.join(linie).strip())
+        tresc = re.sub(r"\s+", " ", " ".join(linie).strip())
         fragmenty.append({"tytul": tytul, "tresc": tresc})
 
     return fragmenty
@@ -67,7 +68,7 @@ def podziel_na_fragmenty(tekst):
 
 def zapisz_baze(fragmenty, sciezka):
     """zapisuje fragmenty do pliku json"""
-    with open(sciezka, 'w', encoding='utf-8') as f:
+    with open(sciezka, "w", encoding="utf-8") as f:
         json.dump(fragmenty, f, ensure_ascii=False, indent=2)
 
 
@@ -110,7 +111,9 @@ def main():
             zapisz_baze(fragmenty, PLIK_WYJSCIOWY)
             print("Zapisano kompatybilny plik:", os.path.abspath(PLIK_WYJSCIOWY))
 
-    print(f"\nGotowe. Łącznie zaindeksowano {len(wszystkie_fragmenty)} fragmentów z {len(pdf_files)} dokumentów.")
+    print(
+        f"\nGotowe. Łącznie zaindeksowano {len(wszystkie_fragmenty)} fragmentów z {len(pdf_files)} dokumentów."
+    )
     return wszystkie_fragmenty
 
 

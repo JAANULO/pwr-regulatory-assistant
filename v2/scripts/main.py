@@ -29,26 +29,27 @@ from shared.transformer import Adam, MiniGPT, URZADZENIE
 # USTAWIENIA
 # ============================================================
 
-BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
-PLIK_DANYCH  = os.path.join(BASE_DIR, "data", "dane.json")
-PLIK_CACHE   = os.path.join(BASE_DIR, "data","model_cache.pkl")
-PLIK_BAZY    = os.path.join(BASE_DIR, "data", "baza_wiedzy.json")
-PLIK_DB      = os.path.join(BASE_DIR, "data", "asystent.db")
-WYMIAR       = 128
-N_WARSTW     = 4
-N_GLOWIC     = 4
-DROPOUT      = 0.01
-EPOKI        = 5000
-LR           = 0.001
-MAKS_DLUGOSC = 512    # zwiększony – fragment regulaminu to ~400 znaków
-BATCH_SIZE   = 32
-PROG_PEWNOSCI = 0.152 # minimalny wynik BM25 żeby użyć kontekstu
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PLIK_DANYCH = os.path.join(BASE_DIR, "data", "dane.json")
+PLIK_CACHE = os.path.join(BASE_DIR, "data", "model_cache.pkl")
+PLIK_BAZY = os.path.join(BASE_DIR, "data", "baza_wiedzy.json")
+PLIK_DB = os.path.join(BASE_DIR, "data", "asystent.db")
+WYMIAR = 128
+N_WARSTW = 4
+N_GLOWIC = 4
+DROPOUT = 0.01
+EPOKI = 5000
+LR = 0.001
+MAKS_DLUGOSC = 512  # zwiększony – fragment regulaminu to ~400 znaków
+BATCH_SIZE = 32
+PROG_PEWNOSCI = 0.152  # minimalny wynik BM25 żeby użyć kontekstu
 
 # Pobieramy rozszerzenia z centralnego słownika (Przeniesiono na górę)
 
 # ============================================================
 # SQLITE – logi, statystyki, feedback
 # ============================================================
+
 
 def inicjalizuj_db():
     inicjalizuj()
@@ -68,13 +69,13 @@ def pokaz_statystyki():
     print("\n  📊 Statystyki sesji:")
     print(f"     Zadanych pytań:       {stats['pytania']}")
     print(f"     Średnie dopasowanie:  {stats['srednie_podobienstwo']}%")
-    if stats.get('top_paragrafy'):
+    if stats.get("top_paragrafy"):
         print("     Najczęstsze tematy:")
-        for w in stats['top_paragrafy']:
+        for w in stats["top_paragrafy"]:
             print(f"       • {w['tytul'][:45]} ({w['n']}×)")
-    if stats.get('zle_odpowiedzi'):
+    if stats.get("zle_odpowiedzi"):
         print("     Ostatnie złe odpowiedzi (👎):")
-        for z in stats['zle_odpowiedzi']:
+        for z in stats["zle_odpowiedzi"]:
             print(f"       • '{z['pytanie'][:40]}' → {z['tytul']}")
     print()
 
@@ -83,25 +84,28 @@ def pokaz_statystyki():
 # CACHE – zapis i wczytywanie modelu GPT
 # ============================================================
 
+
 def hash_danych(sciezka):
     """oblicza hash pliku dane.json – wykrywa zmiany danych"""
     with open(sciezka, "rb") as f:
         return hashlib.md5(f.read()).hexdigest()
 
+
 def zapisz_cache(model, tokenizer, hash_pliku):
     """zapisuje model PyTorch i tokenizer do pliku cache"""
     dane = {
-        "hash":       hash_pliku,
-        "tokenizer":  tokenizer,
+        "hash": hash_pliku,
+        "tokenizer": tokenizer,
         "state_dict": model.state_dict(),
         "config": {
             "rozmiar_slownika": tokenizer.rozmiar,
-            "wymiar":           model.wymiar,
-            "maks_dlugosc":     model.maks_dlugosc,
-        }
+            "wymiar": model.wymiar,
+            "maks_dlugosc": model.maks_dlugosc,
+        },
     }
     torch.save(dane, PLIK_CACHE)
     eksportuj_model(model, tokenizer, hash_pliku)
+
 
 def wczytaj_cache(model, hash_pliku):
     """
@@ -120,31 +124,33 @@ def wczytaj_cache(model, hash_pliku):
     except Exception:
         return None, False
 
+
 def eksportuj_model(model, tokenizer, hash_pliku, sciezka="model_export.pt"):
     """zapisuje skompresowany model do wysyłania na GitHuba"""
     dane = {
-        "hash":       hash_pliku,
-        "tokenizer":  tokenizer,
+        "hash": hash_pliku,
+        "tokenizer": tokenizer,
         "state_dict": {k: v.half() for k, v in model.state_dict().items()},
         "config": {
             "rozmiar_slownika": tokenizer.rozmiar,
-            "wymiar":           model.wymiar,
-            "maks_dlugosc":     model.maks_dlugosc,
-            "n_warstw":         N_WARSTW,
-            "n_glowic":         N_GLOWIC,
-            "dropout":          DROPOUT,
-        }
+            "wymiar": model.wymiar,
+            "maks_dlugosc": model.maks_dlugosc,
+            "n_warstw": N_WARSTW,
+            "n_glowic": N_GLOWIC,
+            "dropout": DROPOUT,
+        },
     }
     torch.save(dane, sciezka, _use_new_zipfile_serialization=True)
     rozmiar = os.path.getsize(sciezka) / 1024 / 1024
     print(f"  📦 Eksport do '{sciezka}': {rozmiar:.1f} MB (gotowy na GitHub)")
+
 
 def wczytaj_eksport(model, sciezka="model_export.pt"):
     """wczytuje skompresowany model (np. pobrany z GitHuba)"""
     if not os.path.exists(sciezka):
         return None, False
     try:
-        dane  = torch.load(sciezka, map_location=URZADZENIE, weights_only=False)
+        dane = torch.load(sciezka, map_location=URZADZENIE, weights_only=False)
         state = {k: v.float() for k, v in dane["state_dict"].items()}
         model.load_state_dict(state)
         rozmiar = os.path.getsize(sciezka) / 1024 / 1024
@@ -153,9 +159,11 @@ def wczytaj_eksport(model, sciezka="model_export.pt"):
     except Exception:
         return None, False
 
+
 # ============================================================
 # WCZYTAJ DANE
 # ============================================================
+
 
 def wczytaj_dane(sciezka):
     """obsługuje zarówno listę jak i słownik z kluczem 'zdania'"""
@@ -168,9 +176,11 @@ def wczytaj_dane(sciezka):
         return dane
     return dane.get("zdania", [])
 
+
 # ============================================================
 # TRENING
 # ============================================================
+
 
 def zbuduj_batch(zdania_ids, tokenizer, batch_size, maks_dlugosc):
     probka = random.sample(zdania_ids, min(batch_size, len(zdania_ids)))
@@ -185,7 +195,7 @@ def zbuduj_batch(zdania_ids, tokenizer, batch_size, maks_dlugosc):
         # SFT Loss Masking
         idx_token = -1
         for i in range(len(w)):
-            tekst_czesciowy = tokenizer.dekoduj(w[:i + 1])
+            tekst_czesciowy = tokenizer.dekoduj(w[: i + 1])
             if tekst_czesciowy.endswith("asystent"):
                 idx_token = i
                 break
@@ -201,6 +211,7 @@ def zbuduj_batch(zdania_ids, tokenizer, batch_size, maks_dlugosc):
     wejscie = torch.tensor(wejscie_lista, dtype=torch.long, device=URZADZENIE)
     cel = torch.tensor(cel_lista, dtype=torch.long, device=URZADZENIE)
     return wejscie, cel
+
 
 def trenuj(model, optymalizator, zdania_ids, tokenizer):
     kryterium = torch.nn.CrossEntropyLoss(ignore_index=-100)
@@ -220,9 +231,11 @@ def trenuj(model, optymalizator, zdania_ids, tokenizer):
 
     return calkowita_strata / n_batchy
 
+
 # ============================================================
 # WYSZUKIWANIE – rozszerzanie zapytania + BM25 + reranking
 # ============================================================
+
 
 def rozszerz_pytanie(pytanie):
     """
@@ -242,6 +255,7 @@ def rozszerz_pytanie(pytanie):
     if len(pytanie.split()) <= 2:
         try:
             from core.slowniki import SYNONIMY
+
             slowo = pytanie.strip().lower().rstrip("?!")
             pasujace = list({v for k, v in SYNONIMY.items() if slowo in k})
             if pasujace:
@@ -269,9 +283,11 @@ def szukaj_z_rerankingiem(wyszukiwarka, pytanie, n_wynikow=1):
 
     return wyniki[:n_wynikow]
 
+
 # ============================================================
 # GENEROWANIE ODPOWIEDZI
 # ============================================================
+
 
 def generuj_odpowiedz(pytanie, historia, temperatura, wyszukiwarka, model, tokenizer):
     """
@@ -308,23 +324,29 @@ def generuj_odpowiedz(pytanie, historia, temperatura, wyszukiwarka, model, token
     trans = str.maketrans("ąćęłńóśźż", "acelnoszz")
     pyt = pytanie_clean.lower().translate(trans)
 
-    intencja_38 = any(f in pyt for f in [
-        "ocena koncowa studiow",
-        "ocena koncowa",
-        "ostateczny wynik studiow",
-        "wynik studiow",
-        "waga pracy dyplomowej",
-        "wazy ocena",
-        "wspolczynnik",
-    ])
-    intencja_19 = any(f in pyt for f in [
-        "skala ocen",
-        "ile procent",
-        "prog",
-        "bardzo dobry",
-        "dostateczny",
-        "niedostateczny",
-    ])
+    intencja_38 = any(
+        f in pyt
+        for f in [
+            "ocena koncowa studiow",
+            "ocena koncowa",
+            "ostateczny wynik studiow",
+            "wynik studiow",
+            "waga pracy dyplomowej",
+            "wazy ocena",
+            "wspolczynnik",
+        ]
+    )
+    intencja_19 = any(
+        f in pyt
+        for f in [
+            "skala ocen",
+            "ile procent",
+            "prog",
+            "bardzo dobry",
+            "dostateczny",
+            "niedostateczny",
+        ]
+    )
 
     for w in wyniki:
         t = w["tytul"].lower()
@@ -345,7 +367,9 @@ def generuj_odpowiedz(pytanie, historia, temperatura, wyszukiwarka, model, token
 
     # Tie-breaker: przy intencji par. 38 wybierz go, jeśli jest blisko najlepszego wyniku
     if intencja_38 and not intencja_19:
-        kandydat_38 = next((w for w in wyniki if "oceny za studia" in w["tytul"].lower()), None)
+        kandydat_38 = next(
+            (w for w in wyniki if "oceny za studia" in w["tytul"].lower()), None
+        )
         if kandydat_38:
             best_score = wynik.get("_score", wynik["podobienstwo"])
             score_38 = kandydat_38.get("_score", kandydat_38["podobienstwo"])
@@ -369,7 +393,9 @@ def generuj_odpowiedz(pytanie, historia, temperatura, wyszukiwarka, model, token
 
     if isinstance(odp, dict):
         wstep = odp.get("wstep", "").strip()
-        punkty = [p.strip() for p in odp.get("punkty", []) if isinstance(p, str) and p.strip()]
+        punkty = [
+            p.strip() for p in odp.get("punkty", []) if isinstance(p, str) and p.strip()
+        ]
         tekst = (wstep + " " + " ".join(punkty)).strip()
         tekst = " ".join(tekst.split())  # porzadkuje biale znaki
 
@@ -385,13 +411,11 @@ def generuj_odpowiedz(pytanie, historia, temperatura, wyszukiwarka, model, token
     return tekst, paragraf, podobienstwo
 
 
-
 # ============================================================
 # GŁÓWNY PROGRAM
 # ============================================================
 
 if __name__ == "__main__":
-
     print("=" * 55)
     print("  MINI-GPT v2 – Asystent Regulaminowy PWr")
     print("=" * 55 + "\n")
@@ -401,7 +425,7 @@ if __name__ == "__main__":
 
     # 1. wczytaj dane
     print("📚 Wczytuję dane...")
-    zdania        = wczytaj_dane(PLIK_DANYCH)
+    zdania = wczytaj_dane(PLIK_DANYCH)
     aktualny_hash = hash_danych(PLIK_DANYCH)
     print(f"  Załadowano {len(zdania)} zdań.\n")
 
@@ -411,12 +435,12 @@ if __name__ == "__main__":
     tokenizer_temp.buduj_slownik(zdania)
 
     model = MiniGPT(
-        rozmiar_slownika = tokenizer_temp.rozmiar,
-        wymiar           = WYMIAR,
-        n_warstw         = N_WARSTW,
-        n_glowic         = N_GLOWIC,
-        dropout          = DROPOUT,
-        maks_dlugosc     = MAKS_DLUGOSC,
+        rozmiar_slownika=tokenizer_temp.rozmiar,
+        wymiar=WYMIAR,
+        n_warstw=N_WARSTW,
+        n_glowic=N_GLOWIC,
+        dropout=DROPOUT,
+        maks_dlugosc=MAKS_DLUGOSC,
     ).to(URZADZENIE)
     print()
 
@@ -436,12 +460,13 @@ if __name__ == "__main__":
             model.ustaw_trening(False)
             print("✅ Wczytano model_export.pt – pomijam trening\n")
         else:
-            tokenizer     = tokenizer_temp
-            zdania_ids    = [tokenizer.koduj(z) for z in zdania]
+            tokenizer = tokenizer_temp
+            zdania_ids = [tokenizer.koduj(z) for z in zdania]
             optymalizator = Adam(lr=LR, parametry=model.parameters())
 
             try:
                 from tqdm import tqdm
+
                 ma_tqdm = True
             except ImportError:
                 ma_tqdm = False
@@ -465,7 +490,9 @@ if __name__ == "__main__":
                 for epoka in range(1, EPOKI + 1):
                     strata = trenuj(model, optymalizator, zdania_ids, tokenizer)
                     if epoka % 100 == 0 or epoka == EPOKI:
-                        print(f"  Epoka {epoka}/{EPOKI} ({epoka / EPOKI * 100:.0f}%)  strata: {strata:.4f}")
+                        print(
+                            f"  Epoka {epoka}/{EPOKI} ({epoka / EPOKI * 100:.0f}%)  strata: {strata:.4f}"
+                        )
 
             print("\n  ✅ Trening zakończony!")
             model.ustaw_trening(False)
@@ -475,8 +502,9 @@ if __name__ == "__main__":
     # 4. załaduj wyszukiwarkę (BM25 + opcjonalny reranking)
     print()
     if os.path.exists(PLIK_BAZY):
-        from core.wyszukiwarka import Wyszukiwarka
-        wyszukiwarka = Wyszukiwarka(PLIK_BAZY)
+        from infrastructure.knowledge_loader import utworz_wyszukiwarke
+
+        wyszukiwarka = utworz_wyszukiwarke(PLIK_BAZY)
         # sprawdź czy embedder jest dostępny
         print("  Reranking przez embeddingi: brak")
     else:
@@ -494,9 +522,9 @@ if __name__ == "__main__":
     print("           /historia | /zapomnij | /info | /pomoc | koniec")
     print("═" * 55 + "\n")
 
-    temperatura   = 0.1
-    historia      = []
-    ostatnie_pid  = None   # ID ostatniego pytania w SQLite (do feedbacku)
+    temperatura = 0.1
+    historia = []
+    ostatnie_pid = None  # ID ostatniego pytania w SQLite (do feedbacku)
 
     # ── pętla rozmowy ──────────────────────────────────────────
     while True:
@@ -529,7 +557,7 @@ if __name__ == "__main__":
                     wyniki = szukaj_z_rerankingiem(wyszukiwarka, zapytanie, n_wynikow=3)
                     print(f"\n  Wyniki dla: '{zapytanie}'")
                     for i, w in enumerate(wyniki, 1):
-                        print(f"  [{i}] {w['tytul']} ({int(w['podobienstwo']*100)}%)")
+                        print(f"  [{i}] {w['tytul']} ({int(w['podobienstwo'] * 100)}%)")
                     print()
                 else:
                     print("  ⚠️  Wyszukiwarka niedostępna.\n")
@@ -545,7 +573,9 @@ if __name__ == "__main__":
                     else:
                         ocena = 1 if czesci[1] == "+" else -1
                         zapisz_feedback(ostatnie_pid, ocena)
-                        print(f"  {'👍 Dziękuję!' if ocena == 1 else '👎 Zapisano, poprawimy.'}\n")
+                        print(
+                            f"  {'👍 Dziękuję!' if ocena == 1 else '👎 Zapisano, poprawimy.'}\n"
+                        )
                 else:
                     print("  ⚠️  Użycie: /feedback + lub /feedback -\n")
                 continue
@@ -606,13 +636,12 @@ if __name__ == "__main__":
 
             # ── generuj odpowiedź ──────────────────────────────
             odpowiedz, paragraf, podobienstwo = generuj_odpowiedz(
-                wejscie, historia, temperatura,
-                wyszukiwarka, model, tokenizer
+                wejscie, historia, temperatura, wyszukiwarka, model, tokenizer
             )
 
             print(f"  🤖 Model: {odpowiedz}")
             if paragraf:
-                print(f"  📖 Źródło: {paragraf}  ({int(podobienstwo*100)}%)")
+                print(f"  📖 Źródło: {paragraf}  ({int(podobienstwo * 100)}%)")
             print()
             print("  (oceń odpowiedź: /feedback + lub /feedback -)")
             print()
@@ -622,11 +651,9 @@ if __name__ == "__main__":
 
             # zapisz do historii w pamięci
             if odpowiedz != "...":
-                historia.append((
-                    wejscie.lower().strip().rstrip("?"),
-                    odpowiedz,
-                    paragraf
-                ))
+                historia.append(
+                    (wejscie.lower().strip().rstrip("?"), odpowiedz, paragraf)
+                )
 
         except KeyboardInterrupt:
             print("\n\n  Program zakończony.\n")

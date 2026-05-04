@@ -3,7 +3,9 @@
 import os
 
 from dotenv import load_dotenv
+
 load_dotenv()
+
 
 def _as_bool(value: str | None, default: bool = False) -> bool:
     if value is None:
@@ -38,4 +40,3 @@ else:
 FLASK_HOST = os.getenv("HOST", "0.0.0.0")
 FLASK_PORT = int(os.getenv("PORT", "5000"))
 FLASK_DEBUG = _as_bool(os.getenv("FLASK_DEBUG"), default=(APP_ENV == "local"))
-

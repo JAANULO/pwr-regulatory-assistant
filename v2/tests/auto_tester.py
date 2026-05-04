@@ -28,7 +28,7 @@ try:
 except ImportError:
     load_dotenv = None
 
-from core.wyszukiwarka import Wyszukiwarka
+from infrastructure.knowledge_loader import utworz_wyszukiwarke
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = (
@@ -49,15 +49,16 @@ if not API_KEY:
 
 klient = genai.Client(api_key=API_KEY)
 
-BASE_DIR      = PROJECT_ROOT
-LOGS_DIR      = os.path.join(BASE_DIR, "logs")
+BASE_DIR = PROJECT_ROOT
+LOGS_DIR = os.path.join(BASE_DIR, "logs")
 os.makedirs(LOGS_DIR, exist_ok=True)  # Tworzy folder logs, jeśli nie istnieje
 
-LICZBA_PYTAN  = 3
-PLIK_WYNIKOW  = os.path.join(LOGS_DIR, "auto_test_wyniki.json")
+LICZBA_PYTAN = 3
+PLIK_WYNIKOW = os.path.join(LOGS_DIR, "auto_test_wyniki.json")
 PLIK_POPRAWEK = os.path.join(LOGS_DIR, "auto_test_poprawki.py")
 
 # ── pomocnicze ────────────────────────────────────────────────
+
 
 def zapytaj_gemini(prompt: str, proba=4) -> str:
     # Wymuszenie modelu, który ma odblokowane darmowe pule
@@ -68,8 +69,7 @@ def zapytaj_gemini(prompt: str, proba=4) -> str:
             # Opóźnienie zapobiegające spamowaniu API
             time.sleep(4)
             return klient.models.generate_content(
-                model=nazwa_modelu,
-                contents=prompt
+                model=nazwa_modelu, contents=prompt
             ).text.strip()
 
         except Exception as e:
@@ -82,10 +82,12 @@ def zapytaj_gemini(prompt: str, proba=4) -> str:
 
             if i < proba - 1:
                 # Szuka dokładnego czasu blokady w błędzie
-                match = re.search(r'retry in ([\d\.]+)s', blad_str)
+                match = re.search(r"retry in ([\d\.]+)s", blad_str)
                 if match:
                     czas_czekania = float(match.group(1)) + 2.0
-                    print(f"  ⚠ Przekroczono limit zapytań (RPM). Czekam {czas_czekania:.1f}s...")
+                    print(
+                        f"  ⚠ Przekroczono limit zapytań (RPM). Czekam {czas_czekania:.1f}s..."
+                    )
                     time.sleep(czas_czekania)
                 else:
                     print("  ⚠ Nierozpoznany błąd blokady. Czekam 60s...")
@@ -104,8 +106,9 @@ def parsuj_json(tekst: str):
 
 # ── kroki ─────────────────────────────────────────────────────
 
+
 def generuj_pytania(baza: list, liczba: int) -> list:
-    tytuły = [p['tytul'] for p in baza]
+    tytuły = [p["tytul"] for p in baza]
     prompt = f"""Jesteś studentem Politechniki Wrocławskiej.
 Wygeneruj {liczba} różnych, realistycznych pytań które student mógłby zadać
 o regulamin studiów. Pytania muszą dotyczyć tych paragrafów:
@@ -128,7 +131,7 @@ def ocen_odpowiedz(pytanie: str, tytul: str, podobienstwo: float) -> dict:
 
 Pytanie: "{pytanie}"
 Znaleziony paragraf: "{tytul}"
-Podobieństwo BM25: {podobienstwo*100:.0f}%
+Podobieństwo BM25: {podobienstwo * 100:.0f}%
 
 Zwróć TYLKO JSON:
 {{
@@ -141,7 +144,11 @@ Zwróć TYLKO JSON:
         tekst = zapytaj_gemini(prompt)
         return parsuj_json(tekst)
     except Exception as e:
-        return {"trafny": False, "komentarz": f"błąd oceny: {e}", "oczekiwany_paragraf": None}
+        return {
+            "trafny": False,
+            "komentarz": f"błąd oceny: {e}",
+            "oczekiwany_paragraf": None,
+        }
 
 
 def analizuj_bledy(bledy: list, baza: list) -> str:
@@ -153,8 +160,8 @@ def analizuj_bledy(bledy: list, baza: list) -> str:
         oczekiwany = b.get("oczekiwany_paragraf", "")
         if oczekiwany:
             for p in baza:
-                if oczekiwany.lower() in p['tytul'].lower():
-                    kontekst[p['tytul']] = p['tresc'][:300]
+                if oczekiwany.lower() in p["tytul"].lower():
+                    kontekst[p["tytul"]] = p["tresc"][:300]
                     break
 
     prompt = f"""Analizujesz błędy systemu wyszukiwania BM25 dla regulaminu PWr.
@@ -192,7 +199,7 @@ def zapisz_poprawki(poprawki_tekst: str, bledy: list):
         for b in bledy:
             f.write(f"#   ✗ '{b['pytanie']}'\n")
             f.write(f"#     → otrzymano:  '{b['otrzymano']}'\n")
-            if b.get('oczekiwany_paragraf'):
+            if b.get("oczekiwany_paragraf"):
                 f.write(f"#     → oczekiwano: '{b['oczekiwany_paragraf']}'\n")
         f.write("\n# Sugerowane wpisy do ROZSZERZENIA:\n")
         f.write(poprawki_tekst)
@@ -200,6 +207,7 @@ def zapisz_poprawki(poprawki_tekst: str, bledy: list):
 
 
 # ── główna funkcja ────────────────────────────────────────────
+
 
 def uruchom():
     print("=" * 55)
@@ -212,14 +220,14 @@ def uruchom():
     with open(PLIK_BAZY, encoding="utf-8") as f:
         baza = json.load(f)
 
-    w = Wyszukiwarka(PLIK_BAZY)
+    w = utworz_wyszukiwarke(PLIK_BAZY)
 
     print(f"\n📝 Generuję {LICZBA_PYTAN} pytań przez Gemini...")
     pytania = generuj_pytania(baza, LICZBA_PYTAN)
     print(f"   Wygenerowano {len(pytania)} pytań\n")
 
     wyniki = []
-    bledy  = []
+    bledy = []
     trafne = 0
 
     for i, pytanie in enumerate(pytania, 1):
@@ -228,16 +236,20 @@ def uruchom():
         rezultaty = w.szukaj(pytanie, n_wynikow=1)
         if not rezultaty:
             print("  → BRAK WYNIKÓW\n")
-            bledy.append({
-                "pytanie": pytanie, "otrzymano": "BRAK",
-                "oczekiwany_paragraf": None, "komentarz": "brak wyników"
-            })
+            bledy.append(
+                {
+                    "pytanie": pytanie,
+                    "otrzymano": "BRAK",
+                    "oczekiwany_paragraf": None,
+                    "komentarz": "brak wyników",
+                }
+            )
             continue
 
-        wynik        = rezultaty[0]
-        tytul        = wynik["tytul"]
+        wynik = rezultaty[0]
+        tytul = wynik["tytul"]
         podobienstwo = wynik["podobienstwo"]
-        print(f"  → {tytul} ({podobienstwo*100:.0f}%)")
+        print(f"  → {tytul} ({podobienstwo * 100:.0f}%)")
 
         ocena = ocen_odpowiedz(pytanie, tytul, podobienstwo)
 
@@ -250,21 +262,27 @@ def uruchom():
                 print(f"    lepszy: {ocena['oczekiwany_paragraf']}\n")
             else:
                 print()
-            bledy.append({
-                "pytanie":             pytanie,
-                "otrzymano":           tytul,
-                "oczekiwany_paragraf": ocena.get("oczekiwany_paragraf"),
-                "komentarz":           ocena.get("komentarz")
-            })
+            bledy.append(
+                {
+                    "pytanie": pytanie,
+                    "otrzymano": tytul,
+                    "oczekiwany_paragraf": ocena.get("oczekiwany_paragraf"),
+                    "komentarz": ocena.get("komentarz"),
+                }
+            )
 
-        wyniki.append({
-            "pytanie": pytanie, "paragraf": tytul,
-            "podobienstwo": podobienstwo, "ocena": ocena
-        })
+        wyniki.append(
+            {
+                "pytanie": pytanie,
+                "paragraf": tytul,
+                "podobienstwo": podobienstwo,
+                "ocena": ocena,
+            }
+        )
 
     print("=" * 55)
     print(f"  WYNIKI: {trafne}/{len(pytania)} trafnych")
-    print(f"  Trafność: {trafne/len(pytania)*100:.0f}%")
+    print(f"  Trafność: {trafne / len(pytania) * 100:.0f}%")
     print("=" * 55)
 
     if bledy:
@@ -276,9 +294,11 @@ def uruchom():
 
     nowe_wyniki = {
         "czas": time.strftime("%Y-%m-%d %H:%M:%S"),
-        "trafne": trafne, "total": len(pytania),
+        "trafne": trafne,
+        "total": len(pytania),
         "trafnosc_procent": round(trafne / len(pytania) * 100, 1),
-        "bledy": bledy, "wyniki": wyniki
+        "bledy": bledy,
+        "wyniki": wyniki,
     }
 
     wszystkie_wyniki = []
@@ -301,7 +321,8 @@ def uruchom():
 
     print(f"📊 Pełne wyniki dopisane do: {PLIK_WYNIKOW}")
 
-#print([m.name for m in klient.models.list()])
+
+# print([m.name for m in klient.models.list()])
 
 if __name__ == "__main__":
     uruchom()

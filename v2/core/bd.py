@@ -2,6 +2,7 @@
 db.py – baza SQLite (lokalnie) lub PostgreSQL/Supabase (produkcja).
 TRYB wykrywany automatycznie przez zmienną środowiskową DATABASE_URL.
 """
+
 import logging
 import os
 import sqlite3
@@ -46,6 +47,7 @@ if TRYB == "postgres":
         pg_pool = None
 else:
     pg_pool = None
+
 
 @contextmanager
 def polacz():
@@ -100,7 +102,7 @@ def zapisz_pytanie(pytanie, tytul, podobienstwo, baza="studia", odpowiedz=None):
                 with conn.cursor() as cur:
                     cur.execute(
                         "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (%s,%s,%s,%s,%s) RETURNING id",
-                        (pytanie, tytul, podobienstwo, baza, odpowiedz)
+                        (pytanie, tytul, podobienstwo, baza, odpowiedz),
                     )
                     conn.commit()
                     return cur.fetchone()["id"]
@@ -111,7 +113,7 @@ def zapisz_pytanie(pytanie, tytul, podobienstwo, baza="studia", odpowiedz=None):
         with polacz() as conn:
             cur = conn.execute(
                 "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
-                (pytanie, tytul, podobienstwo, baza, odpowiedz)
+                (pytanie, tytul, podobienstwo, baza, odpowiedz),
             )
             return cur.lastrowid
 
@@ -123,7 +125,7 @@ def zapisz_feedback(pytanie_id, ocena, komentarz=None):
                 with conn.cursor() as cur:
                     cur.execute(
                         "INSERT INTO feedback (pytanie_id, ocena, komentarz) VALUES (%s,%s,%s)",
-                        (pytanie_id, ocena, komentarz)
+                        (pytanie_id, ocena, komentarz),
                     )
                     conn.commit()
         except Exception as e:
@@ -132,7 +134,7 @@ def zapisz_feedback(pytanie_id, ocena, komentarz=None):
         with polacz() as conn:
             conn.execute(
                 "INSERT INTO feedback (pytanie_id, ocena, komentarz) VALUES (?,?,?)",
-                (pytanie_id, ocena, komentarz)
+                (pytanie_id, ocena, komentarz),
             )
 
 
@@ -159,13 +161,13 @@ def pobierz_wspolczynniki_zbiorczo():
 
     slownik = {}
     for w in wyniki:
-        suma = w['suma_ocen']
+        suma = w["suma_ocen"]
         if suma > 0:
-            slownik[w['tytul']] = 1.2
+            slownik[w["tytul"]] = 1.2
         elif suma < 0:
-            slownik[w['tytul']] = 0.8
+            slownik[w["tytul"]] = 0.8
         else:
-            slownik[w['tytul']] = 1.0
+            slownik[w["tytul"]] = 1.0
     return slownik
 
 
@@ -177,7 +179,7 @@ def pobierz_pytanie(pytanie_id):
                 with conn.cursor() as cur:
                     cur.execute(
                         "SELECT pytanie, tytul, podobienstwo, odpowiedz FROM pytania WHERE id = %s",
-                        (pytanie_id,)
+                        (pytanie_id,),
                     )
                     return cur.fetchone()
         except Exception as e:
@@ -187,7 +189,7 @@ def pobierz_pytanie(pytanie_id):
         with polacz() as conn:
             return conn.execute(
                 "SELECT pytanie, tytul, podobienstwo, odpowiedz FROM pytania WHERE id = ?",
-                (pytanie_id,)
+                (pytanie_id,),
             ).fetchone()
 
 
@@ -199,7 +201,7 @@ def pobierz_ostatnie_pytania(limit=10):
                 with conn.cursor() as cur:
                     cur.execute(
                         "SELECT pytanie FROM pytania WHERE pytanie IS NOT NULL AND pytanie <> '' ORDER BY id DESC LIMIT %s",
-                        (limit * 3,)
+                        (limit * 3,),
                     )
                     rows = cur.fetchall()
         except Exception as e:
@@ -209,7 +211,7 @@ def pobierz_ostatnie_pytania(limit=10):
         with polacz() as conn:
             rows = conn.execute(
                 "SELECT pytanie FROM pytania WHERE pytanie IS NOT NULL AND pytanie <> '' ORDER BY id DESC LIMIT ?",
-                (limit * 3,)
+                (limit * 3,),
             ).fetchall()
 
     unikalne = []
@@ -270,8 +272,8 @@ def pobierz_statystyki():
     else:
         with polacz() as conn:
             total = conn.execute("SELECT COUNT(*) FROM pytania").fetchone()[0]
-            avg   = conn.execute("SELECT AVG(podobienstwo) FROM pytania").fetchone()[0]
-            top   = conn.execute("""
+            avg = conn.execute("SELECT AVG(podobienstwo) FROM pytania").fetchone()[0]
+            top = conn.execute("""
                 SELECT tytul, COUNT(*) as n
                 FROM pytania WHERE tytul IS NOT NULL
                 GROUP BY tytul ORDER BY n DESC LIMIT 5

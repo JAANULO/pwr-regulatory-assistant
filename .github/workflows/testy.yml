@@ -35,7 +35,13 @@ jobs:
       - name: Linter – ruff (PEP8 + błędy składni)
         run: ruff check v2/
 
-      - name: Testy jednostkowe – BM25 (test.py)
+      - name: Formatter – ruff (Sprawdzenie formatowania)
+        run: ruff format --check v2/
+
+      - name: Typowanie – mypy (Statyczna analiza typów)
+        run: mypy v2/ --ignore-missing-imports
+
+      - name: Testy regresji – BM25 (test_diff.py)
         run: |
           cd v2
-          python tests/test.py
+          python tests/test_diff.py --compare

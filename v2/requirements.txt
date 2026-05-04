@@ -10,6 +10,7 @@ python-dotenv==1.2.2
 
 # ── Narzędzia deweloperskie ─────────────────────────────────────
 ruff==0.15.10             # linter + formatter (zastępuje flake8 + black)
+mypy==1.14.1              # statyczna kontrola typów
 
 # ── Opcjonalne: baza PostgreSQL zamiast SQLite ──────────────────
 # psycopg2-binary==2.9.11

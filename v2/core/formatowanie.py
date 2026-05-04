@@ -17,49 +17,75 @@ except ImportError:
 
 TEMATY = {
     "egzamin": [
-        "egzamin", "egzaminu", "egzaminie", "zdać", "zdawać", "oblać",
-        "podejść", "termin", "poprawka", "sesja", "nie zdam", "nie zdałem"
+        "egzamin",
+        "egzaminu",
+        "egzaminie",
+        "zdać",
+        "zdawać",
+        "oblać",
+        "podejść",
+        "termin",
+        "poprawka",
+        "sesja",
+        "nie zdam",
+        "nie zdałem",
     ],
-    "zaliczenie": [
-        "zaliczenie", "zaliczyć", "zaliczenia", "kolokwium", "sprawdzian"
-    ],
-    "urlop": [
-        "urlop", "urlopu", "urlopie", "dziekański", "zdrowotny", "przerwa"
-    ],
-    "skreślenie": [
-        "skreślenie", "skreślić", "wydalenie", "skreślony", "skreslanym"
-    ],
+    "zaliczenie": ["zaliczenie", "zaliczyć", "zaliczenia", "kolokwium", "sprawdzian"],
+    "urlop": ["urlop", "urlopu", "urlopie", "dziekański", "zdrowotny", "przerwa"],
+    "skreślenie": ["skreślenie", "skreślić", "wydalenie", "skreślony", "skreslanym"],
     "praca_dyplomowa": [
-        "praca", "dyplomowa", "dyplomowej", "inżynierska", "magisterska",
-        "dyplom", "antyplagiat", "obron"
+        "praca",
+        "dyplomowa",
+        "dyplomowej",
+        "inżynierska",
+        "magisterska",
+        "dyplom",
+        "antyplagiat",
+        "obron",
     ],
     "ocena": [
-        "ocena", "oceny", "ocenę", "średnia", "wynik", "pięć", "cztery",
-        "trzy", "niedostateczny", "oblicza"
+        "ocena",
+        "oceny",
+        "ocenę",
+        "średnia",
+        "wynik",
+        "pięć",
+        "cztery",
+        "trzy",
+        "niedostateczny",
+        "oblicza",
     ],
     "nieobecność": [
-        "nieobecność", "nieobecności", "opuścić", "opuszczać", "nie przyjść",
-        "opuściłem", "byłem chory"
+        "nieobecność",
+        "nieobecności",
+        "opuścić",
+        "opuszczać",
+        "nie przyjść",
+        "opuściłem",
+        "byłem chory",
     ],
-    "powtarzanie": [
-        "powtarzać", "powtórzyć", "powtarzanie", "drugi raz", "ponownie"
-    ],
+    "powtarzanie": ["powtarzać", "powtórzyć", "powtarzanie", "drugi raz", "ponownie"],
     "wznowienie": [
-        "wznowić", "wznowienie", "wznowienia", "wznowieniu",
-        "przywrócenie", "przywrócić", "po skreśleniu"
+        "wznowić",
+        "wznowienie",
+        "wznowienia",
+        "wznowieniu",
+        "przywrócenie",
+        "przywrócić",
+        "po skreśleniu",
     ],
 }
 
 WSTEPY = {
-    "egzamin":         "📝 W sprawie egzaminów regulamin mówi:\n",
-    "zaliczenie":      "📝 W kwestii zaliczeń regulamin mówi:\n",
-    "urlop":           "🏖️ Jeśli chodzi o urlopy studenckie:\n",
-    "skreślenie":      "⚠️ W sprawie skreślenia z listy studentów:\n",
+    "egzamin": "📝 W sprawie egzaminów regulamin mówi:\n",
+    "zaliczenie": "📝 W kwestii zaliczeń regulamin mówi:\n",
+    "urlop": "🏖️ Jeśli chodzi o urlopy studenckie:\n",
+    "skreślenie": "⚠️ W sprawie skreślenia z listy studentów:\n",
     "praca_dyplomowa": "📄 Jeśli chodzi o pracę dyplomową:\n",
-    "ocena":           "📊 W kwestii ocen i wyników:\n",
-    "nieobecność":     "📅 Jeśli chodzi o nieobecności na zajęciach:\n",
-    "powtarzanie":     "🔄 W kwestii powtarzania przedmiotów:\n",
-    "domyślny":        "📋 Zgodnie z regulaminem studiów PWr:\n",
+    "ocena": "📊 W kwestii ocen i wyników:\n",
+    "nieobecność": "📅 Jeśli chodzi o nieobecności na zajęciach:\n",
+    "powtarzanie": "🔄 W kwestii powtarzania przedmiotów:\n",
+    "domyślny": "📋 Zgodnie z regulaminem studiów PWr:\n",
     "wznowienie": "🔄 W sprawie wznowienia studiów regulamin mówi:\n",
 }
 
@@ -73,6 +99,7 @@ ZACHETY = [
 
 # ── funkcje pomocnicze ────────────────────────────────────────────────────────
 
+
 def wykryj_temat(pytanie):
     """wykrywa temat pytania na podstawie słów kluczowych"""
     pytanie_lower = pytanie.lower()
@@ -80,6 +107,7 @@ def wykryj_temat(pytanie):
         if any(s in pytanie_lower for s in slowa):
             return temat
     return "domyślny"
+
 
 def _score_zdanie(zdanie: str, tokeny_pytania: list) -> int:
     """Liczy ile tokenów pytania pojawia się w zdaniu – im więcej, tym lepiej."""
@@ -94,30 +122,28 @@ def _score_zdanie(zdanie, tokeny_pytania):
 
 
 def wyciagnij_zdania(tresc, max_zdan=3, szukaj=None, pytanie_tokeny=None):
-    tresc = re.sub(r'^§\s*\d+\.\s*\S[^\n\.]{0,60}\.?\s*', '', tresc).strip()
-    tresc_split = re.sub(r'(?<!\bust)(?<!\bpkt)(?<!\bart)(?<!\bpoz)\.\s+(?=[A-ZŁŚŻŹ\d])', '|||', tresc)
-    czesci = [c.strip() for c in tresc_split.split('|||') if len(c.strip()) > 30]
+    tresc = re.sub(r"^§\s*\d+\.\s*\S[^\n\.]{0,60}\.?\s*", "", tresc).strip()
+    tresc_split = re.sub(
+        r"(?<!\bust)(?<!\bpkt)(?<!\bart)(?<!\bpoz)\.\s+(?=[A-ZŁŚŻŹ\d])", "|||", tresc
+    )
+    czesci = [c.strip() for c in tresc_split.split("|||") if len(c.strip()) > 30]
 
     oczyszczone = []
     for z in czesci:
-        z = re.sub(r'\s*Rozdział\s+[IVX]+[^.]*\.?', '', z)
-        z = z.strip().rstrip('.,;: ')
-        z = re.sub(r'\([^)]{0,80}\)', '', z).strip()
-        z = re.sub(r'\s+\d+$', '', z).strip()
-        z = re.sub(r'\s+', ' ', z)
+        z = re.sub(r"\s*Rozdział\s+[IVX]+[^.]*\.?", "", z)
+        z = z.strip().rstrip(".,;: ")
+        z = re.sub(r"\([^)]{0,80}\)", "", z).strip()
+        z = re.sub(r"\s+\d+$", "", z).strip()
+        z = re.sub(r"\s+", " ", z)
         if len(z) > 30:
             oczyszczone.append(z)
 
     # sortuj zdania po dopasowaniu do pytania – najlepsze na górę
     if pytanie_tokeny:
-        oczyszczone.sort(
-            key=lambda z: _score_zdanie(z, pytanie_tokeny),
-            reverse=True
-        )
+        oczyszczone.sort(key=lambda z: _score_zdanie(z, pytanie_tokeny), reverse=True)
     elif szukaj:
         oczyszczone.sort(
-            key=lambda z: sum(1 for s in szukaj if s in z.lower()),
-            reverse=True
+            key=lambda z: sum(1 for s in szukaj if s in z.lower()), reverse=True
         )
 
     wynik = []
@@ -127,15 +153,16 @@ def wyciagnij_zdania(tresc, max_zdan=3, szukaj=None, pytanie_tokeny=None):
 
     return wynik
 
+
 def wyciagnij_skale_ocen(tresc):
     """specjalna obsługa – wyciąga tabelę ocen jako czytelne punkty"""
     oceny = [
-        ("5,0", "bardzo dobry",    "90–100%"),
-        ("4,5", "dobry plus",      "80–89%"),
-        ("4,0", "dobry",           "70–79%"),
-        ("3,5", "dostateczny plus","60–69%"),
-        ("3,0", "dostateczny",     "50–59%"),
-        ("2,0", "niedostateczny",  "0–49%"),
+        ("5,0", "bardzo dobry", "90–100%"),
+        ("4,5", "dobry plus", "80–89%"),
+        ("4,0", "dobry", "70–79%"),
+        ("3,5", "dostateczny plus", "60–69%"),
+        ("3,0", "dostateczny", "50–59%"),
+        ("2,0", "niedostateczny", "0–49%"),
     ]
     linie = ["  Ocena   Słownie               Próg"]
     linie.append("  " + "─" * 38)
@@ -143,9 +170,13 @@ def wyciagnij_skale_ocen(tresc):
         linie.append(f"  {cyfra:<8} {slowo:<22} {prog}")
     return "\n".join(linie)
 
+
 # ── główna funkcja ────────────────────────────────────────────────────────────
 
-def formatuj_odpowiedz(pytanie, wynik_wyszukiwarki, najlepsze_zdanie=None, skrot=None, tylko_jedno=False):
+
+def formatuj_odpowiedz(
+    pytanie, wynik_wyszukiwarki, najlepsze_zdanie=None, skrot=None, tylko_jedno=False
+):
     """
     tworzy przyjazną odpowiedź na podstawie pytania i wyniku z wyszukiwarki.
 
@@ -163,9 +194,9 @@ def formatuj_odpowiedz(pytanie, wynik_wyszukiwarki, najlepsze_zdanie=None, skrot
             "Spróbuj zapytać inaczej lub zajrzyj do dziekanatu."
         )
 
-    tytul        = wynik_wyszukiwarki['tytul']
-    tresc        = wynik_wyszukiwarki['tresc']
-    podobienstwo = wynik_wyszukiwarki['podobienstwo']
+    tytul = wynik_wyszukiwarki["tytul"]
+    tresc = wynik_wyszukiwarki["tresc"]
+    podobienstwo = wynik_wyszukiwarki["podobienstwo"]
 
     # za niskie dopasowanie
     if podobienstwo < 0.08:
@@ -186,18 +217,24 @@ def formatuj_odpowiedz(pytanie, wynik_wyszukiwarki, najlepsze_zdanie=None, skrot
         wstep = "📊 W kwestii skali ocen regulamin mówi:\n"
 
     # wyciągnij kluczowe zdania i sformatuj jako punkty
-    #zdania = wyciagnij_zdania(tresc, max_zdan=3)
+    # zdania = wyciagnij_zdania(tresc, max_zdan=3)
 
     SLOWA_KLUCZOWE = {
-        "tygodni":    ["tygodni", "tygodnie", "15", "piętnaście"],
-        "wznow":      ["wznowi", "ubiegać", "skreśloną", "wniosek"],
-        "skresla": ["skreśla", "rezygnacji", "niepodjęcia", "niezłożenia", "niepodjęcia studiów"],
-        "egzamin":    ["dwukrotnego", "termin", "prawo do"],
-        "urlop":      ["urlop zdrowotny", "urlop dziekański", "udziela"],
+        "tygodni": ["tygodni", "tygodnie", "15", "piętnaście"],
+        "wznow": ["wznowi", "ubiegać", "skreśloną", "wniosek"],
+        "skresla": [
+            "skreśla",
+            "rezygnacji",
+            "niepodjęcia",
+            "niezłożenia",
+            "niepodjęcia studiów",
+        ],
+        "egzamin": ["dwukrotnego", "termin", "prawo do"],
+        "urlop": ["urlop zdrowotny", "urlop dziekański", "udziela"],
     }
 
     tokeny_pyt = _tokenizuj(pytanie)
-    if 'Skala ocen' in tytul or 'skala ocen' in tytul:
+    if "Skala ocen" in tytul or "skala ocen" in tytul:
         zdania = [wyciagnij_skale_ocen(tresc)]
     else:
         slowa = None
@@ -206,7 +243,9 @@ def formatuj_odpowiedz(pytanie, wynik_wyszukiwarki, najlepsze_zdanie=None, skrot
                 slowa = kluczowe
                 break
         tokeny_pyt = _tokenizuj(pytanie)
-        zdania = wyciagnij_zdania(tresc, max_zdan=3, szukaj=slowa, pytanie_tokeny=tokeny_pyt)
+        zdania = wyciagnij_zdania(
+            tresc, max_zdan=3, szukaj=slowa, pytanie_tokeny=tokeny_pyt
+        )
 
     zacheta = random.choice(ZACHETY) if podobienstwo > 0.2 else None
 
@@ -221,21 +260,28 @@ def formatuj_odpowiedz(pytanie, wynik_wyszukiwarki, najlepsze_zdanie=None, skrot
             if zdania:
                 tokeny_pyt = pytanie.lower().split()
                 for z in zdania:
-                    if z != najlepsze_zdanie and sum(1 for t in tokeny_pyt if t in z.lower()) >= 2:
+                    if (
+                        z != najlepsze_zdanie
+                        and sum(1 for t in tokeny_pyt if t in z.lower()) >= 2
+                    ):
                         drugie = z
                         break
             punkty = [najlepsze_zdanie] + ([drugie] if drugie else [])
     else:
-        punkty = zdania[:1] if tylko_jedno else (zdania[:2] if zdania else [tresc[:200]])
+        punkty = (
+            zdania[:1] if tylko_jedno else (zdania[:2] if zdania else [tresc[:200]])
+        )
 
     return {
-        "wstep":        skrot if skrot else wstep.strip(),
-        "punkty":       [] if skrot else punkty,
-        "tytul":        tytul,
-        "zacheta":      zacheta,
+        "wstep": skrot if skrot else wstep.strip(),
+        "punkty": [] if skrot else punkty,
+        "tytul": tytul,
+        "zacheta": zacheta,
         "podobienstwo": podobienstwo,
-        "pelna_tresc":  tresc,
-        "najlepsze_zdanie": najlepsze_zdanie if najlepsze_zdanie else (punkty[0] if punkty else None)
+        "pelna_tresc": tresc,
+        "najlepsze_zdanie": najlepsze_zdanie
+        if najlepsze_zdanie
+        else (punkty[0] if punkty else None),
     }
 
 
@@ -244,9 +290,9 @@ def formatuj_odpowiedz(pytanie, wynik_wyszukiwarki, najlepsze_zdanie=None, skrot
 if __name__ == "__main__":
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     sys.path.insert(0, os.path.join(BASE_DIR, ".."))
-    from core.wyszukiwarka import Wyszukiwarka
+    from infrastructure.knowledge_loader import utworz_wyszukiwarke
 
-    w = Wyszukiwarka(os.path.join(BASE_DIR, "..", "data", "baza_wiedzy.json"))
+    w = utworz_wyszukiwarke(os.path.join(BASE_DIR, "..", "data", "baza_wiedzy.json"))
 
     pytania = [
         "co mam zrobić jak nie zdam egzaminu",
@@ -261,10 +307,10 @@ if __name__ == "__main__":
 
     for pytanie in pytania:
         wyniki = w.szukaj(pytanie, n_wynikow=1)
-        wynik  = wyniki[0] if wyniki else None
-        odp    = formatuj_odpowiedz(pytanie, wynik)
-        print(f"{'='*55}")
+        wynik = wyniki[0] if wyniki else None
+        odp = formatuj_odpowiedz(pytanie, wynik)
+        print(f"{'=' * 55}")
         print(f"❓ {pytanie}")
-        print(f"{'─'*55}")
+        print(f"{'─' * 55}")
         print(odp)
         print()

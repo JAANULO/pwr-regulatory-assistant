@@ -9,35 +9,38 @@ import os
 import re
 import time
 from collections import OrderedDict
-from datetime import datetime
 from typing import TYPE_CHECKING
 
 from flask import Flask, jsonify, render_template, request
 
 try:
-    from .core.settings import ADMIN_TOKEN, FLASK_DEBUG, FLASK_HOST, FLASK_PORT, LOG_LEVEL
+    from .core.settings import (
+        ADMIN_TOKEN,
+        FLASK_DEBUG,
+        FLASK_HOST,
+        FLASK_PORT,
+        LOG_LEVEL,
+    )
     from .core.bd import (
         inicjalizuj,
         pobierz_ostatnie_pytania,
-        pobierz_pytanie,
         pobierz_statystyki,
-        zapisz_feedback,
-        zapisz_pytanie,
     )
-    from .core.formatowanie import formatuj_odpowiedz
     from .core.slowniki import ROZSZERZENIA, SYNONIMY
     from .core.wyszukiwarka import Wyszukiwarka
 except ImportError:
-    from core.settings import ADMIN_TOKEN, FLASK_DEBUG, FLASK_HOST, FLASK_PORT, LOG_LEVEL
+    from core.settings import (
+        ADMIN_TOKEN,
+        FLASK_DEBUG,
+        FLASK_HOST,
+        FLASK_PORT,
+        LOG_LEVEL,
+    )
     from core.bd import (
         inicjalizuj,
         pobierz_ostatnie_pytania,
-        pobierz_pytanie,
         pobierz_statystyki,
-        zapisz_feedback,
-        zapisz_pytanie,
     )
-    from core.formatowanie import formatuj_odpowiedz
     from core.slowniki import ROZSZERZENIA, SYNONIMY
     from core.wyszukiwarka import Wyszukiwarka
 
@@ -50,6 +53,7 @@ if TYPE_CHECKING:
     except ImportError:
         from core.indeks_zdan import IndeksZdan
 
+
 def _znajdz_rozszerzenie(pytanie_lower: str) -> str:
     """Zwraca rozszerzenie dla pierwszej pasującej frazy lub pusty string."""
     for fraza, rozszerzenie in ROZSZERZENIA.items():
@@ -61,7 +65,9 @@ def _znajdz_rozszerzenie(pytanie_lower: str) -> str:
 def _wykryj_numer_paragrafu(pytanie: str) -> str | None:
     """Wykrywa numer paragrafu z zapytania (np. §18, paragraf 18)."""
     pytanie_ascii = pytanie.lower().translate(MAPA_ZNAKOW)
-    dopasowanie = re.search(r"(?:§\s*|paragraf(?:ie|u|em|owi|ach)?\s+)(\d+)", pytanie_ascii)
+    dopasowanie = re.search(
+        r"(?:§\s*|paragraf(?:ie|u|em|owi|ach)?\s+)(\d+)", pytanie_ascii
+    )
     return dopasowanie.group(1) if dopasowanie else None
 
 
@@ -83,13 +89,14 @@ def _cache_set(pytanie: str, odpowiedz: dict):
         CACHE_ODPOWIEDZI.popitem(last=False)
     CACHE_ODPOWIEDZI[pytanie] = {"ts": time.time(), "data": odpowiedz}
 
-BASE_DIR      = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR      = os.path.join(BASE_DIR, "data")
-PLIK_BAZY     = os.path.join(DATA_DIR, "baza_wiedzy.json")
-PLIK_LOG      = os.path.join(BASE_DIR, "logs", "log.txt")
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+PLIK_BAZY = os.path.join(DATA_DIR, "baza_wiedzy.json")
+PLIK_LOG = os.path.join(BASE_DIR, "logs", "log.txt")
 PROG_PEWNOSCI = 0.15
 
-MAPA_ZNAKOW = str.maketrans('ąćęłńóśźż', 'acelnoszz')
+MAPA_ZNAKOW = str.maketrans("ąćęłńóśźż", "acelnoszz")
 
 CACHE_TTL_SECONDS = 60 * 60
 CACHE_MAX_SIZE = 500
@@ -104,6 +111,7 @@ logging.getLogger("werkzeug").setLevel(logging.WARNING)
 wyszukiwarka: Wyszukiwarka | None = None
 indeks_zdan: "IndeksZdan | None" = None
 
+
 def zaladuj_wyszukiwarke():
     global wyszukiwarka
     if not os.path.isdir(DATA_DIR):
@@ -113,70 +121,62 @@ def zaladuj_wyszukiwarke():
 
     if not logger.handlers:
         fh = logging.FileHandler(PLIK_LOG, encoding="utf-8")
-        fh.setFormatter(logging.Formatter(
-            "%(asctime)s | %(levelname)s | %(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S"
-        ))
+        fh.setFormatter(
+            logging.Formatter(
+                "%(asctime)s | %(levelname)s | %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+            )
+        )
         logger.addHandler(fh)
 
-    wyszukiwarka = Wyszukiwarka(DATA_DIR)
-    global indeks_zdan
     try:
-        from .core.indeks_zdan import IndeksZdan
+        from .infrastructure.knowledge_loader import (
+            utworz_wyszukiwarke,
+            utworz_indeks_zdan,
+        )
     except ImportError:
-        from core.indeks_zdan import IndeksZdan
-    indeks_zdan = IndeksZdan(DATA_DIR)
+        from infrastructure.knowledge_loader import (
+            utworz_wyszukiwarke,
+            utworz_indeks_zdan,
+        )
+
+    wyszukiwarka = utworz_wyszukiwarke(DATA_DIR)
+    global indeks_zdan
+    indeks_zdan = utworz_indeks_zdan(DATA_DIR)
     logger.info("Wyszukiwarka zaladowana")
 
+
 # ── trasy ─────────────────────────────────────────────────────────────────────
+
 
 @app.route("/")
 def index():
     return render_template("index.html")
+
 
 # --- Tryb Laboratorium (Symulacja BM25) ---
 @app.route("/lab")
 def lab_view():
     return render_template("lab.html")
 
+
 @app.route("/zapytaj_symulacja", methods=["POST"])
 def zapytaj_symulacja():
     if wyszukiwarka is None:
         return jsonify({"blad": "Wyszukiwarka nie załadowana"}), 500
-        
-    dane = request.get_json(force=True)
-    pytanie = dane.get("pytanie", "").strip()
-    
-    virtual_params = {
-        "bm25_k1": float(dane.get("k1", 1.5)),
-        "bm25_b": float(dane.get("b", 0.75)),
-        "synonym_weight": float(dane.get("syn_weight", 1.0))
-    }
-    
-    if not pytanie:
-        return jsonify({"blad": "Puste pytanie"}), 400
-        
-    # Symulacja BASE
-    wyniki_base = wyszukiwarka.szukaj(pytanie, n_wynikow=1)
-    b_score = wyniki_base[0]['podobienstwo'] if wyniki_base else 0.0
-    
-    # Symulacja DELTA
+
     try:
-        wyniki_delta = wyszukiwarka.szukaj(pytanie, n_wynikow=1, virtual_params=virtual_params)
-        d_score = wyniki_delta[0]['podobienstwo'] if wyniki_delta else 0.0
-        d_title = wyniki_delta[0]['tytul'] if wyniki_delta else "Brak"
-    except Exception as e:
-        logger.error(f"BLAD LAB DELTA: {e}")
-        d_score = 0.0
-        d_title = "ERROR"
-        
-    return jsonify({
-        "base_score": b_score,
-        "delta_score": d_score,
-        "delta_title": d_title,
-        "base_title": wyniki_base[0]['tytul'] if wyniki_base else "Brak"
-    })
+        from .domain.services.simulate_question import execute_simulate_question
+    except ImportError:
+        from domain.services.simulate_question import execute_simulate_question
+
+    payload, status = execute_simulate_question(
+        request.get_json(force=True), wyszukiwarka, logger
+    )
+    return jsonify(payload), status
+
+
 # ----------------------------------------
+
 
 @app.route("/zapytaj", methods=["POST"])
 def zapytaj():
@@ -193,8 +193,10 @@ def zapytaj():
     filtr_zrodlo = dane.get("zrodlo", "Wszystkie dokumenty")
     kontekst_tytul = dane.get("kontekst_tytul", None)  # poprzedni paragraf
     kontekst_pytanie = dane.get("kontekst_pytanie", None)  # poprzednie pytanie
-    #print(f"DEBUG kontekst: tytul={kontekst_tytul}, pytanie={kontekst_pytanie}")
-    logger.info(f"PYTANIE: {pytanie} | zrodlo: {filtr_zrodlo} | kontekst: {kontekst_tytul}")
+    # print(f"DEBUG kontekst: tytul={kontekst_tytul}, pytanie={kontekst_pytanie}")
+    logger.info(
+        f"PYTANIE: {pytanie} | zrodlo: {filtr_zrodlo} | kontekst: {kontekst_tytul}"
+    )
 
     if not pytanie:
         logger.warning("Puste pytanie od klienta")
@@ -204,265 +206,40 @@ def zapytaj():
         return jsonify({"blad": "Wyszukiwarka nie załadowana"}), 500
 
     assert wyszukiwarka is not None
-    w = wyszukiwarka
-
-    cache_dozwolony = kontekst_tytul is None
-    if cache_dozwolony:
-        cached = _cache_get(pytanie)
-        if cached is not None:
-            return jsonify(cached)
-
-    numer_paragrafu = _wykryj_numer_paragrafu(pytanie)
-    if numer_paragrafu:
-        wynik_bezposredni = w.pobierz_paragraf_po_numerze(numer_paragrafu)
-
-        if wynik_bezposredni:
-            odp = formatuj_odpowiedz(pytanie, wynik_bezposredni)
-            tekst_odpowiedzi = odp["wstep"] if isinstance(odp, dict) else odp
-            pid = zapisz_pytanie(
-                pytanie,
-                wynik_bezposredni["tytul"],
-                wynik_bezposredni["podobienstwo"],
-                odpowiedz=tekst_odpowiedzi,
-            )
-
-            logger.info(
-                f"DIRECT_PARAGRAF: pid={pid}, paragraf={numer_paragrafu}, tytul='{wynik_bezposredni['tytul']}'"
-            )
-
-            if isinstance(odp, dict):
-                payload = {
-                    "wstep":         odp["wstep"],
-                    "punkty":        odp["punkty"],
-                    "tytul":         odp["tytul"],
-                    "zacheta":       odp["zacheta"],
-                    "podobienstwo":  odp["podobienstwo"],
-                    "pelna_tresc":   odp["pelna_tresc"],
-                    "tytul2":        None,
-                    "podobienstwo2": None,
-                    "pytanie_id": pid,
-                    "kontekst_tytul": odp["tytul"],
-                    "zrodlo": wynik_bezposredni.get("zrodlo"),
-                }
-                if cache_dozwolony:
-                    _cache_set(pytanie, payload)
-                return jsonify(payload)
-
-            payload = {
-                "odpowiedz": odp,
-                "tytul": wynik_bezposredni["tytul"],
-                "podobienstwo": 1.0,
-                "pytanie_id": pid,
-                "zrodlo": wynik_bezposredni.get("zrodlo"),
-            }
-            if cache_dozwolony:
-                _cache_set(pytanie, payload)
-            return jsonify(payload)
-
-    rozszerzenie = _znajdz_rozszerzenie(pytanie.lower())
-    pytanie_do_szukania = (pytanie + " " + rozszerzenie).strip() if rozszerzenie else pytanie
-
-    # wykryj pytania kontekstowe – krótkie pytania nawiązujące do poprzedniego
-    SYGNALY_KONTEKSTU = [
-        "a co jak", "a jesli", "a jezeli", "co jak", "co jesli",
-        "a co jesli", "i co wtedy", "co wtedy", "a wtedy",
-        "a jak nie", "jak nie zdam", "jak obleje", "co jak nie",
-        "a czy moge", "czy wtedy", "co z tym", "i co z",
-    ]
-    pyt_ascii = pytanie.lower().translate(MAPA_ZNAKOW)
-    
-    jest_kontekstowe = (
-            kontekst_tytul is not None and
-            len(pytanie.split()) <= 7 and
-            any(s in pyt_ascii for s in SYGNALY_KONTEKSTU)
-    )
-    logger.debug(
-        f"jest_kontekstowe={jest_kontekstowe}, tytul={kontekst_tytul}, len={len(pytanie.split())}, ascii={pyt_ascii}"
-    )
-    # dla pytań kontekstowych – dodaj poprzedni paragraf do zapytania
-    if jest_kontekstowe and kontekst_pytanie:
-        pytanie_do_szukania = kontekst_pytanie + " " + pytanie
-        logger.info(f"KONTEKST: rozszerzam pytanie o '{kontekst_pytanie}'")
-        #print(f"DEBUG pytanie_do_szukania: {pytanie_do_szukania}")
-
-    # rozszerzenie krótkich pytań
-    if len(pytanie.split()) <= 2:
-        slowo_bazowe = pytanie.strip().lower().rstrip("?!")
-        pasujace = [v for k, v in SYNONIMY.items() if slowo_bazowe in k]
-        if pasujace:
-            pytanie_do_szukania = pytanie + " " + " ".join(set(pasujace))
-
-    wyniki = w.szukaj(pytanie_do_szukania, n_wynikow=3, zrodlo=filtr_zrodlo)
-    wynik  = wyniki[0] if wyniki else None
-
-    # drugi paragraf przy bliskim podobieństwie lub długim pytaniu
-    wynik2 = None
-    if len(wyniki) >= 2:
-        roznica = wyniki[0]["podobienstwo"] - wyniki[1]["podobienstwo"]
-
-        # Disambiguator (Uściślanie): Dwa paragrafy idą łeb w łeb, a pytanie było bardzo krótkie
-        if roznica <= 0.04 and len(pytanie.split()) <= 4 and wyniki[0]["podobienstwo"] >= 0.12:
-            pid = zapisz_pytanie(pytanie, None, wyniki[0]["podobienstwo"], odpowiedz="[SYSTEM WAHAŃ]")
-            logger.info(f"DISAMBIGUATION: pytanie='{pytanie}' -> {wyniki[0]['tytul']} vs {wyniki[1]['tytul']}")
-            return jsonify({
-                "disambiguation": True,
-                "pytanie_id": pid,
-                "komunikat": "Och! Twoje zapytanie jest delikatnie ogólnikowe i dotyka stref dwóch podobnych tematów. O który dokładnie ustęp Ci chodzi?",
-                "opcje": [wyniki[0]["tytul"], wyniki[1]["tytul"]]
-            })
-
-        # drugi paragraf tylko gdy: blisko pierwszego ORAZ długie pytanie (więcej kontekstu)
-        if roznica < 0.03 and len(pytanie.split()) >= 6:
-            wynik2 = wyniki[1]
-
-
-    # Dynamiczny próg dopasowań (Krótkie strzały zmniejszają wymagania ufności RAG, długie polepszają jakość)
-    dynamiczny_prog = max(0.08, min(0.20, 0.05 + (len(pytanie.split()) * 0.02)))
-    prog = 0.10 if jest_kontekstowe else dynamiczny_prog
-    
-    #print(f"DEBUG dynamic_prog: {dynamiczny_prog}, podobienstwo: {wynik['podobienstwo'] if wynik else None}")
-
-    if not wynik or wynik["podobienstwo"] < prog:
-
-        pod = wynik["podobienstwo"] if wynik else 0.0
-        propozycje = [w["tytul"] for w in wyniki[:3] if w["podobienstwo"] > 0.05]
-        tekst = "Nie znalazłem dokładnej odpowiedzi w regulaminie."
-
-        if propozycje:
-            tekst += f" Może chodzi o: {', '.join(propozycje[:2])}?"
-        pid = zapisz_pytanie(pytanie, None, pod, odpowiedz=tekst)
-        logger.info(f"BRAK_TRAFIENIA: pytanie='{pytanie}', najlepsze={pod:.3f}, pid={pid}")
-
-        payload = {
-            "odpowiedz": tekst,
-            "tytul": None,
-            "podobienstwo": pod,
-            "tytul2": None,
-            "pytanie_id": pid,
-            "zrodlo": None,
-        }
-        if cache_dozwolony:
-            _cache_set(pytanie, payload)
-        return jsonify(payload)
 
     try:
-        from .core.intencje import wykryj_intencje, generuj_skrot, wyciagnij_liczbe, wyciagnij_termin
+        from .domain.services.ask_question import execute_ask_question
     except ImportError:
-        from core.intencje import wykryj_intencje, generuj_skrot, wyciagnij_liczbe, wyciagnij_termin
+        from domain.services.ask_question import execute_ask_question
 
-    intencja = wykryj_intencje(pytanie)
-    if indeks_zdan is not None:
-        zdania_wyniki = indeks_zdan.szukaj(pytanie, n_wynikow=5)
-    else:
-        zdania_wyniki = []
-
-    # klasyfikator intencji – musi być PRZED pętlą
-    intencja = wykryj_intencje(pytanie)
-
-    najlepsze_zdanie = None
-    for zw in zdania_wyniki:
-        if zw['tytul'] != wynik['tytul'] or zw['podobienstwo'] < 0.1:
-            continue
-        if intencja == "LICZBA":
-            # dla "ile dni" szukaj zdania z "odstep" zamiast liczby
-            p_lower = pytanie.lower()
-
-            if "ile dni" in p_lower or "miedzy terminami" in p_lower:
-
-                if any(s in zw['zdanie'].lower() for s in ["odstęp", "odstep", "pięciodniowym", "pieciodniowym"]):
-                    najlepsze_zdanie = zw['zdanie']
-                    break
-
-            else:
-                l = wyciagnij_liczbe(zw['zdanie'])
-                logger.debug(f"zdanie: {zw['zdanie'][:80]} → L:{l}")
-                if l:
-                    najlepsze_zdanie = zw['zdanie']
-                    break
-
-        elif intencja == "TERMIN":
-
-            if wyciagnij_termin(zw['zdanie']):
-                najlepsze_zdanie = zw['zdanie']
-                break
-            # fallback dla "ile dni" – szukaj zdania z odstępem
-            p_lower = pytanie.lower()
-            if any(s in p_lower for s in ["ile dni", "miedzy terminami"]):
-                if any(s in zw['zdanie'].lower() for s in ["odstęp", "odstep", "pięciodniowym", "pieciodniowym"]):
-                    najlepsze_zdanie = zw['zdanie']
-                    break
-        else:
-            najlepsze_zdanie = zw['zdanie']
-            break
-
-    skrot = None
-
-    if najlepsze_zdanie:
-        skrot = generuj_skrot(intencja, pytanie, najlepsze_zdanie)
-
-    # dla SKUTEK i TAK_NIE jedno zdanie wystarczy
-    if intencja in ("SKUTEK", "TAK_NIE") and najlepsze_zdanie:
-        odp = formatuj_odpowiedz(pytanie, wynik, najlepsze_zdanie=najlepsze_zdanie, skrot=skrot, tylko_jedno=True)
-   
-    else:
-        odp = formatuj_odpowiedz(pytanie, wynik, najlepsze_zdanie=najlepsze_zdanie, skrot=skrot)
-    tekst_odpowiedzi = odp["wstep"] if isinstance(odp, dict) else odp
-    pid = zapisz_pytanie(pytanie, wynik["tytul"], wynik["podobienstwo"], odpowiedz=tekst_odpowiedzi)
-    logger.info(
-        f"ODPOWIEDZ: pid={pid}, tytul='{wynik['tytul']}', podobienstwo={wynik['podobienstwo']:.4f}"
+    payload = execute_ask_question(
+        pytanie=pytanie,
+        filtr_zrodlo=filtr_zrodlo,
+        kontekst_tytul=kontekst_tytul,
+        kontekst_pytanie=kontekst_pytanie,
+        wyszukiwarka=wyszukiwarka,
+        indeks_zdan=indeks_zdan,
+        logger=logger,
+        cache_get_fn=_cache_get,
+        cache_set_fn=_cache_set,
+        znajdz_rozszerzenie_fn=_znajdz_rozszerzenie,
+        MAPA_ZNAKOW=MAPA_ZNAKOW,
+        SYNONIMY=SYNONIMY,
     )
 
-    if isinstance(odp, dict):
-        try:
-            from .core.wyszukiwarka import tokenizuj
-        except ImportError:
-            from core.wyszukiwarka import tokenizuj
-        payload = {
-            "wstep":         odp["wstep"],
-            "punkty":        odp["punkty"],
-            "tytul":         odp["tytul"],
-            "zacheta":       odp["zacheta"],
-            "slowa_kluczowe": tokenizuj(pytanie),
-            "podobienstwo":  odp["podobienstwo"],
-            "pelna_tresc":   odp["pelna_tresc"],
-            "tytul2":        wynik2["tytul"] if wynik2 else None,
-            "podobienstwo2": wynik2["podobienstwo"] if wynik2 else None,
-            "pytanie_id": pid,
-            "kontekst_tytul": odp["tytul"],  # przekaż do frontendu
-            "zrodlo": wynik.get("zrodlo"),
-            "zrodlo2": wynik2.get("zrodlo") if wynik2 else None,
-        }
-        if cache_dozwolony:
-            _cache_set(pytanie, payload)
-        return jsonify(payload)
-    # fallback dla błędów (odp to string)
-    payload = {"odpowiedz": odp, "tytul": None, "podobienstwo": 0, "pytanie_id": pid, "zrodlo": None}
-    if cache_dozwolony:
-        _cache_set(pytanie, payload)
     return jsonify(payload)
 
 
 @app.route("/feedback", methods=["POST"])
 def feedback():
     dane = request.get_json(force=True)
-    pid = dane["pytanie_id"]
-    ocena = dane["ocena"]
-    zapisz_feedback(pid, ocena)
-    logger.info(f"FEEDBACK: pytanie_id={pid}, ocena={ocena}")
 
-    # Dodatkowy log do pliku dla negatywnych ocen z niską pewnością
-    if ocena == -1:
-        rekord = pobierz_pytanie(pid)
-        if rekord and rekord["podobienstwo"] is not None and rekord["podobienstwo"] < 0.2:
-            log_dir = os.path.join(BASE_DIR, "logs")
-            os.makedirs(log_dir, exist_ok=True)
-            log_path = os.path.join(log_dir, "do_poprawy.txt")
+    try:
+        from .domain.services.submit_feedback import execute_feedback_submission
+    except ImportError:
+        from domain.services.submit_feedback import execute_feedback_submission
 
-            with open(log_path, "a", encoding="utf-8") as f:
-                czas = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                f.write(
-                    f"[{czas}] Pytanie: '{rekord['pytanie']}' | Odpowiedź: '{rekord['odpowiedz'] or ''}' | Podobieństwo: {rekord['podobienstwo']:.3f} | Tytuł: {rekord['tytul']}\n")
-
+    execute_feedback_submission(dane["pytanie_id"], dane["ocena"], BASE_DIR, logger)
     return jsonify({"ok": True})
 
 
@@ -471,13 +248,14 @@ def graf_widok():
     """Otwiera kompletnie czysty plik nowego interfejsu (żeby nie pożerać wydajności asystenta)"""
     pytanie = request.args.get("pytanie", "")
     return render_template("graf.html", pytanie=pytanie)
-    
+
+
 @app.route("/graf_wektorowy", methods=["GET"])
 def graf_wektorowy():
     """Zwraca graf słów (bigramy) lub graf paragrafów, zależnie od parametru ?tryb="""
     if not wyszukiwarka:
         return jsonify({"nodes": [], "edges": []})
-    
+
     tryb = request.args.get("tryb", "slowa")
     if tryb == "paragrafy":
         return jsonify(wyszukiwarka.generuj_graf_paragrafow())
@@ -489,6 +267,7 @@ def graf_wektorowy():
 def zrodla():
     """Zwraca listę dostępnych plików baz wiedzy z folderu /data."""
     import glob
+
     data_dir = os.path.join(BASE_DIR, "data")
     pliki = [
         os.path.basename(f)
@@ -510,46 +289,11 @@ def historia():
 
 @app.route("/admin/eksport_csv", methods=["GET"])
 def admin_eksport_csv():
-    # Dynamiczny dump danych analitycznych (P3)
-    token = request.args.get("token", "")
-    if token != ADMIN_TOKEN:
-        return "Brak dostępu!", 403
-    
-    import csv
-    import io
-    from flask import Response
     try:
-        from .core.bd import polacz, TRYB
+        from .domain.services.admin_stats import execute_admin_eksport_csv
     except ImportError:
-        from core.bd import polacz, TRYB
-    
-    buf = io.StringIO()
-    writer = csv.writer(buf)
-    writer.writerow(["Czas", "Pytanie Uzytkownika", "Tytul Paragrafu", "Podobienstwo", "Odpowiedz Bota", "Ocena Kciuka (-1 zla)"])
-    
-    zapytanie = """
-        SELECT p.czas, p.pytanie, p.tytul, p.podobienstwo, p.odpowiedz, f.ocena 
-        FROM pytania p 
-        LEFT JOIN feedback f ON p.id = f.pytanie_id 
-        ORDER BY p.id DESC
-    """
-    
-    if TRYB == "postgres":
-        with polacz() as conn:
-            with conn.cursor() as cur:
-                cur.execute(zapytanie)
-                for w in cur.fetchall():
-                    writer.writerow([w["czas"], w["pytanie"], w["tytul"], w["podobienstwo"], w["odpowiedz"], w["ocena"]])
-    else:
-        with polacz() as conn:
-            for w in conn.execute(zapytanie).fetchall():
-                writer.writerow([w["czas"], w["pytanie"], w["tytul"], w["podobienstwo"], w["odpowiedz"], w["ocena"]])
-                
-    return Response(
-        buf.getvalue(),
-        mimetype="text/csv",
-        headers={"Content-disposition": "attachment; filename=raport_pytan_pwr.csv"}
-    )
+        from domain.services.admin_stats import execute_admin_eksport_csv
+    return execute_admin_eksport_csv(request.args.get("token", ""), ADMIN_TOKEN)
 
 
 @app.route("/admin")
@@ -557,23 +301,24 @@ def admin():
     token = request.args.get("token", "")
 
     if token != ADMIN_TOKEN:
-        return "Brak dostępu! Podaj prawidłowy token w adresie, np: /admin?token=dev-token-zmien-mnie", 403
+        return (
+            "Brak dostępu! Podaj prawidłowy token w adresie, np: /admin?token=dev-token-zmien-mnie",
+            403,
+        )
     return render_template("admin.html", stats=pobierz_statystyki(), token=token)
+
 
 @app.route("/admin/dodaj_synonim", methods=["POST"])
 def admin_dodaj_synonim():
-    dane = request.get_json(force=True)
-    token = dane.get("token", "")
-    if token != ADMIN_TOKEN:
-        return jsonify({"blad": "Brak dostepu"}), 403
-    klucz = dane.get("klucz", "").strip().lower()
-    wartosc = dane.get("wartosc", "").strip().lower()
-    if klucz and wartosc:
-        SYNONIMY[klucz] = wartosc
-        logger.info(f"LIVE ADMIN PANEL: Dodano nowe wiazanie RAM: {klucz} -> {wartosc}")
-        return jsonify({"sukces": True, "komunikat": f"Wstrzyknięto do RAM: {klucz} -> {wartosc} (Działa natychmiastowo!)"})
-    return jsonify({"blad": "Złe dane wejściowe"}), 400
+    try:
+        from .domain.services.admin_stats import execute_admin_dodaj_synonim
+    except ImportError:
+        from domain.services.admin_stats import execute_admin_dodaj_synonim
 
+    payload, status = execute_admin_dodaj_synonim(
+        request.get_json(force=True), ADMIN_TOKEN, SYNONIMY, logger
+    )
+    return jsonify(payload), status
 
 
 if __name__ != "__main__":

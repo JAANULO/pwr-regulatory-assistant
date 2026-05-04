@@ -15,7 +15,7 @@ if V2_DIR not in sys.path:
 
 from core.slowniki import ROZSZERZENIA, SYNONIMY
 from core.stemmer import stemuj
-from core.wyszukiwarka import Wyszukiwarka, tokenizuj
+from infrastructure.knowledge_loader import utworz_wyszukiwarke, tokenizuj
 
 print("=" * 55)
 print("  WERYFIKACJA PROJEKTU")
@@ -55,19 +55,31 @@ print("\n[4] Wyszukiwarka:")
 
 # Ścieżka bezwzględna do bazy wiedzy
 PLIK_BAZY = os.path.join(V2_DIR, "data", "baza_wiedzy.json")
-w = Wyszukiwarka(PLIK_BAZY)
-print(f"    Metoda szukaj(zrodlo=): {'TAK' if 'zrodlo' in str(w.szukaj.__code__.co_varnames) else 'BRAK'}")
-print(f"    generuj_graf_paragrafow: {'TAK' if hasattr(w, 'generuj_graf_paragrafow') else 'BRAK'}")
-print(f"    generuj_graf_slow:       {'TAK' if hasattr(w, 'generuj_graf_slow') else 'BRAK'}")
+w = utworz_wyszukiwarke(PLIK_BAZY)
+print(
+    f"    Metoda szukaj(zrodlo=): {'TAK' if 'zrodlo' in str(w.szukaj.__code__.co_varnames) else 'BRAK'}"
+)
+print(
+    f"    generuj_graf_paragrafow: {'TAK' if hasattr(w, 'generuj_graf_paragrafow') else 'BRAK'}"
+)
+print(
+    f"    generuj_graf_slow:       {'TAK' if hasattr(w, 'generuj_graf_slow') else 'BRAK'}"
+)
 
 wyniki_filtr = w.szukaj("egzamin", n_wynikow=2, zrodlo="nieistniejace.json")
-print(f"    Filtr =nieistniejace.json: {len(wyniki_filtr)} wynikow (oczek. 0) {'OK' if len(wyniki_filtr)==0 else 'BLAD'}")
+print(
+    f"    Filtr =nieistniejace.json: {len(wyniki_filtr)} wynikow (oczek. 0) {'OK' if len(wyniki_filtr) == 0 else 'BLAD'}"
+)
 
 wyniki_wszystkie = w.szukaj("egzamin", n_wynikow=2, zrodlo="Wszystkie dokumenty")
-print(f"    Filtr =Wszystkie dokumenty: {len(wyniki_wszystkie)} wynikow (oczek. 2) {'OK' if len(wyniki_wszystkie)==2 else 'BLAD'}")
+print(
+    f"    Filtr =Wszystkie dokumenty: {len(wyniki_wszystkie)} wynikow (oczek. 2) {'OK' if len(wyniki_wszystkie) == 2 else 'BLAD'}"
+)
 
 graf = w.generuj_graf_paragrafow()
-print(f"    Graf paragrafow: {len(graf['nodes'])} wezly, {len(graf['edges'])} krawedzie")
+print(
+    f"    Graf paragrafow: {len(graf['nodes'])} wezly, {len(graf['edges'])} krawedzie"
+)
 
 # 5. Payload check (czy app.py zwroci slowa_kluczowe)
 tokeny = tokenizuj("ile razy mozna powtarzac egzamin")

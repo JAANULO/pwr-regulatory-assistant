@@ -15,35 +15,81 @@ Przykłady:
 # np. "owania" przed "nia" żeby "zaliczowania" → "zalic" a nie "zalicowan"
 KONCOWKI = [
     # czasowniki – długie końcówki najpierw
-    "owałem", "owałam", "owałeś", "owałaś", "owaliśmy", "owałyśmy",
-    "owania", "owanie", "owaniu", "owac",
-    "ałem", "ałam", "ałeś", "ałaś", "aliśmy", "ałyśmy",
-    "ując", "uję", "ujesz", "ujemy", "ujecie", "ują",
-    "yłem", "yłam", "iłem", "iłam",
-    "ąc", "ac", "ec", "yc", "ic",
-
+    "owałem",
+    "owałam",
+    "owałeś",
+    "owałaś",
+    "owaliśmy",
+    "owałyśmy",
+    "owania",
+    "owanie",
+    "owaniu",
+    "owac",
+    "ałem",
+    "ałam",
+    "ałeś",
+    "ałaś",
+    "aliśmy",
+    "ałyśmy",
+    "ując",
+    "uję",
+    "ujesz",
+    "ujemy",
+    "ujecie",
+    "ują",
+    "yłem",
+    "yłam",
+    "iłem",
+    "iłam",
+    "ąc",
+    "ac",
+    "ec",
+    "yc",
+    "ic",
     # rzeczowniki – długie końcówki najpierw
-    "osciach", "osciami", "osciom",
-    "osci", "ości",
-    "iach", "iami", "iom",
-    "aniu", "enia", "enie", "aniu",
-    "aniu", "owaniu",
-
+    "osciach",
+    "osciami",
+    "osciom",
+    "osci",
+    "ości",
+    "iach",
+    "iami",
+    "iom",
+    "aniu",
+    "enia",
+    "enie",
+    "aniu",
+    "aniu",
+    "owaniu",
     # WAŻNE: "u" na końcu rzeczowników – "przedmiotu" → "przedmiot"
-    "owi", "owa", "owe", "owego", "owej", "owym",
-    "ami", "ach", "om",
-    "ow", "ów",
+    "owi",
+    "owa",
+    "owe",
+    "owego",
+    "owej",
+    "owym",
+    "ami",
+    "ach",
+    "om",
+    "ow",
+    "ów",
     "ie",
-    "u",   # przedmiotu→przedmiot, urlopu→urlop
-
+    "u",  # przedmiotu→przedmiot, urlopu→urlop
     # przymiotniki
-    "owego", "owej", "owym",
-    "ego", "emu", "iej", "ej",
-
+    "owego",
+    "owej",
+    "owym",
+    "ego",
+    "emu",
+    "iej",
+    "ej",
     # liczba mnoga
-    "ym", "im",
-    "a", "e",
-    "i", "y",
+    "ym",
+    "im",
+    "a",
+    "e",
+    "i",
+    "y",
 ]
 
 # Minimalna długość rdzenia po obcięciu
@@ -65,19 +111,19 @@ OBOCZNOSCI = {
     "dziekanki": "dziekanka",
 }
 
+
 def stemuj(slowo: str) -> str:
     """
     Zwraca rdzeń słowa po obcięciu końcówki lub wyciąga lemat z tablic twardych oboczności.
     Jeśli żadna końcówka nie pasuje – zwraca słowo bez zmian.
     """
     slowo = slowo.lower().strip()
-    
+
     # Inteligentne obejście lematyzacji (P3)
     if slowo in OBOCZNOSCI:
         return OBOCZNOSCI[slowo]
 
     for koncowka in KONCOWKI:
-
         if slowo.endswith(koncowka):
             rdzen = slowo[: -len(koncowka)]
             if len(rdzen) >= MIN_RDZEN:
@@ -94,18 +140,18 @@ def stemuj_liste(slowa: list) -> list:
 # ── test ──────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     testy = [
-        ("egzaminów",    "egzamin"),
-        ("egzaminie",    "egzamin"),
-        ("egzaminowi",   "egzamin"),
-        ("urlopowi",     "urlop"),
-        ("urlopów",      "urlop"),
+        ("egzaminów", "egzamin"),
+        ("egzaminie", "egzamin"),
+        ("egzaminowi", "egzamin"),
+        ("urlopowi", "urlop"),
+        ("urlopów", "urlop"),
         ("nieobecności", "nieobecnosc"),
-        ("zaliczyłem",   "zalicz"),
-        ("zaliczenia",   "zaliczen"),
-        ("studenta",     "student"),
-        ("studentów",    "student"),
-        ("skreślenia",   "skreslen"),
-        ("wznowienia",   "wznowien"),
+        ("zaliczyłem", "zalicz"),
+        ("zaliczenia", "zaliczen"),
+        ("studenta", "student"),
+        ("studentów", "student"),
+        ("skreślenia", "skreslen"),
+        ("wznowienia", "wznowien"),
     ]
 
     print("Test stemmera:\n")

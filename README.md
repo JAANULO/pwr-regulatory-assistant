@@ -139,6 +139,11 @@ Mini-GPT/
     │   ├── settings.py         # Config environments (.env load)
     │   └── bd.py               # SQLite: stats, feedback
     │
+    ├── domain/                 ← business logic (Clean Architecture)
+    │   └── use_cases/          
+    │       ├── ask_question.py      # /zapytaj endpoint logic
+    │       └── submit_feedback.py   # /feedback endpoint logic
+    │
     ├── data/
     │   ├── *.pdf               # source documents
     │   ├── *.json              # parsed knowledge files (one per document)
@@ -422,6 +427,11 @@ Mini-GPT/
     │   ├── formatowanie.py     # formatowanie odpowiedzi
     │   ├── settings.py         # Ostrzykiwania środowiskowe (.env)
     │   └── bd.py               # SQLite: statystyki, feedback
+    │
+    ├── domain/                 ← logika biznesowa (Clean Architecture)
+    │   └── use_cases/          
+    │       ├── ask_question.py      # logika endpointu /zapytaj
+    │       └── submit_feedback.py   # logika endpointu /feedback
     │
     ├── data/
     │   ├── *.pdf               # dokumenty źródłowe

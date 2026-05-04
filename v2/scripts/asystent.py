@@ -16,12 +16,12 @@ if v2_root not in sys.path:
 
 from core.formatowanie import formatuj_odpowiedz
 from core.slowniki import ROZSZERZENIA, SYNONIMY
-from core.wyszukiwarka import Wyszukiwarka
+from infrastructure.knowledge_loader import utworz_wyszukiwarke
 
 
 # Ścieżki zależne od v2_root
 PLIK_BAZY = os.path.join(v2_root, "data", "baza_wiedzy.json")
-PLIK_LOG  = os.path.join(v2_root, "logs", "log.txt")
+PLIK_LOG = os.path.join(v2_root, "logs", "log.txt")
 PROG_PEWNOSCI = 0.15
 
 os.makedirs(os.path.dirname(PLIK_LOG), exist_ok=True)
@@ -34,6 +34,7 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
     encoding="utf-8",
 )
+
 
 def main():
 
@@ -59,16 +60,15 @@ def main():
         logging.error(f"Plik bazy uszkodzony: {os.path.abspath(PLIK_BAZY)}")
         return
 
-
-    print("\n" + "="*55)
+    print("\n" + "=" * 55)
     print("  ASYSTENT REGULAMINOWY – Politechnika Wrocławska")
-    print("="*55)
+    print("=" * 55)
     print("  Zadaj pytanie o regulamin studiów.")
     print("  Wpisz 'koniec' aby wyjść, '/pomoc' dla komend.")
-    print("="*55 + "\n")
+    print("=" * 55 + "\n")
 
     try:
-        w = Wyszukiwarka(PLIK_BAZY)
+        w = utworz_wyszukiwarke(PLIK_BAZY)
     except Exception as e:
         print(f"\n  ❌ Błąd podczas ładowania bazy: {e}")
         logging.error(f"Błąd ładowania bazy: {e}")
@@ -108,10 +108,10 @@ def main():
 
         elif pytanie.lower().startswith("/szukaj "):
             zapytanie = pytanie[8:].strip()
-            wyniki    = w.szukaj(zapytanie, n_wynikow=3)
+            wyniki = w.szukaj(zapytanie, n_wynikow=3)
             print("\n  Znalezione paragrafy:")
             for i, wyn in enumerate(wyniki, 1):
-                print(f"  [{i}] {wyn['tytul']} ({int(wyn['podobienstwo']*100)}%)")
+                print(f"  [{i}] {wyn['tytul']} ({int(wyn['podobienstwo'] * 100)}%)")
 
         elif pytanie.lower() == "/historia":
             if not historia:
@@ -139,29 +139,32 @@ def main():
 
             # krótkie pytania (1-2 słowa) – rozszerz o kontekst ze słownika synonimów
             if len(pytanie.split()) <= 2:
-                slowo_bazowe = pytanie.strip().lower().rstrip('?!')
+                slowo_bazowe = pytanie.strip().lower().rstrip("?!")
 
                 pasujace = [v for k, v in SYNONIMY.items() if slowo_bazowe in k]
                 if pasujace:
                     pytanie_do_szukania = pytanie + " " + " ".join(set(pasujace))
 
-
             wyniki = w.szukaj(pytanie_do_szukania, n_wynikow=1)
-            wynik  = wyniki[0] if wyniki else None
+            wynik = wyniki[0] if wyniki else None
 
             # drugi paragraf – pokazuj tylko gdy podobieństwo bliskie pierwszemu
             wynik2 = None
             if len(wyniki) == 2:
-                roznica = wyniki[0]['podobienstwo'] - wyniki[1]['podobienstwo']
+                roznica = wyniki[0]["podobienstwo"] - wyniki[1]["podobienstwo"]
                 if roznica < 0.05 or len(pytanie.split()) >= 8:
                     wynik2 = wyniki[1]
 
-            if not wynik or wynik['podobienstwo'] < PROG_PEWNOSCI:
+            if not wynik or wynik["podobienstwo"] < PROG_PEWNOSCI:
                 print()
                 print("  ❓ Nie znalazłem informacji na ten temat w regulaminie.")
-                print("     Spróbuj zapytać inaczej lub użyj /szukaj aby przejrzeć paragrafy.")
+                print(
+                    "     Spróbuj zapytać inaczej lub użyj /szukaj aby przejrzeć paragrafy."
+                )
                 print()
-                logging.warning(f"Brak odpowiedzi: '{pytanie}' (najlepsze: {wynik['podobienstwo'] if wynik else 0:.2f})")
+                logging.warning(
+                    f"Brak odpowiedzi: '{pytanie}' (najlepsze: {wynik['podobienstwo'] if wynik else 0:.2f})"
+                )
                 continue
 
             odp = formatuj_odpowiedz(pytanie, wynik)
@@ -169,10 +172,10 @@ def main():
 
             if isinstance(odp, dict):
                 print(f"  {odp['wstep']}")
-                for p in odp['punkty']:
+                for p in odp["punkty"]:
                     print(f"  • {p}")
                 print(f"\n  📖 Źródło: {odp['tytul']}")
-                if odp['zacheta']:
+                if odp["zacheta"]:
                     print(f"  💡 {odp['zacheta']}")
             else:
                 print(odp)

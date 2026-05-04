@@ -5,6 +5,7 @@ Użycie:
   python test_diff.py --save     (zapisuje obecne wyniki)
   python test_diff.py --compare  (pokazuje zmiany względem zapisu)
 """
+
 import argparse
 import json
 import os
@@ -17,12 +18,13 @@ if v2_dir not in sys.path:
     sys.path.insert(0, v2_dir)
 
 try:
-    from core.wyszukiwarka import Wyszukiwarka
+    from infrastructure.knowledge_loader import utworz_wyszukiwarke
     from tests.test import TESTY
 except ImportError:
     from .test import TESTY
 
 BASELINE_FILE = os.path.join(os.path.dirname(__file__), "baseline.json")
+
 
 def ran_tests(w):
     """Uruchamia testy i zbiera wyniki w formacie słownika"""
@@ -33,14 +35,19 @@ def ran_tests(w):
         results[pytanie] = {
             "oczekiwany": oczekiwany,
             "otrzymany": tytul,
-            "sukces": (oczekiwany.lower() in tytul.lower()) if wyniki else False
+            "sukces": (oczekiwany.lower() in tytul.lower()) if wyniki else False,
         }
     return results
 
+
 def main():
     parser = argparse.ArgumentParser(description="Narzędzie do analizy regresji")
-    parser.add_argument("--save", action="store_true", help="Zapisz aktualne wyniki jako baseline")
-    parser.add_argument("--compare", action="store_true", help="Porownaj aktualne wyniki z baseline")
+    parser.add_argument(
+        "--save", action="store_true", help="Zapisz aktualne wyniki jako baseline"
+    )
+    parser.add_argument(
+        "--compare", action="store_true", help="Porownaj aktualne wyniki z baseline"
+    )
     args = parser.parse_args()
 
     # Ustawienie ścieżek bezwzględnych
@@ -52,7 +59,7 @@ def main():
         print(f"Blad: Nie znaleziono pliku bazy w {PLIK_BAZY}")
         return
 
-    w = Wyszukiwarka(PLIK_BAZY)
+    w = utworz_wyszukiwarke(PLIK_BAZY)
 
     if args.save:
         print("Uruchamiam testy i zapisuję baseline...")
@@ -75,8 +82,9 @@ def main():
 
         for q, old in baseline.items():
             new = current.get(q)
-            if not new: continue
-            
+            if not new:
+                continue
+
             if old["sukces"] != new["sukces"]:
                 diffs.append((q, old["sukces"], new["sukces"]))
 
@@ -89,17 +97,26 @@ def main():
                     print(f"  ✅ POPRAWA:   '{q}'")
                 else:
                     print(f"  ❌ REGRESJA:  '{q}'")
-            
+
             # Podsumowanie liczbowe
             poprawy = len([d for d in diffs if d[2]])
             regresje = len(diffs) - poprawy
             print(f"\nPodsumowanie zmiany: +{poprawy} / -{regresje}")
+
+            if regresje > 0:
+                print(f"\n[!] ALARM: Wykryto {regresje} regresji! Przerywam.")
+                sys.exit(1)
+
+            if poprawy > 0:
+                print("\n[+] GRATULACJE: Poprawiono skuteczność algorytmu!")
     else:
         parser.print_help()
+
 
 if __name__ == "__main__":
     # Obsługa UTF-8 na Windows
     if sys.platform == "win32":
         import io
-        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
     main()
