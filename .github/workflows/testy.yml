@@ -39,16 +39,16 @@ jobs:
           pip install -r v2/requirements.txt
 
       - name: Linter – ruff (PEP8 + błędy składni)
-        run: ruff check v2/
+        run: python -m ruff check v2/
 
       - name: Formatter – ruff (Sprawdzenie formatowania)
-        run: ruff format --check v2/
+        run: python -m ruff format --check v2/
 
       - name: Bezpieczeństwo – bandit (Skanowanie luk)
-        run: bandit -r v2/ -x v2/tests/
+        run: python -m bandit -r v2/ -x v2/tests/
 
       - name: Typowanie – mypy (Statyczna analiza typów)
-        run: mypy v2/ --ignore-missing-imports
+        run: python -m mypy v2/ --ignore-missing-imports
 
       - name: Testy regresji i Accuracy Gate (test_diff.py)
         run: |

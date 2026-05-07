@@ -18,9 +18,10 @@ def run_test():
 
     # Uruchomienie aplikacji w tle
     process = subprocess.Popen(
-        [sys.executable, app_path],
+        [sys.executable, "app.py"],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
+        cwd=base_dir,
         env={**os.environ, "FLASK_DEBUG": "0", "PORT": "5005"},
     )
 
