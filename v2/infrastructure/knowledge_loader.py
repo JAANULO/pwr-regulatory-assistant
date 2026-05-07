@@ -19,7 +19,7 @@ def utworz_wyszukiwarke(plik_bazy: str):
     if not json_files:
         raise FileNotFoundError(f"Brak plikow JSON do indeksowania w: {plik_bazy}")
 
-    print("Ladowanie bazy wiedzy... (Wersja z szybkimi paragrafami!)")
+    print("Ladowanie bazy wiedzy...")
     fragmenty = []
     aktywne_pliki = []
     for sciezka in json_files:
