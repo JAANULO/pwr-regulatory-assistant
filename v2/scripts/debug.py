@@ -12,8 +12,8 @@ from core.intencje import (
 from infrastructure.knowledge_loader import utworz_wyszukiwarke
 
 
-idx = utworz_indeks_zdan("data/baza_wiedzy.json")
-w = utworz_wyszukiwarke("data/baza_wiedzy.json")
+idx = utworz_indeks_zdan("../data/baza_wiedzy.json")
+w = utworz_wyszukiwarke("../data/baza_wiedzy.json")
 
 pytania = [
     "ile dni miedzy terminami egzaminu",

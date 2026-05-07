@@ -11,7 +11,7 @@ import re
 import pdfplumber
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(BASE_DIR, "data")
+DATA_DIR = os.path.join(BASE_DIR, "..", "data")
 PLIK_PDF = os.path.join(DATA_DIR, "regulamin.pdf")
 PLIK_WYJSCIOWY = os.path.join(DATA_DIR, "baza_wiedzy.json")
 
