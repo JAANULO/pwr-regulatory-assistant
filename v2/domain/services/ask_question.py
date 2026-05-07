@@ -61,7 +61,7 @@ def execute_ask_question(
                 odpowiedz=tekst_odpowiedzi,
             )
             logger.info(
-                f"DIRECT_PARAGRAF: pid={pid}, paragraf={numer_paragrafu}, tytul='{wynik_bezposredni['tytul']}'"
+                f"DIRECT_PARAGRAF: pid={pid}, paragraf={numer_paragrafu}, tytul='{wynik_bezposredni.tytul}'"
             )
 
             if isinstance(odp, dict):
@@ -76,7 +76,7 @@ def execute_ask_question(
                     "podobienstwo2": None,
                     "pytanie_id": pid,
                     "kontekst_tytul": odp["tytul"],
-                    "zrodlo": wynik_bezposredni.get("zrodlo"),
+                    "zrodlo": wynik_bezposredni.zrodlo,
                 }
                 if cache_dozwolony:
                     cache_set_fn(pytanie, payload)
@@ -84,10 +84,10 @@ def execute_ask_question(
 
             payload = {
                 "odpowiedz": odp,
-                "tytul": wynik_bezposredni["tytul"],
+                "tytul": wynik_bezposredni.tytul,
                 "podobienstwo": 1.0,
                 "pytanie_id": pid,
-                "zrodlo": wynik_bezposredni.get("zrodlo"),
+                "zrodlo": wynik_bezposredni.zrodlo,
             }
             if cache_dozwolony:
                 cache_set_fn(pytanie, payload)
@@ -145,25 +145,25 @@ def execute_ask_question(
 
     wynik2 = None
     if len(wyniki) >= 2:
-        roznica = wyniki[0]["podobienstwo"] - wyniki[1]["podobienstwo"]
+        roznica = wyniki[0].podobienstwo - wyniki[1].podobienstwo
 
         # Disambiguator
         if (
             roznica <= 0.04
             and len(pytanie.split()) <= 4
-            and wyniki[0]["podobienstwo"] >= 0.12
+            and wyniki[0].podobienstwo >= 0.12
         ):
             pid = zapisz_pytanie(
-                pytanie, None, wyniki[0]["podobienstwo"], odpowiedz="[SYSTEM WAHAŃ]"
+                pytanie, None, wyniki[0].podobienstwo, odpowiedz="[SYSTEM WAHAŃ]"
             )
             logger.info(
-                f"DISAMBIGUATION: pytanie='{pytanie}' -> {wyniki[0]['tytul']} vs {wyniki[1]['tytul']}"
+                f"DISAMBIGUATION: pytanie='{pytanie}' -> {wyniki[0].tytul} vs {wyniki[1].tytul}"
             )
             return {
                 "disambiguation": True,
                 "pytanie_id": pid,
                 "komunikat": "Och! Twoje zapytanie jest delikatnie ogólnikowe i dotyka stref dwóch podobnych tematów. O który dokładnie ustęp Ci chodzi?",
-                "opcje": [wyniki[0]["tytul"], wyniki[1]["tytul"]],
+                "opcje": [wyniki[0].tytul, wyniki[1].tytul],
             }
 
         if roznica < 0.03 and len(pytanie.split()) >= 6:
@@ -173,9 +173,9 @@ def execute_ask_question(
     dynamiczny_prog = max(0.08, min(0.20, 0.05 + (len(pytanie.split()) * 0.02)))
     prog = 0.10 if jest_kontekstowe else dynamiczny_prog
 
-    if not wynik or wynik["podobienstwo"] < prog:
-        pod = wynik["podobienstwo"] if wynik else 0.0
-        propozycje = [w["tytul"] for w in wyniki[:3] if w["podobienstwo"] > 0.05]
+    if not wynik or wynik.podobienstwo < prog:
+        pod = wynik.podobienstwo if wynik else 0.0
+        propozycje = [w.tytul for w in wyniki[:3] if w.podobienstwo > 0.05]
         tekst = "Nie znalazłem dokładnej odpowiedzi w regulaminie."
 
         if propozycje:
@@ -205,7 +205,7 @@ def execute_ask_question(
 
     najlepsze_zdanie = None
     for zw in zdania_wyniki:
-        if zw["tytul"] != wynik["tytul"] or zw["podobienstwo"] < 0.1:
+        if zw["tytul"] != wynik.tytul or zw["podobienstwo"] < 0.1:
             continue
         if intencja == "LICZBA":
             p_lower = pytanie.lower()
@@ -257,10 +257,10 @@ def execute_ask_question(
 
     tekst_odpowiedzi = odp["wstep"] if isinstance(odp, dict) else odp
     pid = zapisz_pytanie(
-        pytanie, wynik["tytul"], wynik["podobienstwo"], odpowiedz=tekst_odpowiedzi
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
     )
     logger.info(
-        f"ODPOWIEDZ: pid={pid}, tytul='{wynik['tytul']}', podobienstwo={wynik['podobienstwo']:.4f}"
+        f"ODPOWIEDZ: pid={pid}, tytul='{wynik.tytul}', podobienstwo={wynik.podobienstwo:.4f}"
     )
 
     if isinstance(odp, dict):
@@ -272,12 +272,12 @@ def execute_ask_question(
             "slowa_kluczowe": tokenizuj(pytanie),
             "podobienstwo": odp["podobienstwo"],
             "pelna_tresc": odp["pelna_tresc"],
-            "tytul2": wynik2["tytul"] if wynik2 else None,
-            "podobienstwo2": wynik2["podobienstwo"] if wynik2 else None,
+            "tytul2": wynik2.tytul if wynik2 else None,
+            "podobienstwo2": wynik2.podobienstwo if wynik2 else None,
             "pytanie_id": pid,
             "kontekst_tytul": odp["tytul"],
-            "zrodlo": wynik.get("zrodlo"),
-            "zrodlo2": wynik2.get("zrodlo") if wynik2 else None,
+            "zrodlo": wynik.zrodlo,
+            "zrodlo2": wynik2.zrodlo if wynik2 else None,
         }
         if cache_dozwolony:
             cache_set_fn(pytanie, payload)

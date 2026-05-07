@@ -17,13 +17,10 @@ v2_dir = os.path.dirname(skrypt_dir)
 if v2_dir not in sys.path:
     sys.path.insert(0, v2_dir)
 
-try:
-    from core.bd import inicjalizuj
-    from infrastructure.knowledge_loader import utworz_wyszukiwarke
-    from tests.test import TESTY
-except ImportError:
-    from core.bd import inicjalizuj
-    from .test import TESTY
+# Importy absolutne po ustawieniu sys.path
+from core.bd import inicjalizuj  # type: ignore
+from infrastructure.knowledge_loader import utworz_wyszukiwarke  # type: ignore
+from tests.test import TESTY  # type: ignore
 
 BASELINE_FILE = os.path.join(os.path.dirname(__file__), "baseline.json")
 
@@ -33,7 +30,7 @@ def ran_tests(w):
     results = {}
     for pytanie, oczekiwany in TESTY:
         wyniki = w.szukaj(pytanie, n_wynikow=1)
-        tytul = wyniki[0]["tytul"] if wyniki else "BRAK"
+        tytul = wyniki[0].tytul if wyniki else "BRAK"
         results[pytanie] = {
             "oczekiwany": oczekiwany,
             "otrzymany": tytul,
@@ -49,6 +46,9 @@ def main():
     )
     parser.add_argument(
         "--compare", action="store_true", help="Porownaj aktualne wyniki z baseline"
+    )
+    parser.add_argument(
+        "--min-accuracy", type=float, default=0.0, help="Minimalna wymagana skutecznosc (0.0 - 1.0)"
     )
     args = parser.parse_args()
 
@@ -114,6 +114,18 @@ def main():
 
             if poprawy > 0:
                 print("\n[+] GRATULACJE: Poprawiono skuteczność algorytmu!")
+
+        # Weryfikacja progu skutecznosci (Accuracy Gate)
+        total_tests = len(current)
+        passed_tests = sum(1 for v in current.values() if v["sukces"])
+        accuracy = passed_tests / total_tests if total_tests > 0 else 0.0
+        
+        print(f"\nAktualna skutecznosc: {accuracy*100:.1f}% ({passed_tests}/{total_tests})")
+        
+        if accuracy < args.min_accuracy:
+            print(f"[!] BLAD: Skutecznosc {accuracy*100:.1f}% jest ponizej progu {args.min_accuracy*100:.1f}%!")
+            sys.exit(1)
+
     else:
         parser.print_help()
 

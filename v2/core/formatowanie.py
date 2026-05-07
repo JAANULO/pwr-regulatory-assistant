@@ -7,10 +7,7 @@ import random
 import re
 import sys
 
-try:
-    from core.wyszukiwarka import tokenizuj as _tokenizuj
-except ImportError:
-    from .wyszukiwarka import tokenizuj as _tokenizuj
+from .wyszukiwarka import tokenizuj as _tokenizuj
 
 
 # ── słowa kluczowe do wykrywania tematu pytania ───────────────────────────────
@@ -188,9 +185,9 @@ def formatuj_odpowiedz(
             "Spróbuj zapytać inaczej lub zajrzyj do dziekanatu."
         )
 
-    tytul = wynik_wyszukiwarki["tytul"]
-    tresc = wynik_wyszukiwarki["tresc"]
-    podobienstwo = wynik_wyszukiwarki["podobienstwo"]
+    tytul = wynik_wyszukiwarki.tytul
+    tresc = wynik_wyszukiwarki.tresc
+    podobienstwo = wynik_wyszukiwarki.podobienstwo
 
     # za niskie dopasowanie
     if podobienstwo < 0.08:
@@ -284,7 +281,7 @@ def formatuj_odpowiedz(
 if __name__ == "__main__":
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     sys.path.insert(0, os.path.join(BASE_DIR, ".."))
-    from infrastructure.knowledge_loader import utworz_wyszukiwarke
+    from infrastructure.knowledge_loader import utworz_wyszukiwarke  # type: ignore
 
     w = utworz_wyszukiwarke(os.path.join(BASE_DIR, "..", "data", "baza_wiedzy.json"))
 

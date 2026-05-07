@@ -8,16 +8,22 @@ on:
 
 jobs:
   test_and_lint:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.12", "3.13"]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout kodu
         uses: actions/checkout@v4
 
-      - name: Konfiguracja Python 3.13
+      - name: Konfiguracja Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: ${{ matrix.python-version }}
 
       - name: Cache zależności pip
         uses: actions/cache@v4
@@ -38,10 +44,17 @@ jobs:
       - name: Formatter – ruff (Sprawdzenie formatowania)
         run: ruff format --check v2/
 
+      - name: Bezpieczeństwo – bandit (Skanowanie luk)
+        run: bandit -r v2/ -x v2/tests/
+
       - name: Typowanie – mypy (Statyczna analiza typów)
         run: mypy v2/ --ignore-missing-imports
 
-      - name: Testy regresji – BM25 (test_diff.py)
+      - name: Testy regresji i Accuracy Gate (test_diff.py)
         run: |
           cd v2
-          python tests/test_diff.py --compare
+          python tests/test_diff.py --compare --min-accuracy 0.65
+
+      - name: Test Integracyjny – Smoke Test (Flask)
+        run: |
+          python v2/tests/smoke_test.py

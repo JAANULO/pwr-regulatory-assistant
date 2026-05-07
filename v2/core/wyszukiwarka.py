@@ -13,9 +13,11 @@ from collections import Counter
 try:
     from core.bd import pobierz_wspolczynniki_zbiorczo
     from core.slowniki import ROZSZERZENIA, SYNONIMY
+    from domain.models import WynikWyszukiwania
 except ImportError:
     from .bd import pobierz_wspolczynniki_zbiorczo
     from .slowniki import ROZSZERZENIA, SYNONIMY
+    from ..domain.models import WynikWyszukiwania  # type: ignore
 
 PLIK_BAZY = os.path.join(os.path.dirname(__file__), "..", "data", "baza_wiedzy.json")
 MAPA_WAG_TTL = 60
@@ -361,18 +363,18 @@ class Wyszukiwarka:
         setattr(self, cache_key, wynik)
         return wynik
 
-    def pobierz_paragraf_po_numerze(self, numer):
+    def pobierz_paragraf_po_numerze(self, numer) -> "WynikWyszukiwania | None":
         """Zwraca fragment paragrafu po numerze lub None, bez liczenia BM25."""
         numer = str(numer)
         for frag in self.fragmenty:
             liczby_w_tytule = re.findall(r"\d+", frag["tytul"])
             if liczby_w_tytule and liczby_w_tytule[0] == numer:
-                return {
-                    "tytul": frag["tytul"],
-                    "tresc": frag["tresc"],
-                    "podobienstwo": 1.0,
-                    "zrodlo": frag.get("zrodlo"),
-                }
+                return WynikWyszukiwania(
+                    tytul=frag["tytul"],
+                    tresc=frag["tresc"],
+                    podobienstwo=1.0,
+                    zrodlo=frag.get("zrodlo"),
+                )
         return None
 
     def generuj_graf_paragrafow(self):
@@ -484,19 +486,19 @@ class Wyszukiwarka:
         wyniki.sort(reverse=True)
 
         kandydaci = [
-            {
-                "tytul": self.fragmenty[i]["tytul"],
-                "tresc": self.fragmenty[i]["tresc"],
-                "podobienstwo": round(podobienstwo, 4),
-                "zrodlo": self.fragmenty[i].get("zrodlo"),
-            }
+            WynikWyszukiwania(
+                tytul=self.fragmenty[i]["tytul"],
+                tresc=self.fragmenty[i]["tresc"],
+                podobienstwo=round(podobienstwo, 4),
+                zrodlo=self.fragmenty[i].get("zrodlo"),
+            )
             for podobienstwo, i in wyniki
             if podobienstwo > 0
         ]
 
         # Filtrowanie po zrodle (dropdown z frontendu)
         if zrodlo and zrodlo not in ("Wszystkie dokumenty", "odlacz", "", None):
-            kandydaci = [k for k in kandydaci if k.get("zrodlo") == zrodlo]
+            kandydaci = [k for k in kandydaci if k.zrodlo == zrodlo]
 
         return kandydaci[:n_wynikow]
 

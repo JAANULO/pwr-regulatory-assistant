@@ -87,12 +87,13 @@ Instead of generating answers from memory (risking hallucinations), the system f
 - **Conversation context memory** — follow-up questions like "and what if I fail?" refer to the previous paragraph
 - Web interface (Flask + HTML/CSS/JS) with mobile support, light/dark mode toggle, sidebar with last 10 queries, and PDF export of chat
 - CLI interface with conversation history
+- **Professional Domain Layer** — data handled via `@dataclasses` (Strict Typing)
+- **Repository Pattern** — clean separation between business logic and database (SQLite/PostgreSQL)
 - **SQLite database** for statistics and feedback (`v2/data/asystent.db`)
 - Text logs to `v2/logs/log.txt` (GUI + CLI runtime events)
 - Feedback buttons 👍/👎 in GUI — saved to database; low-confidence negative feedback is appended to `v2/logs/do_poprawy.txt`
-- Automated tests (`tests/test.py`) — regression set of 150 questions, **150/150 accuracy!**
-- `/historia` endpoint — last 10 questions from SQLite
-- `/admin` dashboard (Chart.js) secured by `ADMIN_TOKEN`
+- Automated tests (`tests/test.py`) — regression set of 150 questions.
+
 ---
 
 ## Test Results
@@ -100,13 +101,11 @@ Instead of generating answers from memory (risking hallucinations), the system f
 | Metric | Value |
 |---|---|
 | Test set size | 150 questions |
-| Accuracy (correct paragraph) | **150/150 (100%)** |
+| Accuracy (correct paragraph) | **103/150 (68.6%)** |
 | Response time | < 50 ms |
-| Knowledge base size | 40 paragraphs |
-| Sentence index size | 465 sentences |
-| BM25 vocabulary | ~2166 unique words |
+| Knowledge base size | 39 paragraphs |
+| BM25 vocabulary | ~2165 unique words |
 | Synonym dictionary entries | ~180 |
-| Query expansion entries | ~80 |
 
 ---
 
@@ -127,38 +126,34 @@ Mini-GPT/
 │   └── dane.json               # training data
 │
 └── v2/                         ← regulatory assistant
-    ├── main.py                 # entry point: training + CLI loop
     ├── app.py                  # Flask server (GUI)
-    ├── parser.py               # PDFs in data/ → JSON knowledge files
-    ├── asystent.py             # standalone CLI interface
     ├── requirements.txt        # Python dependencies
     │
     ├── core/                   ← search & formatting logic
     │   ├── wyszukiwarka.py     # BM25 + Levenshtein + cosine
     │   ├── formatowanie.py     # response formatting
     │   ├── settings.py         # Config environments (.env load)
-    │   └── bd.py               # SQLite: stats, feedback
+    │   └── bd.py               # Database connection layer (SQLite/Postgres)
     │
     ├── domain/                 ← business logic (Clean Architecture)
-    │   └── use_cases/          
-    │       ├── ask_question.py      # /zapytaj endpoint logic
-    │       └── submit_feedback.py   # /feedback endpoint logic
+    │   ├── models.py           # Domain Data Classes
+    │   ├── repositories/       # Repository Pattern (Data access)
+    │   └── services/           # Application Services (Logic)
     │
-    ├── data/
+    ├── infrastructure/         ← External tools & loaders
+    │   ├── pdf_parser.py       # PDF parsing logic
+    │   └── knowledge_loader.py # Knowledge base initialization
+    │
+    ├── data/                   ← Persistent storage
     │   ├── *.pdf               # source documents
-    │   ├── *.json              # parsed knowledge files (one per document)
-    │   └── *_cache.pkl         # BM25 / sentence index caches
+    │   ├── *.json              # parsed knowledge files
+    │   └── *.pkl               # BM25 / sentence index caches
     │
     ├── tests/
-    │   └── test.py             # automated regression tests (150+ questions set)
+    │   └── test.py             # automated regression tests
     │
     ├── static/                 ← Frontend Assets
-    │   ├── css/style.css       # Clean styling matrix
-    │   └── js/main.js          # Independent GUI Logic
-    │
-    └── templates/
-        ├── index.html          # Web interface
-        └── admin.html          # Stats dashboard (Chart.js)
+    └── templates/              ← HTML Views
 ```
 
 ---
@@ -212,21 +207,15 @@ On subsequent runs it loads the model from cache (training is skipped).
 
 ### Version 2.0 — Regulatory Assistant
 
-**Step 1 — generate the knowledge base** (once, or when PDFs in `v2/data/` change):
+**Step 1 — launch the GUI (it will parse PDFs automatically on first run):**
 
 ```bash
 cd v2
-python parser.py
-```
-
-**Step 2 — launch the GUI:**
-
-```bash
 python app.py
 # → open http://localhost:5000
 ```
 
-**Step 3 — run the tests:**
+**Step 2 — run the tests:**
 
 ```bash
 python tests/test.py
@@ -238,21 +227,12 @@ python tests/test.py
 python asystent.py
 ```
 
-**Optional debug helper (PDF parser check):**
-
-```bash
-python tests/debug_parser.py
-```
-
 ### Troubleshooting (v2)
 
-- `FileNotFoundError` for missing knowledge files
-  - Run `python parser.py` in `v2` to parse PDFs from `v2/data/` into JSON files.
 - Red underline on `from core...` in IDE / Pylance Warnings
-  - In JetBrains: mark `v2` as **Sources Root**. 
-  - In VSCode: Create a `.env` file in the main folder and add `PYTHONPATH=v2` to fix Pylance path unresolved issues.
+  - In VSCode: The project includes `pyrightconfig.json` and `.vscode/settings.json` which should fix this automatically.
 - Relative import error (`attempted relative import with no known parent package`)
-  - Do not run package modules by file path; use project entry points (`python app.py`, `python asystent.py`, `python tests/test.py`).
+  - Do not run package modules by file path; use project entry points (`python app.py`, `python asystent.py`, `python -m tests.test`).
 - Missing logs in root `logs/`
   - Runtime logs are stored in `v2/logs/log.txt` (not in repository root).
 
@@ -280,7 +260,7 @@ python tests/debug_parser.py
 | **NumPy** | matrix operations |
 | **pdfplumber** | PDF regulation parsing |
 | **Flask** | HTTP server for GUI |
-| **SQLite** | statistics and feedback storage |
+| **SQLite / Postgres** | statistics and feedback storage |
 | **tqdm** | training progress bar |
 | **Git LFS** | model file storage on GitHub |
 
@@ -303,8 +283,6 @@ python tests/debug_parser.py
 | OS | Windows 10 |
 
 ---
-
-
 
 # 🇵🇱 Asystent Regulaminowy PWr
 
@@ -386,69 +364,15 @@ Zamiast halucynować, model najpierw wyszukuje właściwy paragraf, a potem gene
 - Cache wektorów BM25 (plik `.pkl`) — natychmiastowy start
 - Cache odpowiedzi w API (`/zapytaj`) — TTL 1h, max 500 wpisów
 - Bezpośrednie trafienie paragrafu po numerze (`§18`, `paragraf 18`) bez liczenia BM25
-- **Indeks na poziomie zdań** — zamiast zwracać cały paragraf, system znajduje konkretne zdanie z odpowiedzią
-- **Klasyfikator intencji** — wykrywa typ pytania (LICZBA / TERMIN / TAK-NIE / SKUTEK / PROCEDURA) i zwraca krótką bezpośrednią odpowiedź, np. „Możesz podejść do egzaminu **2 razy**."
-- **Ekstrakcja liczb i terminów przez regex** — konkretne wartości zamiast tekstu regulaminu
-- **Pamięć kontekstu rozmowy** — pytania następcze typu „a co jak nie zdam?" odnoszą się do poprzedniego paragrafu
-- Interfejs webowy (Flask + HTML/CSS/JS) z obsługą mobile, przełącznikiem jasny/ciemny, panelem historii i eksportem rozmowy do PDF
-- Interfejs CLI z historią rozmowy
+- **Indeks na poziomie zdań** — system znajduje konkretne zdanie z odpowiedzią
+- **Klasyfikator intencji** — wykrywa typ pytania (LICZBA / TERMIN / TAK-NIE / SKUTEK / PROCEDURA) i zwraca krótką bezpośrednią odpowiedź
+- **Pamięć kontekstu rozmowy** — pytania następcze odnoszą się do poprzedniego paragrafu
+- Interfejs webowy (Flask + HTML/CSS/JS) z obsługą mobile, panelem historii i eksportem rozmowy do PDF
+- **Profesjonalna warstwa domeny** — dane obsługiwane przez `@dataclasses` (ścisłe typowanie)
+- **Wzorzec Repozytorium** — separacja logiki od bazy danych (SQLite/PostgreSQL)
 - **Baza SQLite** dla statystyk i feedbacku (`v2/data/asystent.db`)
-- Logi tekstowe do `v2/logs/log.txt` (zdarzenia uruchomieniowe GUI/CLI)
-- Przyciski feedbacku 👍/👎 w GUI — zapisywane do bazy; słabe odpowiedzi trafiają do `v2/logs/do_poprawy.txt`
-- Testy automatyczne (`tests/test.py`) — zestaw regresyjny ze skalowania 150 pytań, **trafność 150/150!**
-- Endpoint `/historia` — ostatnie 10 pytań z SQLite
-- Dashboard `/admin` (Chart.js) zabezpieczony tokenem `ADMIN_TOKEN`
+- Testy automatyczne (`tests/test.py`) — zestaw regresyjny.
 
-## Architektura projektu
-
-```
-Mini-GPT/
-├── .github/workflows/          ← Ciągła integracja z Git (Autotesty)
-├── Dockerfile                  ← Architektura mikrokontenerów (Python + Gunicorn)
-├── pyproject.toml              ← Skrypt Lintera Ruff
-├── preview.png                 ← Makieta Dokumentacji GUI
-├── shared/                     ← wspólne moduły (v1 i v2)
-│   ├── transformer.py          # architektura GPT (od zera)
-│   └── tokenizer.py            # tokenizer znakowy
-│
-├── v1/                         ← wersja generatywna
-│   ├── main.py                 # trening + tryb rozmowy
-│   └── dane.json               # dane treningowe
-│
-└── v2/                         ← asystent regulaminowy
-    ├── main.py                 # punkt wejścia: trening + pętla CLI
-    ├── app.py                  # serwer Flask (GUI)
-    ├── parser.py               # PDF-y z data/ → pliki JSON wiedzy
-    ├── asystent.py             # samodzielny interfejs CLI
-    ├── requirements.txt        # zależności Pythona
-    │
-    ├── core/                   ← logika wyszukiwania i formatowania
-    │   ├── wyszukiwarka.py     # BM25 + Levenshtein + cosinus
-    │   ├── formatowanie.py     # formatowanie odpowiedzi
-    │   ├── settings.py         # Ostrzykiwania środowiskowe (.env)
-    │   └── bd.py               # SQLite: statystyki, feedback
-    │
-    ├── domain/                 ← logika biznesowa (Clean Architecture)
-    │   └── use_cases/          
-    │       ├── ask_question.py      # logika endpointu /zapytaj
-    │       └── submit_feedback.py   # logika endpointu /feedback
-    │
-    ├── data/
-    │   ├── *.pdf               # dokumenty źródłowe
-    │   ├── *.json              # baza wiedzy per dokument
-    │   └── *_cache.pkl         # cache indeksów BM25 i zdań
-    │
-    ├── tests/
-    │   └── test.py             # testy automatyczne (regresyjne walidatory obrotowe)
-    │
-    ├── static/                 ← Wydzielona powłoka Frontend 
-    │   ├── css/style.css       # Izolowany plik stylów CSS 
-    │   └── js/main.js          # Obiektowa logika zdarzeń z GUI
-    │
-    └── templates/
-        ├── index.html          # interfejs webowy
-        └── admin.html          # dashboard statystyk
-```
 ---
 
 ## Wyniki testów
@@ -456,13 +380,51 @@ Mini-GPT/
 | Metryka | Wartość |
 |---|---|
 | Rozmiar zestawu testowego | 150 pytań |
-| Trafność (właściwy paragraf) | **150/150 (100%)** |
+| Trafność (właściwy paragraf) | **103/150 (68.6%)** |
 | Czas odpowiedzi | < 50 ms |
-| Rozmiar bazy | 40 paragrafów |
-| Rozmiar indeksu zdań | 465 zdań |
-| Słownik BM25 | ~2166 unikalnych słów |
-| Synonimów w słowniku | ~180 wpisów |
-| Wpisów rozszerzenia zapytań | ~80 |
+| Rozmiar bazy | 39 paragrafów |
+| Słownik BM25 | ~2165 unikalnych słów |
+
+---
+
+## Architektura projektu
+
+```
+Mini-GPT/
+├── .github/workflows/          ← Ciągła integracja z Git (Autotesty)
+├── Dockerfile                  ← Kontener Docker (Python + Gunicorn)
+├── pyproject.toml              ← Konfiguracja Lintera Ruff
+├── shared/                     ← wspólne moduły (v1 i v2)
+│
+└── v2/                         ← asystent regulaminowy
+    ├── app.py                  # serwer Flask (GUI)
+    ├── requirements.txt        # zależności Pythona
+    │
+    ├── core/                   ← logika wyszukiwania i formatowania
+    │   ├── wyszukiwarka.py     # BM25 + Levenshtein + cosinus
+    │   ├── formatowanie.py     # formatowanie odpowiedzi
+    │   └── bd.py               # Warstwa połączeń z bazą danych
+    │
+    ├── domain/                 ← logika biznesowa (Clean Architecture)
+    │   ├── models.py           # Klasy danych (Dataclasses)
+    │   ├── repositories/       # Wzorzec Repozytorium (SQL)
+    │   └── services/           # Serwisy aplikacyjne (Logika)
+    │
+    ├── infrastructure/         ← Narzędzia zewnętrzne
+    │   ├── pdf_parser.py       # Parsowanie PDF
+    │   └── knowledge_loader.py # Inicjalizacja bazy wiedzy
+    │
+    ├── data/                   ← Dane i bazy
+    │   ├── *.pdf               # dokumenty źródłowe
+    │   ├── *.json              # baza wiedzy
+    │   └── *.pkl               # cache indeksów
+    │
+    ├── tests/
+    │   └── test.py             # testy automatyczne
+    │
+    ├── static/                 ← Frontend Assets
+    └── templates/              ← Widoki HTML
+```
 
 ---
 
@@ -471,12 +433,12 @@ Mini-GPT/
 ### Wymagania
 
 - Python 3.10+
-- NVIDIA GPU z obsługą CUDA (opcjonalnie – działa też na CPU)
+- NVIDIA GPU z obsługą CUDA (opcjonalnie)
 
 ### Instalacja zależności
 
 ```bash
-# PyTorch z obsługą CUDA 12.1
+# PyTorch
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 
 # pozostałe biblioteki
@@ -484,15 +446,12 @@ pip install numpy tqdm pdfplumber flask python-dotenv gunicorn ruff
 ```
 
 ### Konfiguracja środowiska (`.env`)
-Bezpieczeństwo sesji administracyjnych we Flasku opiera się na kluczach. Utwórz plik `.env` i dodaj:
+Utwórz plik `.env` i dodaj:
 ```env
 ADMIN_TOKEN=twoje_bezpieczne_haslo
-# Opcjonalnie:
-# DATABASE_URL=sciezka_do_zrzutu.db
 ```
 
-### Automatyzacja Systemowa (Docker)
-Koniec z "u mnie działa". Zbuduj izolowaną maszynę korzystając ze zintegrowanego obrazu. Kontener obsługuje elastyczne wymogi środowiska na potokach Webowych pod darmowe hostingi wymuszające własne gniazda.
+### Uruchomienie (Docker)
 ```bash
 docker build -t asystent-pwr -f Dockerfile .
 docker run -p 5000:5000 asystent-pwr
@@ -500,77 +459,20 @@ docker run -p 5000:5000 asystent-pwr
 
 ---
 
-### Wersja 1.0
-
-
-```bash
-cd v1
-python main.py
-```
-
-Program automatycznie wytrenuje model i uruchomi tryb rozmowy.  
-Przy kolejnych uruchomieniach wczytuje model z cache (trening pomijany).
-
----
-
-### Wersja 2.0 — Asystent Regulaminowy
-
-**Krok 1 — wygeneruj bazę wiedzy** (tylko raz, lub gdy zmienią się PDF-y w `v2/data/`):
+### Uruchomienie wersji 2.0
 
 ```bash
 cd v2
-python parser.py
-```
-
-**Krok 2 — uruchom GUI:**
-
-```bash
 python app.py
 # → otwórz http://localhost:5000
 ```
 
-**Krok 3 — uruchom testy:**
-
-```bash
-python tests/test.py
-```
-
-**Alternatywnie — interfejs CLI:**
-
-```bash
-python asystent.py
-```
-
-**Opcjonalnie — szybki debug parsera PDF:**
-
-```bash
-python tests/debug_parser.py
-```
-
 ### Rozwiązywanie problemów (v2)
 
-- `FileNotFoundError` dla plików wiedzy
-  - Uruchom `python parser.py` w katalogu `v2`, aby sparsować PDF-y z `v2/data/` do JSON.
-- Czerwone podkreślenie `from core...` w IDE (oraz żółte w Pylance/VSCode)
-  - W JetBrains oznacz `v2` jako **Sources Root**.
-  - W VSCode stwórz u siebie plik `.env` przed korzeniem i dopisz `PYTHONPATH=v2` by ominąć niewidome lintery podglądu ścieżkowego.
-- Błąd importu względnego (`attempted relative import with no known parent package`)
-  - Nie uruchamiaj modułów pakietu po ścieżce pliku; używaj punktów wejścia projektu (`python app.py`, `python asystent.py`, `python tests/test.py`).
-- Brak logów w `logs/` w katalogu głównym repo
-  - Logi runtime zapisują się do `v2/logs/log.txt`.
-
----
-
-### Komendy CLI
-
-| Komenda | Opis |
-|---|---|
-| `/szukaj <pytanie>` | pokaż 3 najlepsze paragrafy z wynikami |
-| `/historia` | pokaż historię rozmowy |
-| `/zapomnij` | wyczyść historię |
-| `/info` | informacje o bazie (liczba paragrafów, słów) |
-| `/pomoc` | lista komend |
-| `koniec` | zakończ program |
+- Błędy importów w IDE (Pylance):
+  - Projekt zawiera gotową konfigurację w `.vscode/settings.json`, która automatycznie dodaje folder `v2` do ścieżki wyszukiwania.
+- Błąd importu względnego:
+  - Używaj `python -m tests.test` zamiast bezpośredniego wywołania pliku testu ze ścieżki.
 
 ---
 
@@ -578,29 +480,13 @@ python tests/debug_parser.py
 
 | Technologia | Zastosowanie |
 |---|---|
-| **Python 3.13** | cały backend |
-| **PyTorch** | architektura Transformer, trening GPU |
-| **NumPy** | operacje na macierzach |
-| **pdfplumber** | parsowanie regulaminu PDF |
-| **Flask** | serwer HTTP dla GUI |
-| **SQLite** | statystyki i feedback |
-| **tqdm** | pasek postępu treningu |
-| **Git LFS** | przechowywanie plików modelu na GitHub |
+| **Python 3.13** | backend |
+| **PyTorch** | Transformer, trening GPU |
+| **Flask** | serwer HTTP |
+| **SQLite / Postgres** | statystyki i feedback |
 
-**Algorytmy zaimplementowane od zera** (bez zewnętrznych bibliotek NLP):
-- BM25 (Best Match 25 — ulepszony TF-IDF, używany przez Elasticsearch)
+**Algorytmy zaimplementowane od zera**:
+- BM25 (Best Match 25)
 - Podobieństwo cosinusowe
-- Odległość Levenshteina (korekcja literówek)
-- Architektura GPT / Transformer
-- Tokenizer znakowy
-
----
-
-##  Sprzęt testowy
-
-| Komponent | Specyfikacja |
-|---|---|
-| CPU | Intel Core i7-11700F |
-| GPU | NVIDIA RTX 3060 Ti 8 GB |
-| RAM | 32 GB |
-| System | Windows 10 |
+- Odległość Levenshteina
+- Architektura Transformer / GPT

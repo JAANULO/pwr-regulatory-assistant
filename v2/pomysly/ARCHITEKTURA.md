@@ -15,15 +15,16 @@ Ten dokument definiuje docelową architekturę techniczną i standardy inżynier
 - `DONE` Separacja logiki biznesowej od routera (Flaska). Cała logika znajduje się w `v2/domain/services/`. Plik `app.py` pełni wyłącznie rolę punktu wejściowego (API).
 
 ### 1.2 Wzorzec Repozytorium (Repository Pattern)
-- `TODO` Przeniesienie zapytań SQL z `core/bd.py` do klas repozytoriów, np. `FeedbackRepository`. Ma to odciąć system od bezpośredniej zależności od SQLite/PostgreSQL.
+- `DONE` Przeniesienie zapytań SQL z `core/bd.py` do dedykowanych klas repozytoriów.
+- **Wdrożone Repozytoria:** `PytaniaRepository`, `FeedbackRepository` w `v2/domain/repositories/`. Plik `bd.py` pełni rolę cienkiej warstwy delegującej (thin wrapper).
 
 ### 1.3 Obiekty Dziedzinowe (Value Objects / Dataclasses)
-- `TODO` Zastąpienie przestarzałych słowników (`dict`) ścisłymi typami strukturalnymi używając `@dataclass`. 
-- **Planowane Obiekty:** `ZapytanieUzytkownika`, `WynikWyszukiwania`, `Paragraf`.
+- `DONE` Zastąpienie przestarzałych słowników (`dict`) ścisłymi typami strukturalnymi używając `@dataclass`.
+- **Wdrożone Obiekty:** `WynikWyszukiwania`, `Paragraf`, `OdpowiedzAPI` w pliku `v2/domain/models.py`.
 
 ### 1.4 Separacja Warstwy Infrastruktury
 - `DONE` Utworzenie dedykowanego folderu `v2/infrastructure/`.
-- **Zadanie:** Wydzielenie parsera plików PDF (`parser.py`), obsługi `.pkl` (cache) oraz inicjalizacji bazy wiedzy. Celem jest całkowite uwolnienie katalogu `core/` od narzędzi do wejścia/wyjścia.
+- **Wdrożone Komponenty:** Parser PDF (`pdf_parser.py`), obsługa cache (`knowledge_loader.py`). Katalog `core/` jest wolny od logiki wejścia/wyjścia (I/O).
 
 ### 1.5 Wstrzykiwanie Zależności (Dependency Injection)
 - `TODO` Usunięcie globalnych instancji w plikach (np. `wyszukiwarka` w `app.py`) na rzecz wzorca DI. Przekazywanie obiektów do serwisów za pomocą kontenera (lub jawnie).

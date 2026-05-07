@@ -268,7 +268,7 @@ def main():
             bledy.append((pytanie, oczekiwany_fragment, "BRAK WYNIKOW"))
             continue
 
-        tytul = wyniki[0]["tytul"]
+        tytul = wyniki[0].tytul
         if oczekiwany_fragment.lower() in tytul.lower():
             ok += 1
         else:

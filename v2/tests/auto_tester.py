@@ -17,6 +17,12 @@ import re
 import sys
 import time
 
+# Ustawienie ścieżek przed importami lokalnymi
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
 try:
     from google import genai
 except ImportError:
@@ -30,15 +36,8 @@ try:
 except ImportError:
     HAS_DOTENV = False
 
-from infrastructure.knowledge_loader import utworz_wyszukiwarke
-
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = (
-    os.path.dirname(CURRENT_DIR)
-    if os.path.basename(CURRENT_DIR).lower() == "tests"
-    else CURRENT_DIR
-)
-sys.path.insert(0, PROJECT_ROOT)
+# Importy lokalne (absolutne)
+from infrastructure.knowledge_loader import utworz_wyszukiwarke  # type: ignore
 
 if HAS_DOTENV:
     load_dotenv(os.path.join(PROJECT_ROOT, ".env"))

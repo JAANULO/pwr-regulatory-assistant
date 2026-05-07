@@ -3,14 +3,17 @@
 
 # ── Serwer webowy ───────────────────────────────────────────────
 Flask==3.1.3
-gunicorn==21.2.0          # produkcja (Linux); na Windows użyj: waitress
-
-# ── Zmienne środowiskowe ────────────────────────────────────────
+gunicorn==21.2.0          # produkcja (Linux)
 python-dotenv==1.2.2
+requests==2.32.3          # testy integracyjne
 
-# ── Narzędzia deweloperskie ─────────────────────────────────────
-ruff==0.15.10             # linter + formatter (zastępuje flake8 + black)
+# ── Algorytmy i Dane ────────────────────────────────────────────
+numpy==1.26.4
+pdfplumber==0.11.0
+tqdm==4.66.2
+
+# ── Narzędzia deweloperskie i CI ────────────────────────────────
+ruff==0.15.10             # linter + formatter
 mypy==1.14.1              # statyczna kontrola typów
-
-# ── Opcjonalne: baza PostgreSQL zamiast SQLite ──────────────────
-# psycopg2-binary==2.9.11
+bandit==1.7.8             # skanowanie bezpieczeństwa
+types-requests==2.31.0.20240406  # typy dla mypy
