@@ -25,8 +25,6 @@ try:
         inicjalizuj,
         pobierz_ostatnie_pytania,
         pobierz_statystyki,
-        zapisz_feedback,
-        zapisz_pytanie,
         PLIK_DB,
     )
     from .core.slowniki import ROZSZERZENIA, SYNONIMY
@@ -43,8 +41,6 @@ except ImportError:
         inicjalizuj,
         pobierz_ostatnie_pytania,
         pobierz_statystyki,
-        zapisz_feedback,
-        zapisz_pytanie,
         PLIK_DB,
     )
     from core.slowniki import ROZSZERZENIA, SYNONIMY  # type: ignore
