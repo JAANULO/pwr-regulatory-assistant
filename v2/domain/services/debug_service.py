@@ -5,6 +5,7 @@ import traceback
 import sqlite3
 from datetime import datetime
 
+
 def execute_debug_info(data_dir, db_path, admin_token, request_token):
     """
     Zwraca szczegółowe informacje o stanie systemu i środowiska.
@@ -26,20 +27,26 @@ def execute_debug_info(data_dir, db_path, admin_token, request_token):
                 "path": data_dir,
                 "exists": os.path.exists(data_dir),
                 "is_dir": os.path.isdir(data_dir) if os.path.exists(data_dir) else False,
-                "contents": os.listdir(data_dir) if os.path.exists(data_dir) and os.path.isdir(data_dir) else []
+                "contents": (
+                    os.listdir(data_dir)
+                    if os.path.exists(data_dir) and os.path.isdir(data_dir)
+                    else []
+                ),
             }
         },
         "database": {
             "path": db_path,
             "exists": os.path.exists(db_path),
-            "writable": os.access(db_path, os.W_OK) if os.path.exists(db_path) else False,
+            "writable": (
+                os.access(db_path, os.W_OK) if os.path.exists(db_path) else False
+            ),
         },
         "env_vars": {
             "APP_ENV": os.getenv("APP_ENV"),
             "PORT": os.getenv("PORT"),
             "DATABASE_URL_SET": os.getenv("DATABASE_URL") is not None,
-            "LOG_LEVEL": os.getenv("LOG_LEVEL")
-        }
+            "LOG_LEVEL": os.getenv("LOG_LEVEL"),
+        },
     }
 
     # Próba połączenia z bazą
@@ -53,6 +60,7 @@ def execute_debug_info(data_dir, db_path, admin_token, request_token):
         info["database"]["error"] = str(e)
 
     return info, 200
+
 
 def get_error_details(exception):
     """Pomocnik do wyciągania tracebacku."""

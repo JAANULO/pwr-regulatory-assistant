@@ -194,10 +194,16 @@ def zapytaj():
         except Exception as e:
             logger.exception("Blad inicjalizacji komponentow")
             error_details = get_error_details(e)
-            return jsonify({
-                "odpowiedz": f"❌ Błąd inicjalizacji: {e}",
-                "debug": error_details if request.args.get("token") == ADMIN_TOKEN else None
-            }), 500
+            return jsonify(
+                {
+                    "odpowiedz": f"❌ Błąd inicjalizacji: {e}",
+                    "debug": (
+                        error_details
+                        if request.args.get("token") == ADMIN_TOKEN
+                        else None
+                    ),
+                }
+            ), 500
 
     dane = request.get_json(force=True)
     request_token = dane.get("token") or request.args.get("token")
@@ -237,10 +243,12 @@ def zapytaj():
     except Exception as e:
         logger.exception("Błąd podczas przetwarzania zapytania")
         error_details = get_error_details(e)
-        return jsonify({
-            "odpowiedz": f"❌ Błąd serwera: {e}",
-            "debug": error_details if request_token == ADMIN_TOKEN else None
-        }), 500
+        return jsonify(
+            {
+                "odpowiedz": f"❌ Błąd serwera: {e}",
+                "debug": error_details if request_token == ADMIN_TOKEN else None,
+            }
+        ), 500
 
     return jsonify(payload)
 
