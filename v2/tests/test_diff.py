@@ -11,15 +11,6 @@ import json
 import os
 import sys
 
-# Wymuszenie UTF-8 dla stdout na Windows CI
-if sys.platform == "win32":
-    try:
-        sys.stdout.reconfigure(encoding='utf-8')
-        sys.stderr.reconfigure(encoding='utf-8')
-    except AttributeError:
-        # Fallback dla bardzo starych wersji (nie powinno wystapic w CI)
-        pass
-
 # Ustawienie PYTHONPATH dla folderu v2
 skrypt_dir = os.path.dirname(os.path.abspath(__file__))
 v2_dir = os.path.dirname(skrypt_dir)

@@ -9,14 +9,6 @@ import requests
 import sys
 import os
 
-# Wymuszenie UTF-8 dla stdout na Windows CI
-if sys.platform == "win32":
-    try:
-        sys.stdout.reconfigure(encoding='utf-8')
-        sys.stderr.reconfigure(encoding='utf-8')
-    except AttributeError:
-        pass
-
 
 def run_test():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
