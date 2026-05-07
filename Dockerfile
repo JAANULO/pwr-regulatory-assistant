@@ -22,6 +22,7 @@ COPY v2/ .
 # Logi preinincjalizacyjne
 RUN mkdir -p logs data
 
-# Elastycznosc wobec hostingu Render / Heroku 
-# Wymusza start na przydzielonym PORT z ich wirtualizatora, albo domyslne 5000 deweloperskie u Cb na maszynie.
+# Konfiguracja portu i start serwera
+EXPOSE 5000
+# Używamy formy powłokowej, aby wspierać zmienną środowiskową $PORT (Render/Heroku)
 CMD gunicorn -b 0.0.0.0:${PORT:-5000} app:app

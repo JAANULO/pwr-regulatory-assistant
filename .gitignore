@@ -1,36 +1,33 @@
-# Cache modelu
-model_cache.pkl
-*.pkl
-
-# Eksport modelu (NIE ignorowany - wysyłamy na GitHub)
-# model_export.pt
-
-# Python
+# --- Python & Cache ---
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
-# Środowisko wirtualne
-venv/
+# --- Dane Aplikacji (v2) ---
+# Ignorujemy wygenerowane bazy i logi
+v2/data/*.pkl
+v2/data/*.db
+v2/data/asystent.db
+v2/logs/
+*.log
+
+# --- Środowisko i Klucze ---
 .env
 v2/.env
+venv/
+.venv/
 
-# IDE
+# --- IDE & System ---
 .vscode/
 .idea/
 *.iml
-
-# System
 .DS_Store
 Thumbs.db
 
-# Agenci AI (Prywatne reguły)
+# --- Agenci AI ---
 .agents/
-
-# Dane generowane automatycznie (v2)
-v2/data/baza_wiedzy_cache.pkl
-v2/logs/
-log.txt
-*.db
-asystent.db
-
+.gemini/

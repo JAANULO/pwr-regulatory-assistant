@@ -119,6 +119,12 @@ const chatEl= document.getElementById('chat');
     }
 
     function renderujOdpowiedz(dane) {
+      if (dane.debug) {
+        return '<div>' + escHtml(dane.odpowiedz || '') + '</div>' +
+          '<div style="margin-top:10px; padding:10px; background:#1a1a1a; color:#ff3b30; font-family:monospace; font-size:11px; border-radius:4px; overflow-x:auto; white-space:pre;">' +
+          '<strong>TRACEBACK (ADMIN):</strong>\n' + escHtml(dane.debug) +
+          '</div>';
+      }
       if (dane.punkty) {
         const punktyHtml = dane.punkty.map(item => '<li>' + escHtml(item) + '</li>').join('');
         const zachetaHtml = dane.zacheta
@@ -318,6 +324,9 @@ const chatEl= document.getElementById('chat');
           btnEl.disabled = false;
           return;
         }
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
         const res = await fetch('/zapytaj', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -326,6 +335,7 @@ const chatEl= document.getElementById('chat');
             zrodlo: aktZrodlo,
             kontekst_tytul: ostatniKontekstTytul,
             kontekst_pytanie: ostatniKontekstPytanie,
+            token: token
           }),
         });
 

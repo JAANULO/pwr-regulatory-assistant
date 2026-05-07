@@ -4,6 +4,9 @@ Dokument ten opisuje, jak system działa "pod maską". Przedstawia algorytmy i w
 
 Projekt dzieli się na dwa główne filary: **System Wyszukiwania (RAG)** oraz **Model Generatywny (Mini-GPT)**.
 
+> [!NOTE]
+> Część generatywna (Mini-GPT v1) została wydzielona do osobnego projektu. Ten dokument zachowuje jednak opis obu algorytmów, aby przedstawić pełne spektrum zrealizowanych prac matematycznych.
+
 ---
 
 ## 1. System Wyszukiwania (Asystent Regulaminowy v2)

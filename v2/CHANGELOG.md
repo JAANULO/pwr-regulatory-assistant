@@ -2,6 +2,19 @@
 
 ---
 
+## 🔖 Sesja P7 (Aktualna) – 2026-05-07
+
+### 🚀 Wielka Migracja i Diagnostyka Produkcyjna
+*   **Separacja Projektów (Clean Architecture)**: Wyodrębniono komponenty badawcze AI (Mini-GPT, Transformer) do osobnego repozytorium `mini-gpt`. Repozytorium `model` stało się dedykowanym, "lekkim" systemem produkcyjnym dla Asystenta Regulaminowego.
+    *   Usunięto: folder `v1/`, folder `shared/`, skrypty treningowe PyTorch.
+*   **System Diagnostyki Admina (Render Debug)**:
+    *   Wdrożono endpoint `/admin/debug?token=...` pozwalający na zdalną inspekcję stanu plików, bazy danych i zmiennych środowiskowych na platformie Render.
+    *   Dodano mechanizm "Authenticated Traceback" — administrator po podaniu tokenu widzi pełny ślad błędu (Python traceback) bezpośrednio w interfejsie czatu w przypadku awarii (500).
+*   **Stabilizacja CI/CD**: Naprawiono błędy typowania i kodowania znaków w GitHub Actions, przywracając zielony status buildów dla Windows i Linux.
+*   **Optymalizacja Rozmiaru**: Usunięcie PyTorcha z zależności produkcyjnych drastycznie skróciło czas budowania obrazów i deploymentu.
+
+---
+
 ## 🔖 Sesja P6 (Aktualna) – 2026-04-11
 
 ### ⚙️ Profesjonalizacja Backend & Weryfikacji (P0/P1)

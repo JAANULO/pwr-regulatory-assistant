@@ -1,16 +1,14 @@
- v1/
 **/__pycache__/
 **/*.pkl
 **/*.pyc
 **/*.pt
 .git/
-.gitignore
-README.md
-venv/
 .env
+v2/.env
 .vscode/
 .idea/
 v2/scripts/
-data/*.db
-sprawdz_wszystko.py
-requirements-dev.txt
+v2/tests/
+v2/data/*.db
+v2/data/asystent.db
+v2/pomysly/

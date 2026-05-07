@@ -25,6 +25,9 @@ try:
         inicjalizuj,
         pobierz_ostatnie_pytania,
         pobierz_statystyki,
+        zapisz_feedback,
+        zapisz_pytanie,
+        PLIK_DB,
     )
     from .core.slowniki import ROZSZERZENIA, SYNONIMY
     from .core.wyszukiwarka import Wyszukiwarka
@@ -40,9 +43,17 @@ except ImportError:
         inicjalizuj,
         pobierz_ostatnie_pytania,
         pobierz_statystyki,
+        zapisz_feedback,
+        zapisz_pytanie,
+        PLIK_DB,
     )
     from core.slowniki import ROZSZERZENIA, SYNONIMY  # type: ignore
     from core.wyszukiwarka import Wyszukiwarka  # type: ignore
+
+try:
+    from .domain.services.debug_service import execute_debug_info, get_error_details
+except ImportError:
+    from domain.services.debug_service import execute_debug_info, get_error_details
 
 
 app = Flask(__name__)
@@ -186,9 +197,14 @@ def zapytaj():
             inicjalizuj()
         except Exception as e:
             logger.exception("Blad inicjalizacji komponentow")
-            return jsonify({"blad": f"Blad inicjalizacji: {e}"}), 500
+            error_details = get_error_details(e)
+            return jsonify({
+                "odpowiedz": f"❌ Błąd inicjalizacji: {e}",
+                "debug": error_details if request.args.get("token") == ADMIN_TOKEN else None
+            }), 500
 
     dane = request.get_json(force=True)
+    request_token = dane.get("token") or request.args.get("token")
     pytanie = dane.get("pytanie", "").strip()
     filtr_zrodlo = dane.get("zrodlo", "Wszystkie dokumenty")
     kontekst_tytul = dane.get("kontekst_tytul", None)  # poprzedni paragraf
@@ -202,30 +218,42 @@ def zapytaj():
         logger.warning("Puste pytanie od klienta")
         return jsonify({"blad": "Puste pytanie"}), 400
 
-    if wyszukiwarka is None:
-        return jsonify({"blad": "Wyszukiwarka nie załadowana"}), 500
-
     try:
-        from .domain.services.ask_question import execute_ask_question
-    except ImportError:
-        from domain.services.ask_question import execute_ask_question
+        try:
+            from .domain.services.ask_question import execute_ask_question
+        except ImportError:
+            from domain.services.ask_question import execute_ask_question
 
-    payload = execute_ask_question(
-        pytanie=pytanie,
-        filtr_zrodlo=filtr_zrodlo,
-        kontekst_tytul=kontekst_tytul,
-        kontekst_pytanie=kontekst_pytanie,
-        wyszukiwarka=wyszukiwarka,
-        indeks_zdan=indeks_zdan,
-        logger=logger,
-        cache_get_fn=_cache_get,
-        cache_set_fn=_cache_set,
-        znajdz_rozszerzenie_fn=_znajdz_rozszerzenie,
-        MAPA_ZNAKOW=MAPA_ZNAKOW,
-        SYNONIMY=SYNONIMY,
-    )
+        payload = execute_ask_question(
+            pytanie=pytanie,
+            filtr_zrodlo=filtr_zrodlo,
+            kontekst_tytul=kontekst_tytul,
+            kontekst_pytanie=kontekst_pytanie,
+            wyszukiwarka=wyszukiwarka,
+            indeks_zdan=indeks_zdan,
+            logger=logger,
+            cache_get_fn=_cache_get,
+            cache_set_fn=_cache_set,
+            znajdz_rozszerzenie_fn=_znajdz_rozszerzenie,
+            MAPA_ZNAKOW=MAPA_ZNAKOW,
+            SYNONIMY=SYNONIMY,
+        )
+    except Exception as e:
+        logger.exception("Błąd podczas przetwarzania zapytania")
+        error_details = get_error_details(e)
+        return jsonify({
+            "odpowiedz": f"❌ Błąd serwera: {e}",
+            "debug": error_details if request_token == ADMIN_TOKEN else None
+        }), 500
 
     return jsonify(payload)
+
+
+@app.route("/admin/debug", methods=["GET"])
+def admin_debug():
+    token = request.args.get("token", "")
+    info, status = execute_debug_info(DATA_DIR, PLIK_DB, ADMIN_TOKEN, token)
+    return jsonify(info), status
 
 
 @app.route("/feedback", methods=["POST"])
