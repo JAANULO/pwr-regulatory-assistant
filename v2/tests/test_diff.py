@@ -10,6 +10,12 @@ import argparse
 import json
 import os
 import sys
+import io
+
+# Wymuszenie UTF-8 dla stdout na Windows CI
+if sys.platform == "win32":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
 
 # Ustawienie PYTHONPATH dla folderu v2
 skrypt_dir = os.path.dirname(os.path.abspath(__file__))
@@ -70,7 +76,7 @@ def main():
     w = utworz_wyszukiwarke(PLIK_BAZY)
 
     if args.save:
-        print("Uruchamiam testy i zapisuję baseline...")
+        print("Uruchamiam testy i zapisuje baseline...")
         res = ran_tests(w)
         with open(BASELINE_FILE, "w", encoding="utf-8") as f:
             json.dump(res, f, indent=4, ensure_ascii=False)
@@ -81,7 +87,7 @@ def main():
             print("Blad: Brak pliku baseline.json. Uruchom najpierw z opcją --save.")
             return
 
-        print("Porównuję obecne wyniki z baseline...")
+        print("Porownuje obecne wyniki z baseline...")
         with open(BASELINE_FILE, "r", encoding="utf-8") as f:
             baseline = json.load(f)
 
@@ -116,7 +122,7 @@ def main():
                 sys.exit(1)
 
             if poprawy > 0:
-                print("\n[+] GRATULACJE: Poprawiono skuteczność algorytmu!")
+                print("\n[+] GRATULACJE: Poprawiono skutecznosc algorytmu!")
 
         # Weryfikacja progu skutecznosci (Accuracy Gate)
         total_tests = len(current)

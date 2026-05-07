@@ -330,7 +330,7 @@ if __name__ != "__main__":
 # ── start ─────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("Ładowanie bazy wiedzy...")
+    print("Ladowanie bazy wiedzy...")
     zaladuj_wyszukiwarke()
     print(f"Serwer startuje -> http://localhost:{FLASK_PORT}\n")
     app.run(debug=FLASK_DEBUG, use_reloader=False, host=FLASK_HOST, port=FLASK_PORT)

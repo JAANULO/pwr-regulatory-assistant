@@ -128,7 +128,7 @@ def utworz_indeks_zdan(plik_bazy: str):
     if os.path.exists(cache) and os.path.getmtime(cache) > baza_mtime:
         with open(cache, "rb") as f_pkl:
             zdania, idf, wektory = pickle.load(f_pkl)  # nosec B301
-        print(f"  Indeks zdań: {len(zdania)} zdań (z cache)")
+        print(f"  Indeks zdan: {len(zdania)} zdan (z cache)")
         return IndeksZdan(zdania, idf, wektory)
 
     zdania = []
@@ -153,5 +153,5 @@ def utworz_indeks_zdan(plik_bazy: str):
     except Exception as e:
         print(f"  Nie udalo sie zapisac cache (tryb read-only?): {e}")
 
-    print(f"  Indeks zdań: {len(zdania)} zdań z {len(fragmenty)} paragrafów")
+    print(f"  Indeks zdan: {len(zdania)} zdan z {len(fragmenty)} paragrafow")
     return IndeksZdan(zdania, idf, wektory)

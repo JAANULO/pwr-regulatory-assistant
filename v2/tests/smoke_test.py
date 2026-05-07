@@ -8,6 +8,12 @@ import time
 import requests
 import sys
 import os
+import io
+
+# Wymuszenie UTF-8 dla stdout na Windows CI
+if sys.platform == "win32":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
 
 
 def run_test():
@@ -19,8 +25,6 @@ def run_test():
     # Uruchomienie aplikacji w tle
     process = subprocess.Popen(
         [sys.executable, "app.py"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
         cwd=base_dir,
         env={**os.environ, "FLASK_DEBUG": "0", "PORT": "5005"},
     )
