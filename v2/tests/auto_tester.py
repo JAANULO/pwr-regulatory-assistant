@@ -69,9 +69,8 @@ def zapytaj_gemini(prompt: str, proba=4) -> str:
         try:
             # Opóźnienie zapobiegające spamowaniu API
             time.sleep(4)
-            return klient.models.generate_content(
-                model=nazwa_modelu, contents=prompt
-            ).text.strip()
+            res = klient.models.generate_content(model=nazwa_modelu, contents=prompt)
+            return (res.text or "").strip()
 
         except Exception as e:
             blad_str = str(e)

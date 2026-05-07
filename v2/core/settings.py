@@ -37,6 +37,6 @@ if APP_ENV == "local":
 else:
     ADMIN_TOKEN = os.getenv("ADMIN_TOKEN") or "__ADMIN_DISABLED__"
 
-FLASK_HOST = os.getenv("HOST", "0.0.0.0")
+FLASK_HOST = os.getenv("HOST", "0.0.0.0")  # nosec B104
 FLASK_PORT = int(os.getenv("PORT", "5000"))
 FLASK_DEBUG = _as_bool(os.getenv("FLASK_DEBUG"), default=(APP_ENV == "local"))

@@ -48,7 +48,10 @@ def main():
         "--compare", action="store_true", help="Porownaj aktualne wyniki z baseline"
     )
     parser.add_argument(
-        "--min-accuracy", type=float, default=0.0, help="Minimalna wymagana skutecznosc (0.0 - 1.0)"
+        "--min-accuracy",
+        type=float,
+        default=0.0,
+        help="Minimalna wymagana skutecznosc (0.0 - 1.0)",
     )
     args = parser.parse_args()
 
@@ -119,11 +122,15 @@ def main():
         total_tests = len(current)
         passed_tests = sum(1 for v in current.values() if v["sukces"])
         accuracy = passed_tests / total_tests if total_tests > 0 else 0.0
-        
-        print(f"\nAktualna skutecznosc: {accuracy*100:.1f}% ({passed_tests}/{total_tests})")
-        
+
+        print(
+            f"\nAktualna skutecznosc: {accuracy * 100:.1f}% ({passed_tests}/{total_tests})"
+        )
+
         if accuracy < args.min_accuracy:
-            print(f"[!] BLAD: Skutecznosc {accuracy*100:.1f}% jest ponizej progu {args.min_accuracy*100:.1f}%!")
+            print(
+                f"[!] BLAD: Skutecznosc {accuracy * 100:.1f}% jest ponizej progu {args.min_accuracy * 100:.1f}%!"
+            )
             sys.exit(1)
 
     else:

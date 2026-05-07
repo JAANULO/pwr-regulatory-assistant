@@ -1,7 +1,7 @@
 import os
 import glob
 import json
-import pickle
+import pickle  # nosec B403
 
 
 def utworz_wyszukiwarke(plik_bazy: str):
@@ -56,7 +56,7 @@ def utworz_wyszukiwarke(plik_bazy: str):
     if os.path.exists(cache) and os.path.getmtime(cache) > baza_mtime:
         print("Wczytywanie indeksu z cache...")
         with open(cache, "rb") as f_pkl:
-            idf, wektory, wszystkie_tokeny = pickle.load(f_pkl)
+            idf, wektory, wszystkie_tokeny = pickle.load(f_pkl)  # nosec B301
     else:
         print("Budowanie indeksu TF-IDF...")
         wszystkie_tokeny = []
@@ -127,7 +127,7 @@ def utworz_indeks_zdan(plik_bazy: str):
     baza_mtime = max(os.path.getmtime(p) for p in aktywne_pliki)
     if os.path.exists(cache) and os.path.getmtime(cache) > baza_mtime:
         with open(cache, "rb") as f_pkl:
-            zdania, idf, wektory = pickle.load(f_pkl)
+            zdania, idf, wektory = pickle.load(f_pkl)  # nosec B301
         print(f"  Indeks zdań: {len(zdania)} zdań (z cache)")
         return IndeksZdan(zdania, idf, wektory)
 

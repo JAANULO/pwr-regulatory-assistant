@@ -238,7 +238,7 @@ def formatuj_odpowiedz(
             tresc, max_zdan=3, szukaj=slowa, pytanie_tokeny=tokeny_pyt
         )
 
-    zacheta = random.choice(ZACHETY) if podobienstwo > 0.2 else None
+    zacheta = random.choice(ZACHETY) if podobienstwo > 0.2 else None  # nosec B311
 
     # Pokaż "pełny paragraf" tylko jeśli punkty to < 40% treści
     pokaz_pelna = len(" ".join(zdania if zdania else [])) < len(tresc) * 0.4

@@ -159,7 +159,9 @@ class PytaniaRepository:
         else:
             with self._polacz() as conn:
                 total = conn.execute("SELECT COUNT(*) FROM pytania").fetchone()[0]
-                avg = conn.execute("SELECT AVG(podobienstwo) FROM pytania").fetchone()[0]
+                avg = conn.execute("SELECT AVG(podobienstwo) FROM pytania").fetchone()[
+                    0
+                ]
                 top = conn.execute("""
                     SELECT tytul, COUNT(*) as n
                     FROM pytania WHERE tytul IS NOT NULL

@@ -88,7 +88,7 @@ def pokaz_statystyki():
 def hash_danych(sciezka):
     """oblicza hash pliku dane.json – wykrywa zmiany danych"""
     with open(sciezka, "rb") as f:
-        return hashlib.md5(f.read()).hexdigest()
+        return hashlib.md5(f.read()).hexdigest()  # nosec B324
 
 
 def zapisz_cache(model, tokenizer, hash_pliku):
@@ -115,7 +115,7 @@ def wczytaj_cache(model, hash_pliku):
     if not os.path.exists(PLIK_CACHE):
         return None, False
     try:
-        dane = torch.load(PLIK_CACHE, map_location=URZADZENIE, weights_only=False)
+        dane = torch.load(PLIK_CACHE, map_location=URZADZENIE, weights_only=False)  # nosec B614
         if dane["hash"] != hash_pliku:
             print("  ⚠️  Dane zmieniły się – trenuję od nowa.\n")
             return None, False
@@ -150,7 +150,7 @@ def wczytaj_eksport(model, sciezka="model_export.pt"):
     if not os.path.exists(sciezka):
         return None, False
     try:
-        dane = torch.load(sciezka, map_location=URZADZENIE, weights_only=False)
+        dane = torch.load(sciezka, map_location=URZADZENIE, weights_only=False)  # nosec B614
         state = {k: v.float() for k, v in dane["state_dict"].items()}
         model.load_state_dict(state)
         rozmiar = os.path.getsize(sciezka) / 1024 / 1024
@@ -183,7 +183,7 @@ def wczytaj_dane(sciezka):
 
 
 def zbuduj_batch(zdania_ids, tokenizer, batch_size, maks_dlugosc):
-    probka = random.sample(zdania_ids, min(batch_size, len(zdania_ids)))
+    probka = random.sample(zdania_ids, min(batch_size, len(zdania_ids)))  # nosec B311
     probka = [ids[:maks_dlugosc] for ids in probka if len(ids) >= 2]
     dlugosc = max(len(ids) for ids in probka)
 

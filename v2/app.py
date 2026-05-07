@@ -205,8 +205,6 @@ def zapytaj():
     if wyszukiwarka is None:
         return jsonify({"blad": "Wyszukiwarka nie załadowana"}), 500
 
-    assert wyszukiwarka is not None
-
     try:
         from .domain.services.ask_question import execute_ask_question
     except ImportError:
