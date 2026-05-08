@@ -26,7 +26,9 @@ def execute_debug_info(data_dir, db_path, admin_token, request_token):
             "data_dir": {
                 "path": data_dir,
                 "exists": os.path.exists(data_dir),
-                "is_dir": os.path.isdir(data_dir) if os.path.exists(data_dir) else False,
+                "is_dir": os.path.isdir(data_dir)
+                if os.path.exists(data_dir)
+                else False,
                 "contents": (
                     os.listdir(data_dir)
                     if os.path.exists(data_dir) and os.path.isdir(data_dir)

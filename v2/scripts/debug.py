@@ -1,6 +1,12 @@
-# debug.py
 import inspect
+import os
 import re
+import sys
+
+# Ustawienie ścieżki dla modułów lokalnych
+v2_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if v2_root not in sys.path:
+    sys.path.insert(0, v2_root)
 
 from infrastructure.knowledge_loader import utworz_indeks_zdan
 from core.intencje import (
@@ -12,8 +18,9 @@ from core.intencje import (
 from infrastructure.knowledge_loader import utworz_wyszukiwarke
 
 
-idx = utworz_indeks_zdan("../data/baza_wiedzy.json")
-w = utworz_wyszukiwarke("../data/baza_wiedzy.json")
+PLIK_BAZY = os.path.join(v2_root, "data", "baza_wiedzy.json")
+idx = utworz_indeks_zdan(PLIK_BAZY)
+w = utworz_wyszukiwarke(PLIK_BAZY)
 
 pytania = [
     "ile dni miedzy terminami egzaminu",
@@ -64,7 +71,7 @@ for z in idx.szukaj("ile dni miedzy terminami egzaminu", n_wynikow=10):
     print(f"  {z['podobienstwo']:.3f} | {z['tytul'][:20]} | {z['zdanie'][:80]}")
 
 wyniki = w.szukaj("ile dni miedzy terminami egzaminu", n_wynikow=1)
-print("BM25 tytul:", wyniki[0]["tytul"])
+print("BM25 tytul:", wyniki[0].tytul)
 
 print("f")
 
@@ -73,7 +80,7 @@ intencja = wykryj_intencje(pytanie)
 print("intencja:", intencja)
 
 wyniki_bm25 = w.szukaj(pytanie, n_wynikow=1)
-tytul_bm25 = wyniki_bm25[0]["tytul"]
+tytul_bm25 = wyniki_bm25[0].tytul
 
 zdania_wyniki = idx.szukaj(pytanie, n_wynikow=10)
 for zw in zdania_wyniki:
@@ -127,7 +134,7 @@ print(wykryj_intencje("ile razy mozna powtarzac przedmiot"))
 print(wykryj_intencje("ile razy można powtarzać przedmiot"))
 
 print("f")
-print(inspect.getsource(wyciagnij_liczbe))
+# print(inspect.getsource(wyciagnij_liczbe))
 
 print("f")
 pytanie = "a co jak nie zdam"
@@ -160,4 +167,4 @@ for s in SYGNALY_KONTEKSTU:
 print("f")
 wyniki = w.szukaj("ile razy mozna podejsc do egzaminu a co jak nie zdam", n_wynikow=3)
 for wyn in wyniki:
-    print(round(wyn["podobienstwo"], 3), "|", wyn["tytul"])
+    print(round(wyn.podobienstwo, 3), "|", wyn.tytul)

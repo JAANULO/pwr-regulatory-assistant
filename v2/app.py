@@ -7,9 +7,15 @@ Adres:        http://localhost:5000
 import logging
 import os
 import re
+import sys
 import time
 from collections import OrderedDict
 from typing import TYPE_CHECKING
+
+# Ustawienie ścieżki dla modułów lokalnych
+v2_root = os.path.abspath(os.path.dirname(__file__))
+if v2_root not in sys.path:
+    sys.path.insert(0, v2_root)
 
 from flask import Flask, jsonify, render_template, request
 

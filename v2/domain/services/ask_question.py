@@ -56,8 +56,8 @@ def execute_ask_question(
             tekst_odpowiedzi = odp["wstep"] if isinstance(odp, dict) else odp
             pid = zapisz_pytanie(
                 pytanie,
-                wynik_bezposredni["tytul"],
-                wynik_bezposredni["podobienstwo"],
+                wynik_bezposredni.tytul,
+                wynik_bezposredni.podobienstwo,
                 odpowiedz=tekst_odpowiedzi,
             )
             logger.info(
