@@ -19,52 +19,28 @@ if v2_root not in sys.path:
 
 from flask import Flask, jsonify, render_template, request
 
-try:
-    from .core.settings import (
-        ADMIN_TOKEN,
-        FLASK_DEBUG,
-        FLASK_HOST,
-        FLASK_PORT,
-        LOG_LEVEL,
-    )
-    from .core.bd import (
-        inicjalizuj,
-        pobierz_ostatnie_pytania,
-        pobierz_statystyki,
-        PLIK_DB,
-    )
-    from .core.slowniki import ROZSZERZENIA, SYNONIMY
-    from .core.wyszukiwarka import Wyszukiwarka
-except ImportError:
-    from core.settings import (  # type: ignore
-        ADMIN_TOKEN,
-        FLASK_DEBUG,
-        FLASK_HOST,
-        FLASK_PORT,
-        LOG_LEVEL,
-    )
-    from core.bd import (  # type: ignore
-        inicjalizuj,
-        pobierz_ostatnie_pytania,
-        pobierz_statystyki,
-        PLIK_DB,
-    )
-    from core.slowniki import ROZSZERZENIA, SYNONIMY  # type: ignore
-    from core.wyszukiwarka import Wyszukiwarka  # type: ignore
-
-try:
-    from .domain.services.debug_service import execute_debug_info, get_error_details
-except ImportError:
-    from domain.services.debug_service import execute_debug_info, get_error_details
+from core.settings import (
+    ADMIN_TOKEN,
+    FLASK_DEBUG,
+    FLASK_HOST,
+    FLASK_PORT,
+    LOG_LEVEL,
+)
+from core.bd import (
+    inicjalizuj,
+    pobierz_ostatnie_pytania,
+    pobierz_statystyki,
+    PLIK_DB,
+)
+from core.slowniki import ROZSZERZENIA, SYNONIMY
+from core.wyszukiwarka import Wyszukiwarka
+from domain.services.debug_service import execute_debug_info, get_error_details
 
 
 app = Flask(__name__)
 
 if TYPE_CHECKING:
-    try:
-        from .core.indeks_zdan import IndeksZdan
-    except ImportError:
-        from core.indeks_zdan import IndeksZdan  # type: ignore
+    from core.indeks_zdan import IndeksZdan
 
 
 def _znajdz_rozszerzenie(pytanie_lower: str) -> str:
@@ -141,16 +117,10 @@ def zaladuj_wyszukiwarke():
         )
         logger.addHandler(fh)
 
-    try:
-        from .infrastructure.knowledge_loader import (
-            utworz_wyszukiwarke,
-            utworz_indeks_zdan,
-        )
-    except ImportError:
-        from infrastructure.knowledge_loader import (
-            utworz_wyszukiwarke,
-            utworz_indeks_zdan,
-        )
+    from infrastructure.knowledge_loader import (
+        utworz_wyszukiwarke,
+        utworz_indeks_zdan,
+    )
 
     wyszukiwarka = utworz_wyszukiwarke(DATA_DIR)
     global indeks_zdan
@@ -177,10 +147,7 @@ def zapytaj_symulacja():
     if wyszukiwarka is None:
         return jsonify({"blad": "Wyszukiwarka nie załadowana"}), 500
 
-    try:
-        from .domain.services.simulate_question import execute_simulate_question
-    except ImportError:
-        from domain.services.simulate_question import execute_simulate_question
+    from domain.services.simulate_question import execute_simulate_question
 
     payload, status = execute_simulate_question(
         request.get_json(force=True), wyszukiwarka, logger
@@ -227,10 +194,7 @@ def zapytaj():
         return jsonify({"blad": "Puste pytanie"}), 400
 
     try:
-        try:
-            from .domain.services.ask_question import execute_ask_question
-        except ImportError:
-            from domain.services.ask_question import execute_ask_question
+        from domain.services.ask_question import execute_ask_question
 
         payload = execute_ask_question(
             pytanie=pytanie,
@@ -270,10 +234,7 @@ def admin_debug():
 def feedback():
     dane = request.get_json(force=True)
 
-    try:
-        from .domain.services.submit_feedback import execute_feedback_submission
-    except ImportError:
-        from domain.services.submit_feedback import execute_feedback_submission
+    from domain.services.submit_feedback import execute_feedback_submission
 
     execute_feedback_submission(dane["pytanie_id"], dane["ocena"], BASE_DIR, logger)
     return jsonify({"ok": True})
@@ -325,10 +286,8 @@ def historia():
 
 @app.route("/admin/eksport_csv", methods=["GET"])
 def admin_eksport_csv():
-    try:
-        from .domain.services.admin_stats import execute_admin_eksport_csv
-    except ImportError:
-        from domain.services.admin_stats import execute_admin_eksport_csv
+    from domain.services.admin_stats import execute_admin_eksport_csv
+
     return execute_admin_eksport_csv(request.args.get("token", ""), ADMIN_TOKEN)
 
 
@@ -346,10 +305,7 @@ def admin():
 
 @app.route("/admin/dodaj_synonim", methods=["POST"])
 def admin_dodaj_synonim():
-    try:
-        from .domain.services.admin_stats import execute_admin_dodaj_synonim
-    except ImportError:
-        from domain.services.admin_stats import execute_admin_dodaj_synonim
+    from domain.services.admin_stats import execute_admin_dodaj_synonim
 
     payload, status = execute_admin_dodaj_synonim(
         request.get_json(force=True), ADMIN_TOKEN, SYNONIMY, logger
