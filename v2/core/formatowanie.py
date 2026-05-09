@@ -14,6 +14,7 @@ if __name__ != "__main__":
 else:
     # Dla testów lokalnych
     from typing import TYPE_CHECKING
+
     if TYPE_CHECKING:
         from domain.models import WynikWyszukiwania
 
