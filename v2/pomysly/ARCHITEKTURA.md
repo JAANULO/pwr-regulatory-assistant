@@ -26,8 +26,7 @@ Ten dokument definiuje docelową architekturę techniczną i standardy inżynier
 - `DONE` Utworzenie dedykowanego folderu `v2/infrastructure/`.
 - **Wdrożone Komponenty:** Parser PDF (`pdf_parser.py`), obsługa cache (`knowledge_loader.py`). Katalog `core/` jest wolny od logiki wejścia/wyjścia (I/O).
 
-### 1.5 Wstrzykiwanie Zależności (Dependency Injection)
-- `TODO` Usunięcie globalnych instancji w plikach (np. `wyszukiwarka` w `app.py`) na rzecz wzorca DI. Przekazywanie obiektów do serwisów za pomocą kontenera (lub jawnie).
+- `DONE` Usunięcie globalnych instancji w plikach (np. `wyszukiwarka` w `app.py`) na rzecz wzorca DI. Przekazywanie obiektów do serwisów za pomocą kontenera (klasa `Container`).
 
 ---
 
@@ -52,10 +51,14 @@ Obecnie skrypt weryfikuje składnię (`ruff`) oraz odpala plik `test.py`. To nie
 ### 3.1 Testowanie Regresji (Zabezpieczenie Wyników)
 - `DONE` Zmiana wywoływanego skryptu z `tests/test.py` na `tests/test_diff.py` w pliku `.github/workflows/testy.yml`. Skrypt `test_diff.py` automatycznie zatrzyma wdrożenie i zwróci błąd (`exit code 1`), jeśli wprowadzona przez Ciebie zmiana pogorszy algorytm poniżej obecnego Baseline (103/150).
 
-### 3.2 Weryfikacja Typów (Mypy) w CI
+### 3.2 Diagnostyka i Observability (Admin View)
+- `TODO` Wprowadzenie wzorca "Health Check" dla infrastruktury.
+- **Zasada:** System musi udostępniać endpoint diagnostyczny (zabezpieczony tokenem), który weryfikuje integralność bazy wiedzy (JSON), połączenie z bazą SQL oraz status cache'owania w locie. Umożliwi to szybką identyfikację problemów po stronie hostingu (np. Render/Heroku).
+
+### 3.3 Weryfikacja Typów (Mypy) w CI
 - `DONE` Zintegrowanie narzędzia `mypy` w potoku GitHub Actions w celu sprawdzania zgodności typów przy każdym Commicie.
 
-### 3.3 Walidacja Formatowania Kodu
+### 3.4 Walidacja Formatowania Kodu
 - `DONE` Rozszerzenie potoku GitHub Actions o sprawdzenie formatowania (np. `ruff format --check`).
 
 ---

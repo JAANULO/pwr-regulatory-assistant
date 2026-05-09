@@ -91,41 +91,19 @@ CACHE_TTL_SECONDS = 60 * 60
 CACHE_MAX_SIZE = 500
 CACHE_ODPOWIEDZI: OrderedDict[str, dict] = OrderedDict()
 
-logger = logging.getLogger("asystent")
-logger.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
-logger.propagate = False  # nie przepuszczaj do root loggera
-logging.getLogger("werkzeug").setLevel(logging.WARNING)
+# ── Kontener zależności (DI) ──────────────────────────────────────────────────
+from infrastructure.container import Container
 
-# ── ładowanie wyszukiwarki raz przy starcie ───────────────────────────────────
-wyszukiwarka: Wyszukiwarka | None = None
-indeks_zdan: "IndeksZdan | None" = None
+container = Container(
+    base_dir=BASE_DIR,
+    data_dir=DATA_DIR,
+    log_file=PLIK_LOG
+)
+logger = container.logger
 
 
 def zaladuj_wyszukiwarke() -> None:
-    global wyszukiwarka
-    if not os.path.isdir(DATA_DIR):
-        raise FileNotFoundError(f"Brak katalogu '{DATA_DIR}'.")
-
-    os.makedirs(os.path.dirname(PLIK_LOG), exist_ok=True)
-
-    if not logger.handlers:
-        fh = logging.FileHandler(PLIK_LOG, encoding="utf-8")
-        fh.setFormatter(
-            logging.Formatter(
-                "%(asctime)s | %(levelname)s | %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
-            )
-        )
-        logger.addHandler(fh)
-
-    from infrastructure.knowledge_loader import (
-        utworz_wyszukiwarke,
-        utworz_indeks_zdan,
-    )
-
-    wyszukiwarka = utworz_wyszukiwarke(DATA_DIR)
-    global indeks_zdan
-    indeks_zdan = utworz_indeks_zdan(DATA_DIR)
-    logger.info("Wyszukiwarka zaladowana")
+    container.initialize_components()
 
 
 # ── trasy ─────────────────────────────────────────────────────────────────────
@@ -144,13 +122,13 @@ def lab_view():
 
 @app.route("/zapytaj_symulacja", methods=["POST"])
 def zapytaj_symulacja():
-    if wyszukiwarka is None:
+    if container.wyszukiwarka is None:
         return jsonify({"blad": "Wyszukiwarka nie załadowana"}), 500
 
     from domain.services.simulate_question import execute_simulate_question
 
     payload, status = execute_simulate_question(
-        request.get_json(force=True), wyszukiwarka, logger
+        request.get_json(force=True), container.wyszukiwarka, logger
     )
     return jsonify(payload), status
 
@@ -160,7 +138,7 @@ def zapytaj_symulacja():
 
 @app.route("/zapytaj", methods=["POST"])
 def zapytaj():
-    if wyszukiwarka is None:
+    if container.wyszukiwarka is None:
         try:
             zaladuj_wyszukiwarke()
             inicjalizuj()
@@ -201,8 +179,8 @@ def zapytaj():
             filtr_zrodlo=filtr_zrodlo,
             kontekst_tytul=kontekst_tytul,
             kontekst_pytanie=kontekst_pytanie,
-            wyszukiwarka=wyszukiwarka,
-            indeks_zdan=indeks_zdan,
+            wyszukiwarka=container.wyszukiwarka,
+            indeks_zdan=container.indeks_zdan,
             logger=logger,
             cache_get_fn=_cache_get,
             cache_set_fn=_cache_set,
@@ -250,14 +228,14 @@ def graf_widok():
 @app.route("/graf_wektorowy", methods=["GET"])
 def graf_wektorowy():
     """Zwraca graf słów (bigramy) lub graf paragrafów, zależnie od parametru ?tryb="""
-    if not wyszukiwarka:
+    if not container.wyszukiwarka:
         return jsonify({"nodes": [], "edges": []})
 
     tryb = request.args.get("tryb", "slowa")
     if tryb == "paragrafy":
-        return jsonify(wyszukiwarka.generuj_graf_paragrafow())
+        return jsonify(container.wyszukiwarka.generuj_graf_paragrafow())
     else:
-        return jsonify(wyszukiwarka.generuj_graf_slow(top_k=70))
+        return jsonify(container.wyszukiwarka.generuj_graf_slow(top_k=70))
 
 
 @app.route("/zrodla", methods=["GET"])
