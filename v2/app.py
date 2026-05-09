@@ -10,7 +10,7 @@ import re
 import sys
 import time
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 # Ustawienie ścieżki dla modułów lokalnych
 v2_root = os.path.abspath(os.path.dirname(__file__))
