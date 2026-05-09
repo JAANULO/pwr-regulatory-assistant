@@ -10,7 +10,7 @@ import re
 import sys
 import time
 from collections import OrderedDict
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 # Ustawienie ścieżki dla modułów lokalnych
 v2_root = os.path.abspath(os.path.dirname(__file__))
@@ -60,7 +60,7 @@ def _wykryj_numer_paragrafu(pytanie: str) -> str | None:
     return dopasowanie.group(1) if dopasowanie else None
 
 
-def _cache_get(pytanie: str):
+def _cache_get(pytanie: str) -> dict | None:
     wpis = CACHE_ODPOWIEDZI.get(pytanie)
     if not wpis:
         return None
@@ -70,7 +70,7 @@ def _cache_get(pytanie: str):
     return wpis["data"]
 
 
-def _cache_set(pytanie: str, odpowiedz: dict):
+def _cache_set(pytanie: str, odpowiedz: dict) -> None:
     if pytanie in CACHE_ODPOWIEDZI:
         CACHE_ODPOWIEDZI[pytanie] = {"ts": time.time(), "data": odpowiedz}
         return
@@ -101,7 +101,7 @@ wyszukiwarka: Wyszukiwarka | None = None
 indeks_zdan: "IndeksZdan | None" = None
 
 
-def zaladuj_wyszukiwarke():
+def zaladuj_wyszukiwarke() -> None:
     global wyszukiwarka
     if not os.path.isdir(DATA_DIR):
         raise FileNotFoundError(f"Brak katalogu '{DATA_DIR}'.")

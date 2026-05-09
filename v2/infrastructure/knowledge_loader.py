@@ -2,9 +2,14 @@ import os
 import glob
 import json
 import pickle  # nosec B403
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from core.wyszukiwarka import Wyszukiwarka
+    from core.indeks_zdan import IndeksZdan
 
 
-def utworz_wyszukiwarke(plik_bazy: str):
+def utworz_wyszukiwarke(plik_bazy: str) -> "Wyszukiwarka":
     from core.wyszukiwarka import Wyszukiwarka, tokenizuj, oblicz_idf, zbuduj_wektory
 
     if os.path.isdir(plik_bazy):
@@ -79,7 +84,7 @@ def utworz_wyszukiwarke(plik_bazy: str):
     return Wyszukiwarka(fragmenty, idf, wektory, wszystkie_tokeny)
 
 
-def utworz_indeks_zdan(plik_bazy: str):
+def utworz_indeks_zdan(plik_bazy: str) -> "IndeksZdan":
     from core.indeks_zdan import IndeksZdan, podziel_na_zdania
     from core.wyszukiwarka import tokenizuj, oblicz_idf, zbuduj_wektory
 

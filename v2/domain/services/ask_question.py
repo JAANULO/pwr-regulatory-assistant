@@ -1,20 +1,26 @@
 import re
+import logging
+from typing import TYPE_CHECKING, Any, Callable
+
+if TYPE_CHECKING:
+    from core.wyszukiwarka import Wyszukiwarka
+    from core.indeks_zdan import IndeksZdan
 
 
 def execute_ask_question(
-    pytanie,
-    filtr_zrodlo,
-    kontekst_tytul,
-    kontekst_pytanie,
-    wyszukiwarka,
-    indeks_zdan,
-    logger,
-    cache_get_fn,
-    cache_set_fn,
-    znajdz_rozszerzenie_fn,
-    MAPA_ZNAKOW,
-    SYNONIMY,
-):
+    pytanie: str,
+    filtr_zrodlo: str | None,
+    kontekst_tytul: str | None,
+    kontekst_pytanie: str | None,
+    wyszukiwarka: "Wyszukiwarka",
+    indeks_zdan: "IndeksZdan | None",
+    logger: logging.Logger,
+    cache_get_fn: Callable[[str], Any],
+    cache_set_fn: Callable[[str, Any], None],
+    znajdz_rozszerzenie_fn: Callable[[str], str],
+    MAPA_ZNAKOW: dict[int, int | None],
+    SYNONIMY: dict[str, str],
+) -> dict:
     """
     Wyodrębniona logika biznesowa z endpointu /zapytaj.
     Przetwarza zapytanie użytkownika, obsługuje rozszerzanie kontekstu,

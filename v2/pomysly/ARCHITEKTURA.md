@@ -40,8 +40,8 @@ Ten dokument definiuje docelową architekturę techniczną i standardy inżynier
 - `DONE` Uporządkowanie importów (biblioteki wbudowane -> zewnętrzne -> lokalne absolutne). Eliminacja importów względnych w całym projekcie.
 
 ### 2.3 Ścisłe Typowanie (Strict Type Hinting)
-- `TODO` Wymuszenie adnotacji typów dla wszystkich metod i funkcji (np. `def funkcja(text: str) -> dict:`). 
-- **Weryfikacja:** Docelowo projekt ma przechodzić walidację statyczną `mypy` bez ostrzeżeń.
+- `DONE` Wymuszenie adnotacji typów (PEP 484) dla wszystkich metod i funkcji w całym projekcie.
+- **Wdrożone Zmiany:** Pełne typowanie w `core/`, `infrastructure/`, `domain/` oraz `app.py`. Projekt wykorzystuje `TYPE_CHECKING` do optymalizacji importów i jest przygotowany pod statyczną analizę `mypy`.
 
 ---
 

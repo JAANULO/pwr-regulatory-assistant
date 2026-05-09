@@ -111,7 +111,7 @@ def main():
             wyniki = w.szukaj(zapytanie, n_wynikow=3)
             print("\n  Znalezione paragrafy:")
             for i, wyn in enumerate(wyniki, 1):
-                print(f"  [{i}] {wyn['tytul']} ({int(wyn['podobienstwo'] * 100)}%)")
+                print(f"  [{i}] {wyn.tytul} ({int(wyn.podobienstwo * 100)}%)")
 
         elif pytanie.lower() == "/historia":
             if not historia:
@@ -150,12 +150,12 @@ def main():
 
             # drugi paragraf – pokazuj tylko gdy podobieństwo bliskie pierwszemu
             wynik2 = None
-            if len(wyniki) == 2:
-                roznica = wyniki[0]["podobienstwo"] - wyniki[1]["podobienstwo"]
+            if len(wyniki) >= 2:
+                roznica = wyniki[0].podobienstwo - wyniki[1].podobienstwo
                 if roznica < 0.05 or len(pytanie.split()) >= 8:
                     wynik2 = wyniki[1]
 
-            if not wynik or wynik["podobienstwo"] < PROG_PEWNOSCI:
+            if not wynik or wynik.podobienstwo < PROG_PEWNOSCI:
                 print()
                 print("  ❓ Nie znalazłem informacji na ten temat w regulaminie.")
                 print(
@@ -163,7 +163,7 @@ def main():
                 )
                 print()
                 logging.warning(
-                    f"Brak odpowiedzi: '{pytanie}' (najlepsze: {wynik['podobienstwo'] if wynik else 0:.2f})"
+                    f"Brak odpowiedzi: '{pytanie}' (najlepsze: {wynik.podobienstwo if wynik else 0:.2f})"
                 )
                 continue
 
@@ -188,7 +188,7 @@ def main():
 
             historia.append((pytanie, odp))
             logging.info(f"P: {pytanie}")
-            logging.info(f"O: {wynik['tytul']} ({int(wynik['podobienstwo'] * 100)}%)")
+            logging.info(f"O: {wynik.tytul} ({int(wynik.podobienstwo * 100)}%)")
 
 
 if __name__ == "__main__":

@@ -132,7 +132,7 @@ def stemuj(slowo: str) -> str:
     return slowo
 
 
-def stemuj_liste(slowa: list) -> list:
+def stemuj_liste(slowa: list[str]) -> list[str]:
     """Stemuje całą listę słów."""
     return [stemuj(s) for s in slowa]
 

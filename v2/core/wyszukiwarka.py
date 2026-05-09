@@ -24,14 +24,14 @@ MAPA_WAG_TTL = 60
 _mapa_wag_cache = {"ts": 0.0, "data": {}}
 
 
-def _pobierz_mapa_wag_cached():
+def _pobierz_mapa_wag_cached() -> dict[str, float]:
     obecny_czas = time.time()
     if obecny_czas - _mapa_wag_cache["ts"] <= MAPA_WAG_TTL:
-        return _mapa_wag_cache["data"]
+        return _mapa_wag_cache["data"]  # type: ignore
 
     _mapa_wag_cache["data"] = pobierz_wspolczynniki_zbiorczo()
     _mapa_wag_cache["ts"] = obecny_czas
-    return _mapa_wag_cache["data"]
+    return _mapa_wag_cache["data"]  # type: ignore
 
 
 # ── Krok 1: przygotowanie tekstu ──────────────────────────────────────────────
@@ -39,12 +39,12 @@ def _pobierz_mapa_wag_cached():
 MAPA_ZNAKOW = str.maketrans("ąćęłńóśźżĄĆĘŁŃÓŚŹŻ", "acelnoszzACELNOSZZ")
 
 
-def usun_polskie_znaki(tekst):
+def usun_polskie_znaki(tekst: str) -> str:
     """zamienia polskie litery na odpowiedniki bez ogonkow"""
     return tekst.translate(MAPA_ZNAKOW)
 
 
-def levenshtein(a, b):
+def levenshtein(a: str, b: str) -> int:
     """oblicza odległość edycyjną między dwoma słowami"""
     if len(a) < len(b):
         return levenshtein(b, a)
@@ -66,7 +66,9 @@ def levenshtein(a, b):
 _cache_literowek: dict = {}
 
 
-def popraw_literowke(slowo, slownik, max_odleglosc=1):
+def popraw_literowke(
+    slowo: str, slownik: set[str] | dict[str, float], max_odleglosc: int = 1
+) -> str:
     """
     jeśli słowo nie jest w słowniku, znajdź najbliższe przez Levenshteina.
     Wynik jest cachowany – to samo słowo nie jest przeliczane ponownie.
@@ -95,12 +97,12 @@ def popraw_literowke(slowo, slownik, max_odleglosc=1):
     return wynik
 
 
-def normalizuj(slowo):
+def normalizuj(slowo: str) -> str:
     """zamienia odmianę słowa na formę podstawową używając słownika synonimów"""
     return SYNONIMY.get(slowo, slowo)
 
 
-def tokenizuj(tekst):
+def tokenizuj(tekst: str) -> list[str]:
     """
     rozbija tekst na liste slow (tokenow).
     usuwa interpunkcje, zamienia na male litery,
@@ -174,7 +176,7 @@ def tokenizuj(tekst):
 # ── Krok 2: budowanie macierzy TF-IDF ────────────────────────────────────────
 
 
-def oblicz_tf(slowa):
+def oblicz_tf(slowa: list[str]) -> dict[str, float]:
     """
     oblicza czestotliwosc kazdego slowa we fragmencie.
     wynik: slownik {slowo: wartosc_tf}
@@ -197,7 +199,7 @@ BM25_K1 = 1.5
 BM25_B = 0.75
 
 
-def oblicz_idf_bm25(wszystkie_tokeny):
+def oblicz_idf_bm25(wszystkie_tokeny: list[list[str]]) -> dict[str, float]:
     """
     IDF w wersji BM25 — wzór Robertson/Sparck-Jones.
     Różnica vs klasyczne IDF: log((N - df + 0.5) / (df + 0.5))
@@ -217,12 +219,17 @@ def oblicz_idf_bm25(wszystkie_tokeny):
     return idf
 
 
-def oblicz_idf(wszystkie_tokeny):
+def oblicz_idf(wszystkie_tokeny: list[list[str]]) -> dict[str, float]:
     """zachowane dla kompatybilności — używa BM25"""
     return oblicz_idf_bm25(wszystkie_tokeny)
 
 
-def zbuduj_wektory_bm25(wszystkie_tokeny, idf, custom_k1=None, custom_b=None):
+def zbuduj_wektory_bm25(
+    wszystkie_tokeny: list[list[str]],
+    idf: dict[str, float],
+    custom_k1: float | None = None,
+    custom_b: float | None = None,
+) -> list[dict[str, float]]:
     """
     Buduje wektory BM25. Obsługa wirtualnego override dla Laboratorium (Tryb Symulacji).
     Kluczowa różnica: tf jest normalizowane przez długość dokumentu.
@@ -251,7 +258,12 @@ def zbuduj_wektory_bm25(wszystkie_tokeny, idf, custom_k1=None, custom_b=None):
     return wektory
 
 
-def zbuduj_wektory(wszystkie_tokeny, idf, custom_k1=None, custom_b=None):
+def zbuduj_wektory(
+    wszystkie_tokeny: list[list[str]],
+    idf: dict[str, float],
+    custom_k1: float | None = None,
+    custom_b: float | None = None,
+) -> list[dict[str, float]]:
     """zachowane dla kompatybilności — używa BM25 z opcją custom_params params"""
     return zbuduj_wektory_bm25(wszystkie_tokeny, idf, custom_k1, custom_b)
 
@@ -259,7 +271,9 @@ def zbuduj_wektory(wszystkie_tokeny, idf, custom_k1=None, custom_b=None):
 # ── Krok 3: podobienstwo cosinusowe ──────────────────────────────────────────
 
 
-def podobienstwo_cosinusowe(wektor_a, wektor_b):
+def podobienstwo_cosinusowe(
+    wektor_a: dict[str, float], wektor_b: dict[str, float]
+) -> float:
     """
     mierzy jak bardzo dwa wektory sa do siebie podobne.
     wynik od 0 (brak podobienstwa) do 1 (identyczne).
@@ -285,14 +299,20 @@ def podobienstwo_cosinusowe(wektor_a, wektor_b):
 
 
 class Wyszukiwarka:
-    def __init__(self, fragmenty, idf, wektory, wszystkie_tokeny):
+    def __init__(
+        self,
+        fragmenty: list[dict],
+        idf: dict[str, float],
+        wektory: list[dict[str, float]],
+        wszystkie_tokeny: list[list[str]],
+    ):
         self.fragmenty = fragmenty
         self.idf = idf
         self.wektory = wektory
         self.wszystkie_tokeny = wszystkie_tokeny
 
     @staticmethod
-    def wykryj_numer_paragrafu(pytanie):
+    def wykryj_numer_paragrafu(pytanie: str) -> str | None:
         """Wykrywa numer paragrafu z pytania (np. §18, paragraf 18)."""
         pytanie_czyste = usun_polskie_znaki(pytanie.lower())
         dopasowanie = re.search(
@@ -300,16 +320,16 @@ class Wyszukiwarka:
         )
         return dopasowanie.group(1) if dopasowanie else None
 
-    def generuj_graf_slow(self, top_k=70):
+    def generuj_graf_slow(self, top_k: int = 70) -> dict:
         """Mapuje całą rozpiętość merytoryczną dokumentu w pary skojarzeń na podstawie sąsiedztwa."""
 
         # Cache na poziomie instancji - graf generujemy ZAWSZE TYLKO RAZ!
         cache_key = f"_graf_cache_{top_k}_dziala"
         if hasattr(self, cache_key):
-            return getattr(self, cache_key)
+            return getattr(self, cache_key)  # type: ignore
 
-        bigramy = Counter()
-        wystapienia_wezlow = Counter()
+        bigramy: Counter[tuple[str, str]] = Counter()
+        wystapienia_wezlow: Counter[str] = Counter()
 
         # Mielenie całych akapitów wyraz po wyrazie
         for tokeny in self.wszystkie_tokeny:
@@ -321,11 +341,11 @@ class Wyszukiwarka:
                     continue  # Odrzuca błąd samotnej wyspy (słowo łączące się same ze sobą)
                 # Sortowanie, żeby kolejność słów (A->B czy B->A) nie grała roli
                 para = tuple(sorted([A, B]))
-                bigramy[para] += 1
+                bigramy[para] += 1  # type: ignore
 
         najczestsze = bigramy.most_common(top_k)
 
-        wezly_set = set()
+        wezly_set: set[str] = set()
         edges = []
         for (A, B), waga in najczestsze:
             if waga < 2:
@@ -377,11 +397,11 @@ class Wyszukiwarka:
                 )
         return None
 
-    def generuj_graf_paragrafow(self):
+    def generuj_graf_paragrafow(self) -> dict:
         """Generuje siatkę relacji między paragrafami na podstawie podobieństwa wektorowego."""
         cache_key = "_graf_paragrafow_cache"
         if hasattr(self, cache_key):
-            return getattr(self, cache_key)
+            return getattr(self, cache_key)  # type: ignore
 
         nodes = []
         for frag in self.fragmenty:
@@ -420,7 +440,13 @@ class Wyszukiwarka:
         setattr(self, cache_key, wynik)
         return wynik
 
-    def szukaj(self, pytanie, n_wynikow=1, zrodlo=None, virtual_params=None):
+    def szukaj(
+        self,
+        pytanie: str,
+        n_wynikow: int = 1,
+        zrodlo: str | None = None,
+        virtual_params: dict | None = None,
+    ) -> list[WynikWyszukiwania]:
         """
         Dla podanego pytania zwraca n najbardziej pasujacych fragmentow.
         Parametr virtual_params to słownik suwaków z Laboratorium w locie omijający Cache.

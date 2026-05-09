@@ -10,8 +10,7 @@ __pycache__/
 # --- Dane Aplikacji (v2) ---
 # Ignorujemy wygenerowane bazy i logi
 v2/data/*.pkl
-v2/data/*.db
-v2/data/asystent.db
+v2/**/*.db
 v2/logs/
 *.log
 

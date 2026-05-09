@@ -60,7 +60,12 @@ class IndeksZdan:
     Każde zdanie z każdego paragrafu jest osobnym dokumentem.
     """
 
-    def __init__(self, zdania, idf, wektory):
+    def __init__(
+        self,
+        zdania: list[dict[str, str]],
+        idf: dict[str, float],
+        wektory: list[dict[str, float]],
+    ):
         self.zdania = zdania
         self.idf = idf
         self.wektory = wektory

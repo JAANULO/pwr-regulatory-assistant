@@ -97,25 +97,31 @@ _feedback = FeedbackRepository(polacz, TRYB)
 # ── Publiczne API — thin wrappers delegujące do repozytoriów ──────────────────
 
 
-def zapisz_pytanie(pytanie, tytul, podobienstwo, baza="studia", odpowiedz=None):
+def zapisz_pytanie(
+    pytanie: str,
+    tytul: str | None,
+    podobienstwo: float,
+    baza: str = "studia",
+    odpowiedz: str | None = None,
+) -> int | None:
     return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
 
 
-def pobierz_pytanie(pytanie_id):
+def pobierz_pytanie(pytanie_id: int) -> dict | None:
     return _pytania.pobierz(pytanie_id)
 
 
-def pobierz_ostatnie_pytania(limit=10):
+def pobierz_ostatnie_pytania(limit: int = 10) -> list[dict]:
     return _pytania.pobierz_ostatnie(limit)
 
 
-def pobierz_statystyki():
+def pobierz_statystyki() -> dict:
     return _pytania.pobierz_statystyki()
 
 
-def zapisz_feedback(pytanie_id, ocena, komentarz=None):
+def zapisz_feedback(pytanie_id: int, ocena: int, komentarz: str | None = None) -> bool:
     return _feedback.zapisz(pytanie_id, ocena, komentarz)
 
 
-def pobierz_wspolczynniki_zbiorczo():
+def pobierz_wspolczynniki_zbiorczo() -> dict[str, float]:
     return _feedback.pobierz_wspolczynniki_zbiorczo()

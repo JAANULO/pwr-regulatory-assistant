@@ -9,6 +9,14 @@ import sys
 
 from .wyszukiwarka import tokenizuj as _tokenizuj
 
+if __name__ != "__main__":
+    from domain.models import WynikWyszukiwania
+else:
+    # Dla testów lokalnych
+    from typing import TYPE_CHECKING
+    if TYPE_CHECKING:
+        from domain.models import WynikWyszukiwania
+
 
 # ── słowa kluczowe do wykrywania tematu pytania ───────────────────────────────
 
@@ -97,7 +105,7 @@ ZACHETY = [
 # ── funkcje pomocnicze ────────────────────────────────────────────────────────
 
 
-def wykryj_temat(pytanie):
+def wykryj_temat(pytanie: str) -> str:
     """wykrywa temat pytania na podstawie słów kluczowych"""
     pytanie_lower = pytanie.lower()
     for temat, slowa in TEMATY.items():
@@ -106,13 +114,18 @@ def wykryj_temat(pytanie):
     return "domyślny"
 
 
-def _score_zdanie(zdanie: str, tokeny_pytania: list) -> int:
+def _score_zdanie(zdanie: str, tokeny_pytania: list[str]) -> int:
     """Liczy ile tokenów pytania pojawia się w zdaniu – im więcej, tym lepiej."""
     zdanie_lower = zdanie.lower()
     return sum(1 for t in tokeny_pytania if t in zdanie_lower)
 
 
-def wyciagnij_zdania(tresc, max_zdan=3, szukaj=None, pytanie_tokeny=None):
+def wyciagnij_zdania(
+    tresc: str,
+    max_zdan: int = 3,
+    szukaj: list[str] | None = None,
+    pytanie_tokeny: list[str] | None = None,
+) -> list[str]:
     tresc = re.sub(r"^§\s*\d+\.\s*\S[^\n\.]{0,60}\.?\s*", "", tresc).strip()
     tresc_split = re.sub(
         r"(?<!\bust)(?<!\bpkt)(?<!\bart)(?<!\bpoz)\.\s+(?=[A-ZŁŚŻŹ\d])", "|||", tresc
@@ -145,7 +158,7 @@ def wyciagnij_zdania(tresc, max_zdan=3, szukaj=None, pytanie_tokeny=None):
     return wynik
 
 
-def wyciagnij_skale_ocen(tresc):
+def wyciagnij_skale_ocen(tresc: str) -> str:
     """specjalna obsługa – wyciąga tabelę ocen jako czytelne punkty"""
     oceny = [
         ("5,0", "bardzo dobry", "90–100%"),
@@ -166,8 +179,12 @@ def wyciagnij_skale_ocen(tresc):
 
 
 def formatuj_odpowiedz(
-    pytanie, wynik_wyszukiwarki, najlepsze_zdanie=None, skrot=None, tylko_jedno=False
-):
+    pytanie: str,
+    wynik_wyszukiwarki: "WynikWyszukiwania | None",
+    najlepsze_zdanie: str | None = None,
+    skrot: str | None = None,
+    tylko_jedno: bool = False,
+) -> dict | str:
     """
     tworzy przyjazną odpowiedź na podstawie pytania i wyniku z wyszukiwarki.
 
