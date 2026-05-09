@@ -9,6 +9,7 @@ import os
 import re
 import time
 from collections import Counter
+from typing import Any
 
 try:
     from core.bd import pobierz_wspolczynniki_zbiorczo
@@ -21,7 +22,7 @@ except ImportError:
 
 PLIK_BAZY = os.path.join(os.path.dirname(__file__), "..", "data", "baza_wiedzy.json")
 MAPA_WAG_TTL = 60
-_mapa_wag_cache = {"ts": 0.0, "data": {}}
+_mapa_wag_cache: dict[str, Any] = {"ts": 0.0, "data": {}}
 
 
 def _pobierz_mapa_wag_cached() -> dict[str, float]:
@@ -181,7 +182,7 @@ def oblicz_tf(slowa: list[str]) -> dict[str, float]:
     oblicza czestotliwosc kazdego slowa we fragmencie.
     wynik: slownik {slowo: wartosc_tf}
     """
-    licznik = {}
+    licznik: dict[str, int] = {}
     for slowo in slowa:
         licznik[slowo] = licznik.get(slowo, 0) + 1
 
@@ -242,7 +243,7 @@ def zbuduj_wektory_bm25(
     wektory = []
     for tokeny in wszystkie_tokeny:
         dl = len(tokeny)
-        licznik = {}
+        licznik: dict[str, int] = {}
         for slowo in tokeny:
             licznik[slowo] = licznik.get(slowo, 0) + 1
 
