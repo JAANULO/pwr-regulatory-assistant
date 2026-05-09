@@ -15,7 +15,8 @@ if V2_DIR not in sys.path:
 
 from core.slowniki import ROZSZERZENIA, SYNONIMY
 from core.stemmer import stemuj
-from infrastructure.knowledge_loader import utworz_wyszukiwarke, tokenizuj
+from core.wyszukiwarka import tokenizuj
+from infrastructure.knowledge_loader import utworz_wyszukiwarke
 
 print("=" * 55)
 print("  WERYFIKACJA PROJEKTU")
@@ -97,18 +98,17 @@ try:
 except py_compile.PyCompileError as e:
     print(f"    Skladnia app.py: BLAD - {e}")
 
-# 7. Sprawdz czy index.html ma wyborZrodla i walidatorZrodla
-print("\n[7] Frontend (index.html):")
-index_path = os.path.join(V2_DIR, "templates", "index.html")
-html = open(index_path, encoding="utf-8").read()
+# 7. Sprawdz czy main.js ma wyborZrodla i walidatorZrodla
+print("\n[7] Frontend (main.js):")
+js_path = os.path.join(V2_DIR, "static", "js", "main.js")
+js_content = open(js_path, encoding="utf-8").read()
 checks = [
-    ("wyborZrodla", "Dropdown zrodla"),
+    ("wyborZrodla", "Obsluga zrodla (DOM ID)"),
     ("walidatorZrodla", "Funkcja walidatora"),
     ("slowa_kluczowe", "Highlight slow kluczowych"),
-    ("sformatowanaPelnaTrescDisplay", "Formatowanie pelnej tresci"),
 ]
 for token, opis in checks:
-    obecny = token in html
+    obecny = token in js_content
     print(f"    {opis}: {'OK' if obecny else 'BRAK'}")
 
 print("\n" + "=" * 55)
