@@ -13,11 +13,11 @@ RUN apt-get update && apt-get install -y \
     poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
-COPY v2/requirements.txt .
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Pobranie roota środowiska wykonawczego PWr
-COPY v2/ .
+COPY . .
 
 # Logi preinincjalizacyjne
 RUN mkdir -p logs data

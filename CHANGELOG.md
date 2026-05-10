@@ -8,11 +8,11 @@ Wszystkie istotne zmiany w projekcie są odnotowywane w tym pliku zgodnie ze sta
 ### Dodano
 - **Wzorce Projektowe**: Wdrożenie kontenera zależności (**Dependency Injection**) poprzez klasę `Container`. Usunięto globalne instancje z `app.py`.
 - **Wydajność**: Asynchroniczne zapisywanie feedbacku i logów przy użyciu modułu `threading` (non-blocking I/O).
-- **Infrastruktura**: Nowy plik `v2/infrastructure/container.py` zarządzający cyklem życia komponentów.
+- **Infrastruktura**: Nowy plik `infrastructure/container.py` zarządzający cyklem życia komponentów.
 
 ### Naprawiono
 - **CI/CD**: Usunięcie nieużywanych importów (`logging`, `LOG_LEVEL`) oraz naprawa formatowania w plikach `app.py` i `container.py`.
-- **Stabilność**: Naprawa uszkodzonych importów w `v2/app.py` po refaktoryzacji.
+- **Stabilność**: Naprawa uszkodzonych importów w `app.py` po refaktoryzacji.
 
 ---
 
@@ -22,7 +22,7 @@ Wszystkie istotne zmiany w projekcie są odnotowywane w tym pliku zgodnie ze sta
 - **Regression Testing**: Wdrożenie `tests/test_diff.py` porównującego wyniki z `baseline.json`. Automatyczna blokada wdrożeń pogarszających jakość (Baseline: 103/150).
 
 ### Zmieniono
-- **Architektura (Clean Architecture)**: Wyodrębnienie logiki biznesowej do `v2/domain/services/` oraz repozytoriów do `v2/domain/repositories/`.
+- **Architektura (Clean Architecture)**: Wyodrębnienie logiki biznesowej do `domain/services/` oraz repozytoriów do `domain/repositories/`.
 - **UI/UX**: Przywrócenie oryginalnego, ciemnego motywu ("neonowego") po odrzuceniu wersji hybrydowej.
 
 ---

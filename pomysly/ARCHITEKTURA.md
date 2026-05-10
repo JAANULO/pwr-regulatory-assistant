@@ -12,18 +12,18 @@ Ten dokument definiuje docelową architekturę techniczną i standardy inżynier
 ## 1. Architektura i Wzorce Projektowe
 
 ### 1.1 Refaktoryzacja na Serwisy Aplikacyjne (Clean Architecture)
-- `DONE` Separacja logiki biznesowej od routera (Flaska). Cała logika znajduje się w `v2/domain/services/`. Plik `app.py` pełni wyłącznie rolę punktu wejściowego (API).
+- `DONE` Separacja logiki biznesowej od routera (Flaska). Cała logika znajduje się w `domain/services/`. Plik `app.py` pełni wyłącznie rolę punktu wejściowego (API).
 
 ### 1.2 Wzorzec Repozytorium (Repository Pattern)
 - `DONE` Przeniesienie zapytań SQL z `core/bd.py` do dedykowanych klas repozytoriów.
-- **Wdrożone Repozytoria:** `PytaniaRepository`, `FeedbackRepository` w `v2/domain/repositories/`. Plik `bd.py` pełni rolę cienkiej warstwy delegującej (thin wrapper).
+- **Wdrożone Repozytoria:** `PytaniaRepository`, `FeedbackRepository` w `domain/repositories/`. Plik `bd.py` pełni rolę cienkiej warstwy delegującej (thin wrapper).
 
 ### 1.3 Obiekty Dziedzinowe (Value Objects / Dataclasses)
 - `DONE` Zastąpienie przestarzałych słowników (`dict`) ścisłymi typami strukturalnymi używając `@dataclass`.
-- **Wdrożone Obiekty:** `WynikWyszukiwania`, `Paragraf`, `OdpowiedzAPI` w pliku `v2/domain/models.py`.
+- **Wdrożone Obiekty:** `WynikWyszukiwania`, `Paragraf`, `OdpowiedzAPI` w pliku `domain/models.py`.
 
 ### 1.4 Separacja Warstwy Infrastruktury
-- `DONE` Utworzenie dedykowanego folderu `v2/infrastructure/`.
+- `DONE` Utworzenie dedykowanego folderu `infrastructure/`.
 - **Wdrożone Komponenty:** Parser PDF (`pdf_parser.py`), obsługa cache (`knowledge_loader.py`). Katalog `core/` jest wolny od logiki wejścia/wyjścia (I/O).
 
 - `DONE` Usunięcie globalnych instancji w plikach (np. `wyszukiwarka` w `app.py`) na rzecz wzorca DI. Przekazywanie obiektów do serwisów za pomocą kontenera (klasa `Container`).

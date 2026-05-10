@@ -33,7 +33,7 @@ python app.py
 
 ```
 model/
-├── v2/
+├── 
 │   ├── app.py              # Serwer Flask – główny punkt wejścia
 │   ├── core/
 │   │   ├── wyszukiwarka.py # Algorytm BM25 + TF-IDF
@@ -83,4 +83,4 @@ Przykład: `fix: popraw tokenizację dla pytań z literówkami`
 - **Python**: PEP 8, wcięcia 4 spacje, max. 100 znaków na linię
 - **HTML/JS**: wcięcia 2 spacje
 - **Zero zewnętrznych bibliotek NLP** — algorytmy BM25, Levenshteina i stemmer są napisane od zera
-- Linter: `ruff check v2/`
+- Linter: `ruff check `

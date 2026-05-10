@@ -67,13 +67,12 @@ git clone https://github.com/JAANULO/model.git
 cd model
 
 # 2. Install dependencies (Production optimized)
-pip install -r v2/requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Running Locally
 
 ```bash
-cd v2
 python app.py
 # → open http://localhost:5000
 ```
@@ -147,7 +146,6 @@ Eksperymenty z własną architekturą Transformer (v1.0) zostały przeniesione d
 
 ### Szybki start
 ```bash
-cd v2
 pip install -r requirements.txt
 python app.py
 ```
@@ -167,14 +165,14 @@ python app.py
 model/
 ├── .github/workflows/          ← CI/CD (Autotesty ruff/mypy/bandit)
 ├── Dockerfile                  ← Kontener Docker
-└── v2/                         ← Asystent Regulaminowy
-    ├── app.py                  # Serwer Flask (GUI)
-    ├── core/                   ← Logika BM25 + Levenshtein
-    ├── domain/                 ← Warstwa domenowa (Modele/Repozytoria)
-    ├── infrastructure/         ← Parsery PDF i loader wiedzy
-    ├── data/                   ← PDFy i bazy JSON
-    ├── static/                 ← Frontend (JS/CSS)
-    └── templates/              ← Widoki HTML
+├── app.py                      ← Serwer API Flask
+├── core/                       ← Algorytmy i ustawienia
+├── domain/                     ← Logika biznesowa i repozytoria
+├── infrastructure/             ← Loadery i infrastruktura
+├── static/                     ← Frontend (JS, CSS)
+├── templates/                  ← Frontend (HTML)
+├── data/                       ← Bazy wiedzy (JSON, SQLite)
+└── tests/                      ← Testy i weryfikacja
 ```
 
 ---

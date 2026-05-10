@@ -53,3 +53,27 @@
 2026-04-02 23:48:26 | INFO | Wyszukiwarka zaladowana
 2026-05-09 16:38:41 | === Sesja rozpoczęta ===
 2026-05-09 22:08:20 | INFO | Wyszukiwarka zaladowana
+2026-05-10 11:55:25 | INFO | Wyszukiwarka zainicjalizowana (DI)
+2026-05-10 11:55:25 | INFO | Indeks zdań zainicjalizowany (DI)
+2026-05-10 11:55:29 | INFO | PYTANIE: jak oblicza się średnią ocen? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 11:55:29 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "c:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "c:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 265, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "c:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz

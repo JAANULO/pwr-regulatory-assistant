@@ -15,7 +15,7 @@ Ten dokument zawiera wizję rozwoju projektu, uporządkowaną według poziomu tr
 - `DONE` Testy działają stabilnie na Windows (UTF-8, ścieżki bezwzględne).
 
 ### 0.2 Test Diff Tool (Analiza Regresji)
-- `DONE` Narzędzie `v2/tests/test_diff.py` gotowe. baseline.json wygenerowany.
+- `DONE` Narzędzie `tests/test_diff.py` gotowe. baseline.json wygenerowany.
 
 ### 0.3 Wizualny feedback "Thinking" (UI)
 - `DONE` Dodano pulsujący tekst "Szukam informacji..." i odświeżono animację dots.
