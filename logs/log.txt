@@ -77,3 +77,361 @@ Traceback (most recent call last):
         (pytanie, tytul, podobienstwo, baza, odpowiedz),
     )
 sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:53:53 | INFO | Wyszukiwarka zainicjalizowana (DI)
+2026-05-10 14:53:53 | INFO | Indeks zdań zainicjalizowany (DI)
+2026-05-10 14:53:53 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:53:53 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:53:58 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:53:58 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:54:03 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:54:03 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:54:04 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:54:04 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:54:08 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:54:08 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:54:09 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:54:09 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:54:13 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:54:13 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:54:14 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:54:14 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:54:18 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:54:18 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:54:19 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:54:19 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:54:24 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:54:24 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:54:29 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:54:29 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:54:34 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:54:34 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:54:39 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:54:39 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:54:44 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:54:44 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:54:50 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:54:50 | ERROR | Błąd podczas przetwarzania zapytania
+Traceback (most recent call last):
+  File "C:\Users\Janusz\Documents\GitHub\model\app.py", line 166, in zapytaj
+    payload = execute_ask_question(
+        pytanie=pytanie,
+    ...<10 lines>...
+        SYNONIMY=SYNONIMY,
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\services\ask_question.py", line 254, in execute_ask_question
+    pid = zapisz_pytanie(
+        pytanie, wynik.tytul, wynik.podobienstwo, odpowiedz=tekst_odpowiedzi
+    )
+  File "C:\Users\Janusz\Documents\GitHub\model\core\bd.py", line 107, in zapisz_pytanie
+    return _pytania.zapisz(pytanie, tytul, podobienstwo, baza, odpowiedz)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Janusz\Documents\GitHub\model\domain\repositories\pytania_repo.py", line 59, in zapisz
+    cur = conn.execute(
+        "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+        (pytanie, tytul, podobienstwo, baza, odpowiedz),
+    )
+sqlite3.OperationalError: table pytania has no column named odpowiedz
+2026-05-10 14:55:08 | INFO | Wyszukiwarka zainicjalizowana (DI)
+2026-05-10 14:55:08 | INFO | Indeks zdań zainicjalizowany (DI)
+2026-05-10 14:55:20 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 14:55:20 | INFO | ODPOWIEDZ: pid=1, tytul='§ 18. Egzaminy', podobienstwo=0.1786

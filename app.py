@@ -291,6 +291,8 @@ if __name__ != "__main__":
 # ── start ─────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
+    print("Inicjalizacja bazy danych...")
+    inicjalizuj()
     print("Ladowanie bazy wiedzy...")
     zaladuj_wyszukiwarke()
     print(f"Serwer startuje -> http://localhost:{FLASK_PORT}\n")
