@@ -58,11 +58,17 @@ def utworz_wyszukiwarke(plik_bazy: str) -> "Wyszukiwarka":
         )
 
     baza_mtime = max(os.path.getmtime(p) for p in aktywne_pliki)
+    idf = None
     if os.path.exists(cache) and os.path.getmtime(cache) > baza_mtime:
         print("Wczytywanie indeksu z cache...")
-        with open(cache, "rb") as f_pkl:
-            idf, wektory, wszystkie_tokeny = pickle.load(f_pkl)  # nosec B301
-    else:
+        try:
+            with open(cache, "rb") as f_pkl:
+                idf, wektory, wszystkie_tokeny = pickle.load(f_pkl)  # nosec B301
+        except Exception as e:
+            print(f"   Ostrzeżenie: Cache uszkodzony ({e}). Buduję indeks na nowo...")
+            idf = None
+
+    if idf is None:
         print("Budowanie indeksu TF-IDF...")
         wszystkie_tokeny = []
         for f in fragmenty:
@@ -131,10 +137,13 @@ def utworz_indeks_zdan(plik_bazy: str) -> "IndeksZdan":
 
     baza_mtime = max(os.path.getmtime(p) for p in aktywne_pliki)
     if os.path.exists(cache) and os.path.getmtime(cache) > baza_mtime:
-        with open(cache, "rb") as f_pkl:
-            zdania, idf, wektory = pickle.load(f_pkl)  # nosec B301
-        print(f"  Indeks zdan: {len(zdania)} zdan (z cache)")
-        return IndeksZdan(zdania, idf, wektory)
+        try:
+            with open(cache, "rb") as f_pkl:
+                zdania, idf, wektory = pickle.load(f_pkl)  # nosec B301
+            print(f"  Indeks zdan: {len(zdania)} zdan (z cache)")
+            return IndeksZdan(zdania, idf, wektory)
+        except Exception as e:
+            print(f"  Ostrzeżenie: Cache zdan uszkodzony ({e}). Buduję na nowo...")
 
     zdania = []
     for fragment in fragmenty:
