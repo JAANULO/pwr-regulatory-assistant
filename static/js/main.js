@@ -499,7 +499,6 @@ const chatEl= document.getElementById('chat');
 
     function przelaczTrybZbiorczy(cb) {
       if (cb.checked) {
-        wybraneZrodloIndywiduallo = null;
         wybraneZrodloIndywidualne = "Wszystkie dokumenty";
       } else {
         wybraneZrodloIndywidualne = "baza_wiedzy.json"; // fallback
@@ -590,21 +589,4 @@ const chatEl= document.getElementById('chat');
       toggleSidebar();       // Zamknij pasek
       inputEl.value = pytanie; // Wstaw treść
       wyslij();              // Przekaż od razu do bota
-    }
-
-    function walidatorZrodla() {
-      const select = document.getElementById('wyborZrodla').value;
-      const input = document.getElementById('input');
-      const btn = document.getElementById('btn');
-      if (select === "odlacz") {
-        input.disabled = true;
-        btn.disabled = true;
-        input.placeholder = "Brak podpiętej bazy wiedzy! Wybierz źródło...";
-        input.style.opacity = 0.5;
-      } else {
-        input.disabled = false;
-        btn.disabled = false;
-        input.placeholder = "Zadaj pytanie o regulamin studiów…";
-        input.style.opacity = 1;
-      }
     }

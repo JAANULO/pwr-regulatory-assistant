@@ -50,7 +50,7 @@ Ten dokument zawiera wizję rozwoju projektu, uporządkowaną według poziomu tr
 ### 2.3 Żwawe odpowiedzi na "luźno" zadane pytania (Slang i Fast Track)
 - `PARTIAL` Obsługa potocznych pytań, slangu studenckiego i literówek (Słowniki i Levenshtein gotowe, brakuje Kart Szybkiej Odpowiedzi).
 - **Implementacja (Słowniki):** Nasycenie bazy `SYNONIMY` potocyzmami (np. *dziekanka, warun, uwalenie, kolos*).
-- **Implementacja (Wyszukiwarka):** Zwiększenie tolerancji algorytmu Levenshteina (`max_odleglosc=2`) dla słów dłuższych niż 6 znaków w funkcji `popraw_literowke()`.
+- **Implementacja (Wyszukiwarka):** Zwiększenie tolerancji algorytmu Levenshteina (`max_odleglosc=2`) dla słów dłuższych niż 8 znaków w funkcji `popraw_literowke()`.
 - **Implementacja (Direct Answers):** Wprowadzenie mini-bazy "Karty Szybkiej Odpowiedzi", która w przypadku 100% pewności intencji zwraca krótką, z góry zdefiniowaną odpowiedź przed zacytowaniem regulaminu.
 
 ---

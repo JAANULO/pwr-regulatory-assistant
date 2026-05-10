@@ -36,7 +36,7 @@ def podziel_na_zdania(tresc: str) -> list[str]:
 
     # podziel po kropce kończącej zdanie
     podzielony = re.sub(
-        r"(?<!\bust)(?<!\bpkt)(?<!\bart)(?<!\bpoz)(?<!\bust)(?<!\bm\.in)\.\s+(?=[A-ZŁŚŻŹ\d])",
+        r"(?<!\bust)(?<!\bpkt)(?<!\bart)(?<!\bpoz)(?<!\bm\.in)\.\s+(?=[A-ZŁŚŻŹ\d])",
         "|||",
         tresc,
     )

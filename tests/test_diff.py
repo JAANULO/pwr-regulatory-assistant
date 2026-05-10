@@ -13,9 +13,9 @@ import sys
 
 # Ustawienie PYTHONPATH dla katalogu głównego projektu
 skrypt_dir = os.path.dirname(os.path.abspath(__file__))
-root_dir = os.path.dirname(skrypt_dir)
-if root_dir not in sys.path:
-    sys.path.insert(0, root_dir)
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
 
 # Importy absolutne po ustawieniu sys.path
 from core.bd import inicjalizuj  # type: ignore

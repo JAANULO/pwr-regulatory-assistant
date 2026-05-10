@@ -129,7 +129,7 @@ def wyciagnij_zdania(
 ) -> list[str]:
     tresc = re.sub(r"^§\s*\d+\.\s*\S[^\n\.]{0,60}\.?\s*", "", tresc).strip()
     tresc_split = re.sub(
-        r"(?<!\bust)(?<!\bpkt)(?<!\bart)(?<!\bpoz)\.\s+(?=[A-ZŁŚŻŹ\d])", "|||", tresc
+        r"(?<!\bust)(?<!\bpkt)(?<!\bart)(?<!\bpoz)(?<!\bm\.in)\.\s+(?=[A-ZŁŚŻŹ\d])", "|||", tresc
     )
     czesci = [c.strip() for c in tresc_split.split("|||") if len(c.strip()) > 30]
 
@@ -243,7 +243,7 @@ def formatuj_odpowiedz(
     }
 
     tokeny_pyt = _tokenizuj(pytanie)
-    if "Skala ocen" in tytul or "skala ocen" in tytul:
+    if "skala ocen" in tytul.lower():
         zdania = [wyciagnij_skale_ocen(tresc)]
     else:
         slowa = None
@@ -251,7 +251,6 @@ def formatuj_odpowiedz(
             if fraza in pytanie.lower():
                 slowa = kluczowe
                 break
-        tokeny_pyt = _tokenizuj(pytanie)
         zdania = wyciagnij_zdania(
             tresc, max_zdan=3, szukaj=slowa, pytanie_tokeny=tokeny_pyt
         )
@@ -259,7 +258,7 @@ def formatuj_odpowiedz(
     zacheta = random.choice(ZACHETY) if podobienstwo > 0.2 else None  # nosec B311
 
     # Pokaż "pełny paragraf" tylko jeśli punkty to < 40% treści
-    pokaz_pelna = len(" ".join(zdania if zdania else [])) < len(tresc) * 0.4
+    # Logika wyświetlania pełnego paragrafu jest realizowana na froncie
 
     if najlepsze_zdanie and najlepsze_zdanie not in (zdania or []):
         if tylko_jedno:

@@ -11,9 +11,9 @@ import time
 from collections import OrderedDict
 
 # Ustawienie ścieżki dla modułów lokalnych
-v2_root = os.path.abspath(os.path.dirname(__file__))
-if v2_root not in sys.path:
-    sys.path.insert(0, v2_root)
+ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
 
 from flask import Flask, jsonify, render_template, request
 

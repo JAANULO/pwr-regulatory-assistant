@@ -103,8 +103,7 @@ print("\n[7] Frontend (main.js):")
 js_path = os.path.join(ROOT_DIR, "static", "js", "main.js")
 js_content = open(js_path, encoding="utf-8").read()
 checks = [
-    ("wyborZrodla", "Obsluga zrodla (DOM ID)"),
-    ("walidatorZrodla", "Funkcja walidatora"),
+    ("infoBazaWidzy", "Zarządzanie bazami (Modal)"),
     ("slowa_kluczowe", "Highlight slow kluczowych"),
 ]
 for token, opis in checks:

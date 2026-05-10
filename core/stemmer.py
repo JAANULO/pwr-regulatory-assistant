@@ -99,7 +99,7 @@ MIN_RDZEN = 4
 # Słownik sztywnych koninkcyjnych oboczności
 OBOCZNOSCI = {
     "studenci": "student",
-    "kolowkium": "kolokwium",
+    "kolokwium": "kolokwium",
     "kolokwia": "kolokwium",
     "kolos": "kolokwium",
     "skreslenia": "skreslenie",

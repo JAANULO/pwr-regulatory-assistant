@@ -103,6 +103,14 @@ def normalizuj(slowo: str) -> str:
     return SYNONIMY.get(slowo, slowo)
 
 
+STOPWORDS = {
+    "i", "w", "z", "do", "na", "ze", "nie", "sie", "jest", "to", "a", "o", "lub", "oraz", "po", "przez",
+    "przy", "ten", "ta", "te", "tego", "tej", "tym", "tych", "od", "za", "jak", "czy", "co", "kt", "kto",
+    "ale", "bo", "by", "go", "mu", "jej", "ich", "im", "je", "dla", "gdy", "az", "tez", "juz", "jesli",
+    "ze", "tego", "tej", "jego", "jako",
+}
+
+
 def tokenizuj(tekst: str) -> list[str]:
     """
     rozbija tekst na liste slow (tokenow).
@@ -114,63 +122,10 @@ def tokenizuj(tekst: str) -> list[str]:
     tekst = re.sub(r"[^\w\s]", " ", tekst)
 
     slowa = tekst.split()
-    stopwords = {
-        "i",
-        "w",
-        "z",
-        "do",
-        "na",
-        "ze",
-        "nie",
-        "sie",
-        "jest",
-        "to",
-        "a",
-        "o",
-        "lub",
-        "oraz",
-        "po",
-        "przez",
-        "przy",
-        "ten",
-        "ta",
-        "te",
-        "tego",
-        "tej",
-        "tym",
-        "tych",
-        "od",
-        "za",
-        "jak",
-        "czy",
-        "co",
-        "kt",
-        "kto",
-        "ale",
-        "bo",
-        "by",
-        "go",
-        "mu",
-        "jej",
-        "ich",
-        "im",
-        "je",
-        "dla",
-        "gdy",
-        "az",
-        "tez",
-        "juz",
-        "jesli",
-        "ze",
-        "tego",
-        "tej",
-        "jego",
-        "jako",
-    }
     return [
         normalizuj(s)
         for s in slowa
-        if s not in stopwords and (len(s) > 1 or s.isdigit())
+        if s not in STOPWORDS and (len(s) > 1 or s.isdigit())
     ]
 
 
