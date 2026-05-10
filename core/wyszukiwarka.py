@@ -319,9 +319,7 @@ class Wyszukiwarka:
         """Wykrywa numer paragrafu z zapytania (np. §18, paragraf 18)."""
         # Standaryzacja: usuwamy polskie znaki i zamieniamy na małe litery
         p = usun_polskie_znaki(pytanie.lower())
-        dopasowanie = re.search(
-            r"(?:§\s*|paragraf(?:ie|u|em|owi|ach)?\s+)(\d+)", p
-        )
+        dopasowanie = re.search(r"(?:§\s*|paragraf(?:ie|u|em|owi|ach)?\s+)(\d+)", p)
         return dopasowanie.group(1) if dopasowanie else None
 
     def generuj_graf_slow(self, top_k: int = 70) -> dict:

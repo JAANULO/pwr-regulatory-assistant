@@ -91,7 +91,9 @@ def inicjalizuj():
                 columns = [row[1] for row in cursor.fetchall()]
                 if "odpowiedz" not in columns:
                     conn.execute("ALTER TABLE pytania ADD COLUMN odpowiedz TEXT")
-                    _LOG.info("Migracja: Dodano kolumnę 'odpowiedz' do tabeli 'pytania'")
+                    _LOG.info(
+                        "Migracja: Dodano kolumnę 'odpowiedz' do tabeli 'pytania'"
+                    )
             except Exception as e:
                 _LOG.warning("Błąd migracji kolumny 'odpowiedz': %s", e)
 

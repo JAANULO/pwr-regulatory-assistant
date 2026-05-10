@@ -5,7 +5,6 @@ Adres:        http://localhost:5000
 """
 
 import os
-import re
 import sys
 import time
 from collections import OrderedDict

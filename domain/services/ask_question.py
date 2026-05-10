@@ -1,4 +1,3 @@
-import re
 import logging
 from typing import TYPE_CHECKING, Any, Callable
 
@@ -288,5 +287,3 @@ def execute_ask_question(
     if cache_dozwolony:
         cache_set_fn(pytanie, payload)
     return payload
-
-
