@@ -5,6 +5,7 @@
 Flask==3.1.3
 gunicorn==21.2.0          # produkcja (Linux)
 python-dotenv==1.2.2
+psycopg2-binary==2.9.9    # PostgreSQL (produkcja)
 requests==2.32.3          # testy integracyjne
 
 # ── Algorytmy i Dane ────────────────────────────────────────────

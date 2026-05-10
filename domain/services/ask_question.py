@@ -43,7 +43,7 @@ def execute_ask_question(
             return cached
 
     # 1. Sprawdzenie czy pytanie odnosi się wprost do konkretnego paragrafu
-    numer_paragrafu = _wykryj_numer_paragrafu_wew(pytanie, MAPA_ZNAKOW)
+    numer_paragrafu = wyszukiwarka.wykryj_numer_paragrafu(pytanie)
     if numer_paragrafu:
         wynik_bezposredni = wyszukiwarka.pobierz_paragraf_po_numerze(numer_paragrafu)
         if wynik_bezposredni:
@@ -290,9 +290,3 @@ def execute_ask_question(
     return payload
 
 
-def _wykryj_numer_paragrafu_wew(pytanie: str, MAPA_ZNAKOW: dict) -> str | None:
-    pytanie_ascii = pytanie.lower().translate(MAPA_ZNAKOW)
-    dopasowanie = re.search(
-        r"(?:§\s*|paragraf(?:ie|u|em|owi|ach)?\s+)(\d+)", pytanie_ascii
-    )
-    return dopasowanie.group(1) if dopasowanie else None

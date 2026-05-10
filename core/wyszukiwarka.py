@@ -316,10 +316,11 @@ class Wyszukiwarka:
 
     @staticmethod
     def wykryj_numer_paragrafu(pytanie: str) -> str | None:
-        """Wykrywa numer paragrafu z pytania (np. §18, paragraf 18)."""
-        pytanie_czyste = usun_polskie_znaki(pytanie.lower())
+        """Wykrywa numer paragrafu z zapytania (np. §18, paragraf 18)."""
+        # Standaryzacja: usuwamy polskie znaki i zamieniamy na małe litery
+        p = usun_polskie_znaki(pytanie.lower())
         dopasowanie = re.search(
-            r"(?:§\s*|paragraf(?:ie|u|em|owi|ach)?\s+)(\d+)", pytanie_czyste
+            r"(?:§\s*|paragraf(?:ie|u|em|owi|ach)?\s+)(\d+)", p
         )
         return dopasowanie.group(1) if dopasowanie else None
 
@@ -553,9 +554,9 @@ def main():
         wyniki = w.szukaj(pytanie, n_wynikow=1)
         if wyniki:
             w1 = wyniki[0]
-            print(f"  Paragraf:     {w1['tytul']}")
-            print(f"  Podobienstwo: {w1['podobienstwo']}")
-            print(f"  Fragment:     {w1['tresc'][:200]}...")
+            print(f"  Paragraf:     {w1.tytul}")
+            print(f"  Podobienstwo: {w1.podobienstwo}")
+            print(f"  Fragment:     {w1.tresc[:200]}...")
         print()
 
 

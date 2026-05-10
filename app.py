@@ -30,6 +30,7 @@ from core.bd import (
     PLIK_DB,
 )
 from core.slowniki import ROZSZERZENIA, SYNONIMY
+from core.wyszukiwarka import Wyszukiwarka
 from domain.services.debug_service import execute_debug_info, get_error_details
 
 
@@ -45,12 +46,8 @@ def _znajdz_rozszerzenie(pytanie_lower: str) -> str:
 
 
 def _wykryj_numer_paragrafu(pytanie: str) -> str | None:
-    """Wykrywa numer paragrafu z zapytania (np. §18, paragraf 18)."""
-    pytanie_ascii = pytanie.lower().translate(MAPA_ZNAKOW)
-    dopasowanie = re.search(
-        r"(?:§\s*|paragraf(?:ie|u|em|owi|ach)?\s+)(\d+)", pytanie_ascii
-    )
-    return dopasowanie.group(1) if dopasowanie else None
+    """Wykrywa numer paragrafu używając scentralizowanej logiki."""
+    return Wyszukiwarka.wykryj_numer_paragrafu(pytanie)
 
 
 def _cache_get(pytanie: str) -> dict | None:
