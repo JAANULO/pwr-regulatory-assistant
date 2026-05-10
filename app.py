@@ -87,11 +87,7 @@ CACHE_ODPOWIEDZI: OrderedDict[str, dict] = OrderedDict()
 # ── Kontener zależności (DI) ──────────────────────────────────────────────────
 from infrastructure.container import Container
 
-container = Container(
-    base_dir=BASE_DIR,
-    data_dir=DATA_DIR,
-    log_file=PLIK_LOG
-)
+container = Container(base_dir=BASE_DIR, data_dir=DATA_DIR, log_file=PLIK_LOG)
 logger = container.logger
 
 

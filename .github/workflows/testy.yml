@@ -32,32 +32,31 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('v2/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
       - name: Instalacja zależności
         run: |
           python -m pip install --upgrade pip
-          pip install -r v2/requirements.txt
+          pip install -r requirements.txt
 
       - name: Linter – ruff (PEP8 + błędy składni)
-        run: python -m ruff check v2/
+        run: python -m ruff check .
 
       - name: Formatter – ruff (Sprawdzenie formatowania)
-        run: python -m ruff format --check v2/
+        run: python -m ruff format --check .
 
       - name: Bezpieczeństwo – bandit (Skanowanie luk)
-        run: python -m bandit -r v2/ -x v2/tests/
+        run: python -m bandit -r . -x ./tests/
 
       - name: Typowanie – mypy (Statyczna analiza typów)
-        run: python -m mypy v2/ --ignore-missing-imports
+        run: python -m mypy . --ignore-missing-imports
 
       - name: Testy regresji i Accuracy Gate (test_diff.py)
         run: |
-          cd v2
           python tests/test_diff.py --compare --min-accuracy 0.65
 
       - name: Test Integracyjny – Smoke Test (Flask)
         run: |
-          python v2/tests/smoke_test.py
+          python tests/smoke_test.py

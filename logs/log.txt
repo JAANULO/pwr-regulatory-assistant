@@ -1,0 +1,55 @@
+2026-03-17 14:29:05 | INFO | Wyszukiwarka zaladowana
+2026-03-17 14:29:12 | INFO | PYTANIE: co grozi za nieobecności?
+2026-03-17 14:29:12 | INFO | ODPOWIEDZ: pid=15, tytul='§ 16. Realizacja zajęć', podobienstwo=0.2395
+2026-03-17 17:43:43 | === Sesja rozpoczęta ===
+2026-03-17 17:43:51 | === Sesja przerwana ===
+
+2026-03-17 17:44:03 | INFO | Wyszukiwarka zaladowana
+2026-03-17 17:45:39 | INFO | PYTANIE: jezeli nie zdałem przedmiotu to kiedy musze go poprawiać?
+2026-03-17 17:45:39 | INFO | BRAK_TRAFIENIA: pytanie='jezeli nie zdałem przedmiotu to kiedy musze go poprawiać?'
+2026-03-17 17:45:57 | INFO | PYTANIE: jak wznowić studia po skreśleniu?
+2026-03-17 17:45:57 | INFO | ODPOWIEDZ: pid=16, tytul='§ 34. Wznowienia studiów, przywrócenie praw studenta', podobienstwo=0.1695
+2026-03-17 17:46:03 | INFO | PYTANIE: jak oblicza się średnią ocen?
+2026-03-17 17:46:03 | INFO | ODPOWIEDZ: pid=17, tytul='§ 19. Skala ocen', podobienstwo=0.4717
+2026-03-17 17:46:21 | INFO | PYTANIE: ile razy moge nie zdać egzaminu?
+2026-03-17 17:46:21 | INFO | ODPOWIEDZ: pid=18, tytul='§ 18. Egzaminy', podobienstwo=0.1810
+2026-03-20 13:49:08 | INFO | Wyszukiwarka zaladowana
+2026-03-20 13:49:13 | INFO | PYTANIE: jak oblicza się średnią ocen? | kontekst: None
+2026-03-20 13:52:57 | INFO | Wyszukiwarka zaladowana
+2026-03-20 13:53:03 | INFO | PYTANIE: jak oblicza się średnią ocen? | kontekst: None
+2026-03-20 13:53:03 | INFO | ODPOWIEDZ: pid=6, tytul='§ 19. Skala ocen', podobienstwo=0.4717
+2026-03-20 14:03:47 | INFO | Wyszukiwarka zaladowana
+2026-03-20 14:03:54 | INFO | PYTANIE: kiedy można wziąć urlop dziekański? | kontekst: None
+2026-03-20 14:03:54 | INFO | ODPOWIEDZ: pid=7, tytul='§ 27. Urlopy', podobienstwo=0.2007
+2026-03-20 14:31:25 | INFO | Wyszukiwarka zaladowana
+2026-03-20 14:32:01 | INFO | PYTANIE: jak oblicza się średnią ocen? | kontekst: None
+2026-03-20 14:32:02 | INFO | ODPOWIEDZ: pid=8, tytul='§ 19. Skala ocen', podobienstwo=0.4717
+2026-03-20 14:32:18 | INFO | PYTANIE: przepis na zupę pomidorową | kontekst: None
+2026-03-20 14:32:18 | INFO | BRAK_TRAFIENIA: pytanie='przepis na zupę pomidorową', najlepsze=0.112
+2026-03-20 14:43:44 | INFO | Wyszukiwarka zaladowana
+2026-03-20 14:43:56 | INFO | PYTANIE: ile masz lat? | kontekst: None
+2026-03-20 14:43:56 | INFO | BRAK_TRAFIENIA: pytanie='ile masz lat?', najlepsze=0.096, pid=9
+2026-03-20 14:45:21 | INFO | Wyszukiwarka zaladowana
+2026-03-20 14:45:29 | INFO | PYTANIE: ile masz lat? | kontekst: None
+2026-03-20 14:45:29 | INFO | BRAK_TRAFIENIA: pytanie='ile masz lat?', najlepsze=0.096, pid=10
+2026-03-20 14:45:35 | INFO | FEEDBACK: pytanie_id=10, ocena=-1
+2026-04-02 21:38:33 | INFO | Wyszukiwarka zaladowana
+2026-04-02 21:39:02 | INFO | PYTANIE: ile razy można podejść do egzaminu? | kontekst: None
+2026-04-02 21:52:09 | INFO | Wyszukiwarka zaladowana
+2026-04-02 21:52:20 | INFO | PYTANIE: ile razy można podejść do egzaminu? | kontekst: None
+2026-04-02 21:53:45 | INFO | PYTANIE: jak wznowić studia po skreśleniu? | kontekst: None
+2026-04-02 21:54:21 | INFO | Wyszukiwarka zaladowana
+2026-04-02 21:54:27 | INFO | PYTANIE: co grozi za nieobecności? | kontekst: None
+2026-04-02 21:54:56 | INFO | PYTANIE: ile razy można podejść do egzaminu? | kontekst: None
+2026-04-02 21:56:36 | INFO | Wyszukiwarka zaladowana
+2026-04-02 21:56:40 | INFO | PYTANIE: co grozi za nieobecności? | kontekst: None
+2026-04-02 21:56:40 | INFO | ODPOWIEDZ: pid=11, tytul='§ 16. Realizacja zajęć', podobienstwo=0.2395
+2026-04-02 23:16:43 | INFO | Wyszukiwarka zaladowana
+2026-04-02 23:41:49 | INFO | Wyszukiwarka zaladowana
+2026-04-02 23:44:16 | INFO | Wyszukiwarka zaladowana
+2026-04-02 23:44:25 | INFO | Wyszukiwarka zaladowana
+2026-04-02 23:45:46 | INFO | Wyszukiwarka zaladowana
+2026-04-02 23:46:28 | INFO | Wyszukiwarka zaladowana
+2026-04-02 23:48:26 | INFO | Wyszukiwarka zaladowana
+2026-05-09 16:38:41 | === Sesja rozpoczęta ===
+2026-05-09 22:08:20 | INFO | Wyszukiwarka zaladowana

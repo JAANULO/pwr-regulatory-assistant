@@ -33,7 +33,7 @@ Ten dokument definiuje docelową architekturę techniczną i standardy inżynier
 ## 2. Optymalizacja i Czystość Kodu
 
 ### 2.1 Asynchroniczne logowanie statystyk
-- `TODO` Wykorzystanie modułu `threading` do zapisu danych o logach i feedbacku bez blokowania wątku głównego (znaczne przyspieszenie czasu odpowiedzi API).
+- `DONE` Wykorzystanie modułu `threading` do zapisu feedbacku i logów "do poprawy" w tle. Dzięki temu API nie czeka na operacje I/O dysku przed wysłaniem potwierdzenia do klienta.
 
 ### 2.2 Standaryzacja Importów (PEP 8 Policy)
 - `DONE` Uporządkowanie importów (biblioteki wbudowane -> zewnętrzne -> lokalne absolutne). Eliminacja importów względnych w całym projekcie.
