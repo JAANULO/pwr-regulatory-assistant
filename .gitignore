@@ -7,16 +7,15 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 
-# --- Dane Aplikacji (v2) ---
+# --- Dane Aplikacji ---
 # Ignorujemy wygenerowane bazy i logi
-v2/data/*.pkl
-v2/**/*.db
-v2/logs/
+data/*.pkl
+data/*.db
+logs/
 *.log
 
 # --- Środowisko i Klucze ---
 .env
-v2/.env
 venv/
 .venv/
 
