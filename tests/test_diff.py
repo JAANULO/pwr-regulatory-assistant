@@ -11,16 +11,20 @@ import json
 import os
 import sys
 
-# Ustawienie PYTHONPATH dla folderu v2
+# Ustawienie PYTHONPATH dla katalogu głównego projektu
 skrypt_dir = os.path.dirname(os.path.abspath(__file__))
-v2_dir = os.path.dirname(skrypt_dir)
-if v2_dir not in sys.path:
-    sys.path.insert(0, v2_dir)
+root_dir = os.path.dirname(skrypt_dir)
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
 
 # Importy absolutne po ustawieniu sys.path
 from core.bd import inicjalizuj  # type: ignore
 from infrastructure.knowledge_loader import utworz_wyszukiwarke  # type: ignore
-from tests.test import TESTY  # type: ignore
+
+try:
+    from tests.test import TESTY  # type: ignore
+except ImportError:
+    from test import TESTY  # type: ignore
 
 BASELINE_FILE = os.path.join(os.path.dirname(__file__), "baseline.json")
 

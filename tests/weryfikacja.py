@@ -9,9 +9,9 @@ import sys
 
 # Ustawienie ścieżki dla modułów lokalnych
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-V2_DIR = os.path.dirname(BASE_DIR)
-if V2_DIR not in sys.path:
-    sys.path.insert(0, V2_DIR)
+ROOT_DIR = os.path.dirname(BASE_DIR)
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
 
 from core.slowniki import ROZSZERZENIA, SYNONIMY
 from core.stemmer import stemuj
@@ -55,7 +55,7 @@ for s, oczek in testy_stem:
 print("\n[4] Wyszukiwarka:")
 
 # Ścieżka bezwzględna do bazy wiedzy
-PLIK_BAZY = os.path.join(V2_DIR, "data", "baza_wiedzy.json")
+PLIK_BAZY = os.path.join(ROOT_DIR, "data", "baza_wiedzy.json")
 w = utworz_wyszukiwarke(PLIK_BAZY)
 print(
     f"    Metoda szukaj(zrodlo=): {'TAK' if 'zrodlo' in str(w.szukaj.__code__.co_varnames) else 'BRAK'}"
@@ -92,7 +92,7 @@ print(f"    OK: {len(tokeny) > 0}")
 # 6. Kluczowe importy app.py
 print("\n[6] Importy app.py:")
 try:
-    app_path = os.path.join(V2_DIR, "app.py")
+    app_path = os.path.join(ROOT_DIR, "app.py")
     py_compile.compile(app_path, doraise=True)
     print("    Skladnia app.py: OK")
 except py_compile.PyCompileError as e:
@@ -100,7 +100,7 @@ except py_compile.PyCompileError as e:
 
 # 7. Sprawdz czy main.js ma wyborZrodla i walidatorZrodla
 print("\n[7] Frontend (main.js):")
-js_path = os.path.join(V2_DIR, "static", "js", "main.js")
+js_path = os.path.join(ROOT_DIR, "static", "js", "main.js")
 js_content = open(js_path, encoding="utf-8").read()
 checks = [
     ("wyborZrodla", "Obsluga zrodla (DOM ID)"),
