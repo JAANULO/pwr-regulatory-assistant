@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM python:3.13-slim
 
-# Blokada przed trzymaniem spacji w pip i outputach systemowych  
+# Blokada przed trzymaniem spacji w pip i outputach systemowych
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 

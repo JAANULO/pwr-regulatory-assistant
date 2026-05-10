@@ -25,9 +25,9 @@ def execute_admin_eksport_csv(token, admin_token):
     )
 
     zapytanie = """
-        SELECT p.czas, p.pytanie, p.tytul, p.podobienstwo, p.odpowiedz, f.ocena 
-        FROM pytania p 
-        LEFT JOIN feedback f ON p.id = f.pytanie_id 
+        SELECT p.czas, p.pytanie, p.tytul, p.podobienstwo, p.odpowiedz, f.ocena
+        FROM pytania p
+        LEFT JOIN feedback f ON p.id = f.pytanie_id
         ORDER BY p.id DESC
     """
 

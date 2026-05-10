@@ -1,0 +1,27 @@
+# .pre-commit-config.yaml – Wersja Ultra-Kompatybilna dla Windows
+# Wszystkie hooki są wywoływane lokalnie przez Pythona, aby uniknąć błędów /bin/sh
+
+repos:
+  - repo: local
+    hooks:
+      # 1. Ruff - Formatowanie
+      - id: ruff-format
+        name: ruff format
+        entry: python -m ruff format
+        language: system
+        types: [python]
+
+      # 2. Ruff - Linter (poprawki)
+      - id: ruff-lint
+        name: ruff lint
+        entry: python -m ruff check --fix
+        language: system
+        types: [python]
+
+      # 3. Twój test weryfikacyjny
+      - id: weryfikacja-projektu
+        name: Weryfikacja spójności projektu
+        entry: cmd /c python tests/weryfikacja.py
+        language: system
+        pass_filenames: false
+        always_run: true

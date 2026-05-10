@@ -129,7 +129,9 @@ def wyciagnij_zdania(
 ) -> list[str]:
     tresc = re.sub(r"^§\s*\d+\.\s*\S[^\n\.]{0,60}\.?\s*", "", tresc).strip()
     tresc_split = re.sub(
-        r"(?<!\bust)(?<!\bpkt)(?<!\bart)(?<!\bpoz)(?<!\bm\.in)\.\s+(?=[A-ZŁŚŻŹ\d])", "|||", tresc
+        r"(?<!\bust)(?<!\bpkt)(?<!\bart)(?<!\bpoz)(?<!\bm\.in)\.\s+(?=[A-ZŁŚŻŹ\d])",
+        "|||",
+        tresc,
     )
     czesci = [c.strip() for c in tresc_split.split("|||") if len(c.strip()) > 30]
 

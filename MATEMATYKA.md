@@ -6,7 +6,7 @@ Dokument ten opisuje, jak system działa "pod maską". Przedstawia algorytmy i w
 
 ## 1. System Wyszukiwania (Asystent Regulaminowy)
 
-Celem systemu jest znalezienie jednego, najbardziej trafnego paragrafu regulaminu na podstawie pytania użytkownika. 
+Celem systemu jest znalezienie jednego, najbardziej trafnego paragrafu regulaminu na podstawie pytania użytkownika.
 
 ### A. Korekta literówek – Odległość Levenshteina
 Używamy algorytmu programowania dynamicznego do obliczenia minimalnej liczby operacji (wstawienie, usunięcie, zamiana) potrzebnych do przekształcenia jednego słowa w drugie. W kodzie dopuszczamy maksymalnie **1 błąd edycyjny** dla krótkich słów oraz **2 błędy** dla słów dłuższych niż 8 znaków.

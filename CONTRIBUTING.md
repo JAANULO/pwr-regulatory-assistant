@@ -1,6 +1,6 @@
 # Jak wnosić wkład do projektu
 
-Dziękuję za zainteresowanie projektem **Asystent Regulaminowy PWr**!  
+Dziękuję za zainteresowanie projektem **Asystent Regulaminowy PWr**!
 Poniżej znajdziesz wszystko, czego potrzebujesz, żeby uruchomić projekt lokalnie i wprowadzić zmiany.
 
 ---
@@ -33,7 +33,7 @@ python app.py
 
 ```
 model/
-├── 
+├──
 │   ├── app.py              # Serwer Flask – główny punkt wejścia
 │   ├── core/
 │   │   ├── wyszukiwarka.py # Algorytm BM25 + TF-IDF

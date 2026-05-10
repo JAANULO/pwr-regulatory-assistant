@@ -16,4 +16,5 @@ tqdm==4.66.2
 ruff==0.15.10             # linter + formatter
 mypy==1.14.1              # statyczna kontrola typów
 bandit==1.7.8             # skanowanie bezpieczeństwa
+pre-commit==3.7.1         # automatyzacja hooków gita
 types-requests==2.31.0.20240406  # typy dla mypy

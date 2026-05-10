@@ -4,7 +4,7 @@
 
 # 🇬🇧 PWr Regulatory Assistant
 
-> An information retrieval system for the study regulations of Wrocław University of Science and Technology (PWr).  
+> An information retrieval system for the study regulations of Wrocław University of Science and Technology (PWr).
 > Unlike classic LLMs that hallucinate — **this system always cites the exact source paragraph**.
 
 An academic project built entirely from scratch — no external NLP libraries (no scikit-learn, no Hugging Face, no external APIs).
@@ -101,7 +101,7 @@ The project includes advanced diagnostics for the production environment (e.g., 
 
 # 🇵🇱 Asystent Regulaminowy PWr
 
-> System wyszukiwania informacji z regulaminu studiów Politechniki Wrocławskiej.  
+> System wyszukiwania informacji z regulaminu studiów Politechniki Wrocławskiej.
 > Zamiast halucynować jak klasyczne LLM — **zawsze podaje źródłowy paragraf regulaminu**.
 
 Projekt akademicki zbudowany od zera — bez gotowych bibliotek NLP (bez sklearn, bez Hugging Face, bez zewnętrznych API).
@@ -128,7 +128,7 @@ pytanie użytkownika: "ile razy można podejść do egzaminu?"
 ## Wersje projektu
 
 ### Asystent Regulaminowy (Aktywna)
-Główny cel projektu to dostarczanie precyzyjnych informacji prawnych. 
+Główny cel projektu to dostarczanie precyzyjnych informacji prawnych.
 - **BM25 napisany od zera** (lepsza trafność niż TF-IDF).
 - **Korekcja literówek Levenshteina** (od zera).
 - **Indeks na poziomie zdań** — system znajduje konkretne zdanie z odpowiedzią.

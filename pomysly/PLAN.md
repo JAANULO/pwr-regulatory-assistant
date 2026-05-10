@@ -26,7 +26,7 @@ Ten dokument zawiera wizję rozwoju projektu, uporządkowaną według poziomu tr
 
 ### 1.1 Bezpieczeństwo i Konfiguracja (.env)
 - `DONE` Migracja `ADMIN_TOKEN` oraz ścieżek baz danych do pliku `.env` (python-dotenv).
- 
+
  ### 1.2 Responsywność i Mobilność (Mobile First)
  - `TODO` Dostosowanie interfejsu do urządzeń mobilnych (Aplikacja webowa/PWA).
  - **Implementacja:** Meta-tagi viewport, elastyczne kontenery (Flexbox/Grid), obsługa gestów dotykowych dla bocznego menu.
@@ -81,11 +81,11 @@ Ten dokument zawiera wizję rozwoju projektu, uporządkowaną według poziomu tr
 - **Implementacja (API):** Nowy endpoint przyjmujący pliki (np. `.pdf`, `.txt`) do ekstrakcji czystego tekstu.
 - **Implementacja (Logika):** Segmentacja tekstu pliku na zdania/akapity i iteracyjne przepuszczanie każdego przez funkcję `wyszukiwarka.szukaj()`.
 - **Implementacja (Wynik):** Zestawienie i wyświetlenie ustrukturyzowanego raportu porównawczego w UI, prezentującego zdania wsadowe zestawione z dopasowanymi paragrafami regulaminu (na podstawie wyniku BM25).
- 
+
  ---
- 
+
  ## Poziom 6: Administracja i Diagnostyka
- 
+
  ### 6.1 Tryb Diagnostyczny (Admin Health Check)
  - `TODO` Rozbudowany system raportowania błędów dla administratora w przypadku awarii hostingu.
  - **Implementacja (Backend):** Endpoint `/health` zwracający stan połączenia z bazą, dostępność plików JSON oraz status procesów.
@@ -101,4 +101,3 @@ Ten dokument zawiera wizję rozwoju projektu, uporządkowaną według poziomu tr
 
 > [!IMPORTANT]
 > Projekt jest rozwijany z **całkowitym wyłączeniem gotowych modeli AI** (No NLP Libraries).
-
