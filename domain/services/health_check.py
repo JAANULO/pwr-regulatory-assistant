@@ -21,7 +21,7 @@ def execute_health_check(
     if provided_token != admin_token:
         return {"error": "Brak dostępu (Nieprawidłowy token)"}, 403
 
-    status = {
+    status: Dict[str, Any] = {
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
         "status": "OK",
         "checks": {},
