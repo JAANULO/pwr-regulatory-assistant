@@ -51,7 +51,7 @@ jobs:
         run: python -m bandit -r . -x ./tests/
 
       - name: Typowanie – mypy (Statyczna analiza typów)
-        run: python -m mypy . --ignore-missing-imports
+        run: python -m mypy . --ignore-missing-imports --explicit-package-bases
 
       - name: Testy regresji i Accuracy Gate (test_diff.py)
         run: |
