@@ -193,6 +193,17 @@ def admin_debug():
     return jsonify(info), status
 
 
+@app.route("/admin/health", methods=["GET"])
+def admin_health():
+    token = request.args.get("token", "")
+    from domain.services.health_check import execute_health_check
+
+    info, status = execute_health_check(
+        DATA_DIR, PLIK_BAZY, ADMIN_TOKEN, token, container, CACHE_ODPOWIEDZI
+    )
+    return jsonify(info), status
+
+
 @app.route("/feedback", methods=["POST"])
 def feedback():
     dane = request.get_json(force=True)

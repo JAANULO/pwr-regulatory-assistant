@@ -60,9 +60,32 @@ def polacz():
 
 
 def inicjalizuj():
-    """Tworzy tabele jeśli nie istnieją."""
+    """Tworzy tabele jeśli nie istnieją (SQLite i PostgreSQL)."""
     if TRYB == "postgres":
-        pass  # tabele stworzone w Supabase przez SQL Editor
+        with polacz() as conn:
+            cur = conn.cursor()
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS pytania (
+                    id          SERIAL PRIMARY KEY,
+                    pytanie     TEXT NOT NULL,
+                    tytul       TEXT,
+                    podobienstwo REAL,
+                    odpowiedz   TEXT,
+                    baza        TEXT DEFAULT 'studia',
+                    czas        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS feedback (
+                    id          SERIAL PRIMARY KEY,
+                    pytanie_id  INTEGER REFERENCES pytania(id),
+                    ocena       INTEGER NOT NULL,
+                    komentarz   TEXT,
+                    czas        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
+            conn.commit()
+            _LOG.info("Baza PostgreSQL zainicjalizowana pomyślnie")
     else:
         with polacz() as conn:
             conn.executescript("""

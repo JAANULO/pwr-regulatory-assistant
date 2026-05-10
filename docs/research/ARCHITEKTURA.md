@@ -52,8 +52,8 @@ Obecnie skrypt weryfikuje składnię (`ruff`) oraz odpala plik `test.py`. To nie
 - `DONE` Zmiana wywoływanego skryptu z `tests/test.py` na `tests/test_diff.py` w pliku `.github/workflows/testy.yml`. Skrypt `test_diff.py` automatycznie zatrzyma wdrożenie i zwróci błąd (`exit code 1`), jeśli wprowadzona przez Ciebie zmiana pogorszy algorytm poniżej obecnego Baseline (103/150).
 
 ### 3.2 Diagnostyka i Observability (Admin View)
-- `TODO` Wprowadzenie wzorca "Health Check" dla infrastruktury.
-- **Zasada:** System musi udostępniać endpoint diagnostyczny (zabezpieczony tokenem), który weryfikuje integralność bazy wiedzy (JSON), połączenie z bazą SQL oraz status cache'owania w locie. Umożliwi to szybką identyfikację problemów po stronie hostingu (np. Render/Heroku).
+- `DONE` Wprowadzenie wzorca "Health Check" dla infrastruktury.
+- **Zasada:** System udostępnia endpoint `/admin/health` (zabezpieczony tokenem), który weryfikuje integralność bazy wiedzy (JSON), połączenie z bazą SQL oraz status cache'owania w locie. Umożliwia to szybką identyfikację problemów po stronie hostingu.
 
 ### 3.3 Weryfikacja Typów (Mypy) w CI
 - `DONE` Zintegrowanie narzędzia `mypy` w potoku GitHub Actions w celu sprawdzania zgodności typów przy każdym Commicie.
