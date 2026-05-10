@@ -26,7 +26,7 @@ class FeedbackRepository:
         pytanie_id: int,
         ocena: int,
         komentarz: Optional[str] = None,
-    ) -> None:
+    ) -> bool:
         """Zapisuje ocenę użytkownika do bazy."""
         if self._tryb == "postgres":
             try:
@@ -45,6 +45,7 @@ class FeedbackRepository:
                     "INSERT INTO feedback (pytanie_id, ocena, komentarz) VALUES (?,?,?)",
                     (pytanie_id, ocena, komentarz),
                 )
+        return True
 
     def pobierz_wspolczynniki_zbiorczo(self) -> dict:
         """

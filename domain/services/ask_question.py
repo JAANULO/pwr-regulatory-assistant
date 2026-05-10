@@ -26,26 +26,15 @@ def execute_ask_question(
     Przetwarza zapytanie użytkownika, obsługuje rozszerzanie kontekstu,
     podobieństwa z BM25, disambiguację oraz generowanie skrótów/odpowiedzi.
     """
-    try:
-        from core.formatowanie import formatuj_odpowiedz
-        from core.bd import zapisz_pytanie
-        from core.wyszukiwarka import tokenizuj
-        from core.intencje import (
-            wykryj_intencje,
-            generuj_skrot,
-            wyciagnij_liczbe,
-            wyciagnij_termin,
-        )
-    except ImportError:
-        from ...core.formatowanie import formatuj_odpowiedz
-        from ...core.bd import zapisz_pytanie
-        from ...core.wyszukiwarka import tokenizuj
-        from ...core.intencje import (
-            wykryj_intencje,
-            generuj_skrot,
-            wyciagnij_liczbe,
-            wyciagnij_termin,
-        )
+    from core.formatowanie import formatuj_odpowiedz
+    from core.bd import zapisz_pytanie
+    from core.wyszukiwarka import tokenizuj
+    from core.intencje import (
+        wykryj_intencje,
+        generuj_skrot,
+        wyciagnij_liczbe,
+        wyciagnij_termin,
+    )
 
     cache_dozwolony = kontekst_tytul is None
     if cache_dozwolony:

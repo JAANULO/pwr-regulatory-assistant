@@ -5,10 +5,7 @@ from datetime import datetime
 
 def _background_save(pid, ocena, base_dir, logger):
     """Faktyczny zapis wykonujący się w osobnym wątku."""
-    try:
-        from core.bd import zapisz_feedback, pobierz_pytanie
-    except ImportError:
-        from ...core.bd import zapisz_feedback, pobierz_pytanie
+    from core.bd import zapisz_feedback, pobierz_pytanie
 
     try:
         zapisz_feedback(pid, ocena)
