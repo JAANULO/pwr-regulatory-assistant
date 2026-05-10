@@ -4,13 +4,11 @@ Uruchomienie: python app.py
 Adres:        http://localhost:5000
 """
 
-import logging
 import os
 import re
 import sys
 import time
 from collections import OrderedDict
-from typing import TYPE_CHECKING
 
 # Ustawienie ścieżki dla modułów lokalnych
 v2_root = os.path.abspath(os.path.dirname(__file__))
@@ -24,7 +22,6 @@ from core.settings import (
     FLASK_DEBUG,
     FLASK_HOST,
     FLASK_PORT,
-    LOG_LEVEL,
 )
 from core.bd import (
     inicjalizuj,
@@ -33,14 +30,10 @@ from core.bd import (
     PLIK_DB,
 )
 from core.slowniki import ROZSZERZENIA, SYNONIMY
-from core.wyszukiwarka import Wyszukiwarka
 from domain.services.debug_service import execute_debug_info, get_error_details
 
 
 app = Flask(__name__)
-
-if TYPE_CHECKING:
-    from core.indeks_zdan import IndeksZdan
 
 
 def _znajdz_rozszerzenie(pytanie_lower: str) -> str:
