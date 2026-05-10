@@ -12,7 +12,7 @@ An academic project built entirely from scratch — no external NLP libraries (n
 ---
 
 <p align="center">
-  <img src="preview.png" alt="App Interface GUI" width="800">
+  <img src="docs/assets/preview.png" alt="App Interface GUI" width="800">
 </p>
 
 ## How It Works
@@ -42,10 +42,11 @@ The current version of the project is a production-ready information retrieval s
 Instead of generating answers from memory, it uses a **RAG (Retrieval-Augmented Generation)** approach focused on precision.
 
 **Key Features:**
-- **BM25 Algorithm from scratch** — optimized for Polish legal texts.
+- **BM25 Algorithm from scratch** — optimized for Polish legal texts ([see details in docs/MATEMATYKA.md](docs/MATEMATYKA.md)).
 - **Levenshtein Distance** — custom implementation for typo correction.
 - **Intent Classifier** — extracts numbers, dates, and consequences from paragraphs.
 - **Diagnostics API** — built-in tools for production monitoring and error tracing.
+- **Release History** — track changes in [docs/CHANGELOG.md](docs/CHANGELOG.md).
 
 ### Mini-GPT Research (Archived/Moved)
 
@@ -162,9 +163,13 @@ python app.py
 ## Architektura projektu
 
 ```
-model/
-├── .github/workflows/          ← CI/CD (Autotesty ruff/mypy/bandit)
-├── Dockerfile                  ← Kontener Docker
+├── docs/                       ← Dokumentacja techniczna i changelog
+│   ├── assets/                 ← Obrazy i grafiki
+│   └── research/               ← Notatki i pomysły (dawniej pomysly/)
+├── deployment/                 ← Pliki wdrożeniowe (Docker, Gunicorn)
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   └── gunicorn.conf.py
 ├── app.py                      ← Serwer API Flask
 ├── core/                       ← Algorytmy i ustawienia
 ├── domain/                     ← Logika biznesowa i repozytoria

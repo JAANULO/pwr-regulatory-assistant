@@ -435,3 +435,7 @@ sqlite3.OperationalError: table pytania has no column named odpowiedz
 2026-05-10 14:55:08 | INFO | Indeks zdań zainicjalizowany (DI)
 2026-05-10 14:55:20 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
 2026-05-10 14:55:20 | INFO | ODPOWIEDZ: pid=1, tytul='§ 18. Egzaminy', podobienstwo=0.1786
+2026-05-10 15:45:13 | INFO | Wyszukiwarka zainicjalizowana (DI)
+2026-05-10 15:45:13 | INFO | Indeks zdań zainicjalizowany (DI)
+2026-05-10 15:45:24 | INFO | PYTANIE: ile razy mozna zdawac egzamin? | zrodlo: Wszystkie dokumenty | kontekst: None
+2026-05-10 15:45:24 | INFO | ODPOWIEDZ: pid=1, tytul='§ 18. Egzaminy', podobienstwo=0.1786

@@ -6,10 +6,11 @@ Wszystkie istotne zmiany w projekcie są odnotowywane w tym pliku zgodnie ze sta
 
 ## [2.3.0] - 2026-05-10
 ### Dodano
-- **Struktura (Root Migration)**: Pełne przeniesienie projektu z katalogu `v2/` do roota. Usunięcie wszystkich nieaktualnych referencji ścieżek.
+- **Struktura (Root Migration & Cleanup)**: Pełne przeniesienie projektu do roota. Reorganizacja plików pomocniczych do folderów `/docs` (dokumentacja), `/docs/research` (notatki) oraz `/deployment` (Docker/Gunicorn).
 - **Optymalizacja Wyszukiwarki**: Przeniesienie `STOPWORDS` poza funkcję `tokenizuj` (znaczny wzrost wydajności przy seryjnych zapytaniach).
 - **Poprawa Skuteczności**: Rozszerzenie słowników o frazy dotyczące praktyk zawodowych i ECTS. Wynik testów regresji wzrósł do **65.7%** (+3 punkty).
-- **Czyszczenie Kodu**: Usunięcie martwego kodu (funkcja `walidatorZrodla`) oraz unifikacja stałej `ROOT_DIR`.
+- **Czyszczenie Kodu**: Usunięcie martwego kodu oraz unifikacja stałej `ROOT_DIR`.
+- **Automatyzacja**: Wdrożenie `pre-commit` z linterem `ruff` i autotestem weryfikacyjnym.
 
 ### Naprawiono
 - **Błędy JS**: Naprawa literówki w wyborze źródła wiedzy oraz przywrócenie poprawnego działania historii zapytań.

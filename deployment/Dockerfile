@@ -24,5 +24,5 @@ RUN mkdir -p logs data
 
 # Konfiguracja portu i start serwera
 EXPOSE 5000
-# Używamy formy powłokowej, aby wspierać zmienną środowiskową $PORT (Render/Heroku)
-CMD gunicorn -b 0.0.0.0:${PORT:-5000} app:app
+# Używamy konfiguracji z folderu deployment/
+CMD gunicorn -c deployment/gunicorn.conf.py app:app
