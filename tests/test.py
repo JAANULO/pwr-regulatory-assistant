@@ -104,6 +104,10 @@ TESTY_TRUDNE = [
     ("co to jest powtazane przedmyotu", "Powtarz"),
     ("kedy mozna vzac urlop dzekansky", "Urlop"),
     ("czy praca jest spravdzana antyplagyatem", "Dyplom"),
+    # --- Nowe testy definicji ze Słownika Pojęć (§ 2) ---
+    ("kto to jest absolwent?", "Słownik"),
+    ("co oznacza roznice programowe?", "Słownik"),
+    ("co to sa punkty ects?", "Słownik"),
 ]
 
 
@@ -246,6 +250,30 @@ TESTY = (
 
 
 def main():
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--k1", type=float, default=None)
+    parser.add_argument("--b", type=float, default=None)
+    parser.add_argument("--syn", type=float, default=None)
+    parser.add_argument("--threshold", type=float, default=None)
+    args, unknown = parser.parse_known_args()
+
+    virtual_params = {}
+    if args.k1 is not None:
+        virtual_params["bm25_k1"] = args.k1
+    if args.b is not None:
+        virtual_params["bm25_b"] = args.b
+    if args.syn is not None:
+        virtual_params["synonym_weight"] = args.syn
+    if args.threshold is not None:
+        virtual_params["confidence_threshold"] = args.threshold
+
+    if not virtual_params:
+        virtual_params = None
+    else:
+        print(f"Uruchamiam testy z parametrami wirtualnymi (CLI): {virtual_params}")
+
     # Użycie ścieżek bezwzględnych dla stabilności na Windows
     SKRYPT_DIR = os.path.dirname(os.path.abspath(__file__))
     BASE_DIR = os.path.dirname(SKRYPT_DIR)
@@ -267,7 +295,7 @@ def main():
     print(f"Rozpoczynam testy ({len(TESTY)} przypadkow)...")
 
     for pytanie, oczekiwany_fragment in TESTY:
-        wyniki = w.szukaj(pytanie, n_wynikow=1)
+        wyniki = w.szukaj(pytanie, n_wynikow=1, virtual_params=virtual_params)
         if not wyniki:
             bledy.append((pytanie, oczekiwany_fragment, "BRAK WYNIKOW"))
             continue

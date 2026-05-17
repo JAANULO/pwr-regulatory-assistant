@@ -1,0 +1,109 @@
+# data/slownik.toml - Słownik pojęć § 2 Regulaminu studiów PWr
+
+[absolwent]
+definicja = "absolwent – osoba, która ukończyła studia;"
+warianty = ["absolwent", "absolwenta", "absolwentem"]
+
+[cykl_ksztalcenia]
+definicja = "cykl kształcenia – ciąg następujących po sobie semestrów (cykli dydaktycznych) o dacie początku i – wynikającej z przypisanego do niego programu studiów – dacie końca, w których realizowane są kolejne etapy studiów z przypisanego programu i planu studiów;"
+warianty = ["cykl ksztalcenia", "cyklu ksztalcenia"]
+
+[dzd]
+definicja = "DZD – Dział Dostępności;"
+warianty = ["dzd", "dzial dostepnosci"]
+
+[dziekan]
+definicja = "dziekan – dziekan wydziału, prodziekan wydziału, na którym kształci się student, dyrektor filii;"
+warianty = ["dziekan", "dziekana", "dziekanem"]
+
+[efekty_uczenia_sie]
+definicja = "efekty uczenia się – wiedza, umiejętności i kompetencje społeczne nabyte przez studenta w procesie uczenia;"
+warianty = ["efekty uczenia sie", "efektow uczenia sie", "efektem uczenia sie"]
+
+[egzaminator]
+definicja = "egzaminator – koordynator przedmiotu lub inna osoba wskazana przez odpowiednio dziekana, dyrektora SJO, uprawniona to weryfikacji efektów uczenia się;"
+warianty = ["egzaminator"]
+
+[etap_studiow]
+definicja = "etap studiów – semestr studiów, podstawowa jednostka składowa programu studiów realizowana w cyklu dydaktycznym obejmujący okres, w którym odbywają się zajęcia oraz sesję egzaminacyjną;"
+warianty = ["etap studiow", "etapu studiow", "etapow studiow"]
+
+[kalendarz_akademicki]
+definicja = "kalendarz akademicki – dokument określający szczegółową organizację roku akademickiego;"
+warianty = ["kalendarz akademicki"]
+
+[karta_przedmiotu]
+definicja = "karta przedmiotu – będący elementem programu studiów opis przedmiotu, określający przedmiotowe efekty uczenia się oraz treści programowe zapewniające uzyskanie efektów uczenia się w ramach przedmiotu;"
+warianty = ["karta przedmiotu", "karty przedmiotu"]
+
+[kierunek_studiow]
+definicja = "kierunek studiów – wyodrębniona część jednego lub kilku obszarów kształcenia, przyporządkowana co najmniej do jednej dyscypliny, realizowana w sposób określony w programie studiów;"
+warianty = ["kierunek studiow", "kierunku studiow"]
+
+[kierunek_standaryzowany]
+definicja = "kierunek studiów przygotowujący do wykonywania zawodów wymienionych w art. 68 ust 1 Ustawy;"
+warianty = ["kierunek standaryzowany"]
+
+[koordynator_przedmiotu]
+definicja = "koordynator przedmiotu – prowadzący zajęcia, a w przypadku grupy zajęć – prowadzący zajęcia wiodące (końcowe) w grupie zajęć lub inna osoba wskazana przez odpowiednio dziekana, dyrektora SJO, dyrektora SWFiS, uprawniona do weryfikacji efektów uczenia się;"
+warianty = ["koordynator przedmiotu", "koordynatora przedmiotu"]
+
+[plan_studiow]
+definicja = "plan studiów – będący elementem programu studiów harmonogram realizacji kolejnych etapów studiów na danym kierunku, poziomie, profilu i formie wraz z przypisanymi do tych etapów przedmiotami, wymiarem godzinowym i punktowym, a także dopuszczalnym deficytem punktów ECTS;"
+warianty = ["plan studiow", "planu studiow"]
+
+[program_studiow]
+definicja = "program studiów – efekty uczenia się, przypisane do danego kierunku, poziomu, profilu i formy studiów oraz opis procesu prowadzącego do uzyskania tych efektów, wraz ze wskazaniem liczby punktów ECTS przypisanych do zajęć;"
+warianty = ["program studiow", "programu studiow"]
+
+[prowadzacy_zajecia]
+definicja = "prowadzący zajęcia – nauczyciel akademicki lub inna osoba, której powierzono realizację zajęć;"
+warianty = ["prowadzacy zajecia", "prowadzacego zajecia"]
+
+[przedmiot]
+definicja = "przedmiot – określone w programie i planie studiów zajęcia lub grupa zajęć;"
+warianty = ["przedmiot", "przedmiotu"]
+
+[punkty_ects]
+definicja = "punkty ECTS – punkty zdefiniowane w europejskim systemie akumulacji i transferu punktów (European Credit Transfer System) jako miara średniego nakładu pracy studenta, niezbędnego do uzyskania zakładanych efektów uczenia się;"
+warianty = ["punkty ects", "punkt ects", "ects"]
+
+[rozklad_zajec]
+definicja = "rozkład zajęć – szczegółowy harmonogram realizacji zajęć w danym semestrze (cyklu dydaktycznym), określający w szczególności miejsce i termin odbywania zajęć wraz ze wskazaniem prowadzącego zajęcia;"
+warianty = ["rozklad zajec", "rozkladu zajec"]
+
+[roznice_programowe]
+definicja = "różnice programowe – przedmioty, które student zobowiązany jest zaliczyć dodatkowo ze względu na przeniesienie z innej uczelni lub uczelni zagranicznej, zmianę wydziału, kierunku studiów lub formy studiów, powtarzanie etapu studiów, urlop od zajęć, wznowienie studiów;"
+warianty = ["roznice programowe", "roznic programowych", "roznica programowa"]
+
+[semestr]
+definicja = "semestr (cykl dydaktyczny) – semestr danego roku akademickiego, składający się z okresu, w którym odbywają się zajęcia, sesji egzaminacyjnej oraz przerwy semestralnej;"
+warianty = ["semestr", "semestru", "cykl dydaktyczny", "cyklu dydaktycznego"]
+
+[student]
+definicja = "student – osoba, która została przyjęta na studia w Uczelni, rozpoczęła studia i nabyła prawa studenta;"
+warianty = ["student", "studenta", "studentem", "studenci"]
+
+[student_ze_szczegolnymi_potrzebami]
+definicja = "student ze szczególnymi potrzebami – student będący jednocześnie osobą, o której mowa w art. 2 pkt 3 ustawy z dnia 19 lipca 2019 r. o zapewnieniu dostępności osobom ze szczególnymi potrzebami (t.j. Dz. U. z 2022 r., poz. 2240);"
+warianty = ["student ze szczegolnymi potrzebami"]
+
+[system_teleinformatyczny]
+definicja = "system teleinformatyczny – Uniwersytecki System Obsługi Studentów (USOS) służy w Uczelni do obsługi toku studiów oraz do komunikacji ze studentami drogą elektroniczną;"
+warianty = ["system teleinformatyczny"]
+
+[tok_studiow]
+definicja = "tok studiów – przebieg studiów danego studenta, na który składają się wynikające z programu studiów etapy studiów oraz wykorzystane urlopy i powtarzane etapy studiów, od pierwszego etapu studiów do uzyskania dyplomu ukończenia studiów;"
+warianty = ["tok studiow", "toku studiow"]
+
+[ustawa]
+definicja = "Ustawa – Ustawa z dnia 20 lipca 2018 r. Prawo o szkolnictwie wyższym i nauce;"
+warianty = ["ustawa", "ustawy"]
+
+[wydzial]
+definicja = "wydział – podstawowa jednostka organizacyjna Uczelni, której podstawowymi zadaniami są kształcenie i działalność naukowa, prowadząca studia na określonych kierunkach, poziomach, profilu i formie;"
+warianty = ["wydzial", "wydzialu"]
+
+[zapisy_na_zajecia]
+definicja = "zapisy (rejestracja) na zajęcia – zapisanie na zajęcia w ramach przedmiotu;"
+warianty = ["zapisy na zajecia", "zapisow na zajecia", "rejestracja na zajecia", "zapisy"]

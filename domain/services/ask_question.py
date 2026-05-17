@@ -87,6 +87,34 @@ def execute_ask_question(
                 cache_set_fn(pytanie, payload)
             return payload
 
+    # 1.5. Sprawdzenie czy pytanie odnosi się do definicji pojęć z § 2 Słownika
+    from core.szybkie_odpowiedzi import dopasuj_szybka_odpowiedz
+
+    szybka_def = dopasuj_szybka_odpowiedz(pytanie)
+    if szybka_def:
+        wynik_bezposredni = wyszukiwarka.pobierz_paragraf_po_numerze(2)
+        if wynik_bezposredni:
+            pid = zapisz_pytanie(
+                pytanie,
+                wynik_bezposredni.tytul,
+                wynik_bezposredni.podobienstwo,
+                odpowiedz=szybka_def,
+            )
+            payload = {
+                "odpowiedz": szybka_def,
+                "tytul": wynik_bezposredni.tytul,
+                "podobienstwo": 1.0,
+                "pelna_tresc": wynik_bezposredni.tresc,
+                "tytul2": None,
+                "podobienstwo2": None,
+                "pytanie_id": pid,
+                "kontekst_tytul": wynik_bezposredni.tytul,
+                "zrodlo": wynik_bezposredni.zrodlo,
+            }
+            if cache_dozwolony:
+                cache_set_fn(pytanie, payload)
+            return payload
+
     rozszerzenie = znajdz_rozszerzenie_fn(pytanie.lower())
     pytanie_do_szukania = (
         (pytanie + " " + rozszerzenie).strip() if rozszerzenie else pytanie

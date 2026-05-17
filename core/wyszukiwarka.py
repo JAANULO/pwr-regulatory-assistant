@@ -525,6 +525,14 @@ class Wyszukiwarka:
             if trafienie:
                 return [trafienie]
 
+        # Szybka ścieżka dla definicji ze słownika pojęć (§ 2)
+        from core.szybkie_odpowiedzi import dopasuj_szybka_odpowiedz
+
+        if dopasuj_szybka_odpowiedz(pytanie):
+            trafienie = self.pobierz_paragraf_po_numerze(2)
+            if trafienie:
+                return [trafienie]
+
         # tokenizuj z korekcją literówek (w tym na synonimach) PRZED normalizacją
         slownik_korekcji = set(self.idf.keys()) | set(SYNONIMY.keys())
         tokeny_pytania = tokenizuj(pytanie, slownik_korekcji)
@@ -578,6 +586,12 @@ class Wyszukiwarka:
 
         wyniki.sort(reverse=True)
 
+        confidence_threshold = 0.0
+        if virtual_params:
+            confidence_threshold = float(
+                virtual_params.get("confidence_threshold", 0.0)
+            )
+
         kandydaci = [
             WynikWyszukiwania(
                 tytul=self.fragmenty[i]["tytul"],
@@ -586,7 +600,7 @@ class Wyszukiwarka:
                 zrodlo=self.fragmenty[i].get("zrodlo"),
             )
             for podobienstwo, i in wyniki
-            if podobienstwo > 0
+            if podobienstwo >= confidence_threshold and podobienstwo > 0
         ]
 
         # Filtrowanie po zrodle (dropdown z frontendu)

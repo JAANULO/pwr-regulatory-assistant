@@ -4,8 +4,13 @@ Wszystkie istotne zmiany w projekcie są odnotowywane w tym pliku zgodnie ze sta
 
 ---
 
-## [2.4.0] - 2026-05-17
+## [2.5.0] - 2026-05-17
 ### Dodano
+- **Karty Szybkiej Odpowiedzi (Słownik pojęć - 2.3)**: Wdrożenie mechanizmu natychmiastowego serwowania oficjalnych definicji z § 2 regulaminu studiów PWr (np. absolwent, student, punkty ECTS) w 100% poprawnej polszczyźnie (bez mojibake).
+- **Dwuetapowe dopasowywanie intencji**: Zaprojektowanie bezpiecznego dopasowania fraz wielowyrazowych oraz precyzyjnego oczyszczania podmiotu dla wyrazów jednowyrazowych, co unika fałszywych dopasowań (np. powtarzanie przedmiotu).
+- **Integracja bezinwazyjna**: Wpięcie szybkiej ścieżki w `Wyszukiwarka.szukaj()` oraz `execute_ask_question()` bez konieczności jakichkolwiek modyfikacji w kodzie frontendu (pełna kompatybilność wsteczna).
+- **Laboratorium Regulaminowe (Tryb Symulacji - symulacja.md)**: Wdrożenie pełnego wsparcia dla specyfikacji trybu symulacji: zaimplementowano dynamiczny próg pewności (`confidence_threshold` / "Nie wiem"), zintegrowano nowy suwak we frontendzie, zaimplementowano parametryzację CLI w skrypcie `tests/test.py` do masowych symulacji z konsoli, oraz przywrócono pełną wierność symulacji systemu (usunięto sztuczny bypass szybkich ścieżek).
+- **Testy**: Dodanie przypadków weryfikacyjnych dla pojęć słownikowych do `tests/test.py`. Skuteczność testów regresyjnych wynosi **110/156** zaliczonych przypadków.
 - **Wyszukiwarka (Korekcja Fonetyczna - 2.4)**: Wdrożenie uproszczeń fonetycznych języka polskiego (Homophonic Polish Fuzzy Search). Słowa zawierające wyłącznie błędy ortograficzne (np. `rezignacja`, `gurny`, `hrobry`) są korygowane w czasie O(1).
 - **Potok NLP**: Przebudowanie kolejności tokenizacji (Stopwords -> Korekcja literówek -> Synonimy), co odblokowało korekcję literówek na synonimach i studenckim slangu (np. `dzekansky` -> `dziekański`).
 - **Skrypt Walidacyjny (3.4)**: Utworzenie `tests/validate_dictionaries.py` w celu wykrywania cykli, błędów składni, nieoczyszczonych kluczy i łańcuchów normalizacji w bazie słowników.

@@ -56,10 +56,10 @@ Ten dokument zawiera wizję rozwoju projektu, uporządkowaną według poziomu tr
 - `DONE` Rozbudowa synonimów dla nowych, trudnych paragrafów regulaminu.
 
 ### 2.3 Żwawe odpowiedzi na "luźno" zadane pytania (Slang i Fast Track)
-- `PARTIAL` Obsługa potocznych pytań, slangu studenckiego i literówek (Słowniki i Levenshtein gotowe, brakuje Kart Szybkiej Odpowiedzi).
+- `DONE` Obsługa potocznych pytań, slangu studenckiego i literówek (Słowniki i Levenshtein gotowe, wdrożono zrekonstruowane Karty Szybkiej Odpowiedzi oparte na § 2 Słownika Pojęć).
 - **Implementacja (Słowniki):** Nasycenie bazy `SYNONIMY` potocyzmami (np. *dziekanka, warun, uwalenie, kolos*).
 - **Implementacja (Wyszukiwarka):** Zwiększenie tolerancji algorytmu Levenshteina (`max_odleglosc=2`) dla słów dłuższych niż 8 znaków w funkcji `popraw_literowke()`.
-- **Implementacja (Direct Answers):** Wprowadzenie mini-bazy "Karty Szybkiej Odpowiedzi", która w przypadku 100% pewności intencji zwraca krótką, z góry zdefiniowaną odpowiedź przed zacytowaniem regulaminu.
+- **Implementacja (Direct Answers):** Wdrożenie inteligentnego dopasowywania dwuetapowego i natychmiastowego serwowania definicji słownikowych z § 2 bez zmian w kodzie warstwy graficznej.
 
 ### 2.4 Fonetyczna tolerancja na literówki (Homophonic Polish Fuzzy Search)
 - `DONE` Zwiększenie celności korekcji literówek o błędy fonetyczne typowe dla języka polskiego.

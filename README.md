@@ -80,7 +80,7 @@ python app.py
 
 ---
 
-## 🛠️ Diagnostics & Admin Tools
+## Diagnostics & Admin Tools
 
 The project includes advanced diagnostics for the production environment (e.g., Render):
 - **Debug Endpoint**: `/admin/debug?token=YOUR_TOKEN`

@@ -9,6 +9,7 @@ def execute_simulate_question(dane, wyszukiwarka, logger):
         "bm25_k1": float(dane.get("k1", 1.5)),
         "bm25_b": float(dane.get("b", 0.75)),
         "synonym_weight": float(dane.get("syn_weight", 1.0)),
+        "confidence_threshold": float(dane.get("threshold", 0.0)),
     }
 
     if not pytanie:

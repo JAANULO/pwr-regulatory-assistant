@@ -46,13 +46,14 @@ def waliduj_slowniki():
 
     plik_synonimow = os.path.join(root_dir, "data", "synonimy.toml")
     plik_rozszerzen = os.path.join(root_dir, "data", "rozszerzenia.toml")
+    plik_slownika = os.path.join(root_dir, "data", "slownik.toml")
 
     bledy = []
 
     print("=== Uruchamiam Walidację Spójności Słowników ===")
 
     # 1. Sprawdzenie istnienia plików
-    for plik in [plik_synonimow, plik_rozszerzen]:
+    for plik in [plik_synonimow, plik_rozszerzen, plik_slownika]:
         if not os.path.exists(plik):
             bledy.append(f"Plik słownika nie istnieje: {plik}")
 
@@ -75,6 +76,14 @@ def waliduj_slowniki():
     except Exception as e:
         bledy.append(f"Błąd składni w rozszerzenia.toml: {e}")
         rozszerzenia = {}
+
+    try:
+        with open(plik_slownika, "rb") as f:
+            slownik_pojec = tomllib.load(f)
+        print("  [OK] slownik.toml załadowany pomyślnie.")
+    except Exception as e:
+        bledy.append(f"Błąd składni w slownik.toml: {e}")
+        slownik_pojec = {}
 
     if bledy:
         wypisz_bledy_i_wyjdz(bledy)
@@ -118,6 +127,41 @@ def waliduj_slowniki():
             bledy.append(
                 f"rozszerzenia.toml: Klucz '{k}' nie jest znormalizowany! Powinien brzmieć: '{normal_k}'."
             )
+
+    # 4.5. Walidacja formatu słownika pojęć w slownik.toml
+    print("Walidacja struktury i kluczy w slownik.toml...")
+    for k, v in slownik_pojec.items():
+        if not isinstance(v, dict):
+            bledy.append(f"slownik.toml: Pojęcie '{k}' musi być sekcją (tabelą TOML).")
+            continue
+
+        definicja = v.get("definicja", "")
+        warianty = v.get("warianty", [])
+
+        if not isinstance(definicja, str) or not definicja.strip():
+            bledy.append(
+                f"slownik.toml: Pojęcie '{k}' musi posiadać niepustą definicję tekstową."
+            )
+
+        if not isinstance(warianty, list) or not warianty:
+            bledy.append(
+                f"slownik.toml: Pojęcie '{k}' musi posiadać niepustą listę wariantów fleksyjnych."
+            )
+            continue
+
+        for var in warianty:
+            if not isinstance(var, str) or not var.strip():
+                bledy.append(
+                    f"slownik.toml: Wariant pojęcia '{k}' musi być niepustym stringiem."
+                )
+                continue
+
+            # Sprawdzenie normalizacji wariantów
+            normal_var = usun_polskie_znaki(var.lower()).strip()
+            if var != normal_var:
+                bledy.append(
+                    f"slownik.toml: Wariant '{var}' pojęcia '{k}' nie jest znormalizowany! Powinien brzmieć: '{normal_var}'."
+                )
 
     # 5. Wykrywanie cykli i wieloetapowych łańcuchów w synonimy.toml
     print("Wyszukiwanie cykli i łańcuchów normalizacji w synonimy.toml...")

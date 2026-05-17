@@ -238,6 +238,11 @@
                 <label>Siła Synonimów (TF Multiplier) <span id="syn_val">1.00</span></label>
                 <input type="range" id="param_syn" min="0.0" max="5.0" step="0.1" value="1.0">
             </div>
+
+            <div class="control-group" style="margin-top: 20px;">
+                <label>Próg Pewności ("Nie wiem") <span id="threshold_val">0.10</span></label>
+                <input type="range" id="param_threshold" min="0.0" max="0.5" step="0.01" value="0.10">
+            </div>
         </div>
 
         <button class="run-btn" id="runTestBtn" onclick="uruchomSymulacje()">Symuluj Uderzenie</button>
@@ -256,7 +261,7 @@
 
 <script>
     // Aktualizacja wskaźników z suwaków
-    const paramInputs = ['k1', 'b', 'syn'];
+    const paramInputs = ['k1', 'b', 'syn', 'threshold'];
     paramInputs.forEach(id => {
         const el = document.getElementById(`param_${id}`);
         const valEl = document.getElementById(`${id}_val`);
@@ -336,7 +341,8 @@
             pytanie: document.getElementById('queryInput').value,
             k1: document.getElementById('param_k1').value,
             b: document.getElementById('param_b').value,
-            syn_weight: document.getElementById('param_syn').value
+            syn_weight: document.getElementById('param_syn').value,
+            threshold: document.getElementById('param_threshold').value
         };
 
         const btn = document.getElementById('runTestBtn');
@@ -381,6 +387,7 @@
             k1: document.getElementById('param_k1').value,
             b: document.getElementById('param_b').value,
             synonym_weight: document.getElementById('param_syn').value,
+            confidence_threshold: document.getElementById('param_threshold').value,
             timestamp: new Date().toISOString()
         };
         const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
