@@ -57,7 +57,12 @@ def utworz_wyszukiwarke(plik_bazy: str) -> "Wyszukiwarka":
             f"Nie znaleziono poprawnych fragmentow (tytul+tresc) w JSON: {plik_bazy}"
         )
 
-    baza_mtime = max(os.path.getmtime(p) for p in aktywne_pliki)
+    slowniki = [
+        os.path.join(data_dir, "synonimy.toml"),
+        os.path.join(data_dir, "rozszerzenia.toml"),
+    ]
+    pliki_sledzone = list(aktywne_pliki) + [s for s in slowniki if os.path.exists(s)]
+    baza_mtime = max(os.path.getmtime(p) for p in pliki_sledzone)
     idf = None
     if os.path.exists(cache) and os.path.getmtime(cache) > baza_mtime:
         print("Wczytywanie indeksu z cache...")
@@ -135,7 +140,12 @@ def utworz_indeks_zdan(plik_bazy: str) -> "IndeksZdan":
             f"Nie znaleziono poprawnych fragmentow (tytul+tresc) w JSON: {plik_bazy}"
         )
 
-    baza_mtime = max(os.path.getmtime(p) for p in aktywne_pliki)
+    slowniki = [
+        os.path.join(data_dir, "synonimy.toml"),
+        os.path.join(data_dir, "rozszerzenia.toml"),
+    ]
+    pliki_sledzone = list(aktywne_pliki) + [s for s in slowniki if os.path.exists(s)]
+    baza_mtime = max(os.path.getmtime(p) for p in pliki_sledzone)
     if os.path.exists(cache) and os.path.getmtime(cache) > baza_mtime:
         try:
             with open(cache, "rb") as f_pkl:

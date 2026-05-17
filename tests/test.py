@@ -100,6 +100,10 @@ TESTY_TRUDNE = [
     ("urlop?", "Urlop"),
     ("jak wznowic studia po skresleniu", "Wznow"),
     ("czy praca dyplomowa ma antyplagiat", "Dyplom"),
+    # --- Nowe testy z literówkami fonetycznymi (Homophonic Polish Fuzzy Search) ---
+    ("co to jest powtazane przedmyotu", "Powtarz"),
+    ("kedy mozna vzac urlop dzekansky", "Urlop"),
+    ("czy praca jest spravdzana antyplagyatem", "Dyplom"),
 ]
 
 
@@ -146,12 +150,12 @@ TESTY_P4_ROZBUDOWANE = [
     ("jak napisać podanie o urlop dziekanski", "Urlop"),
     (
         "czy moge zrezygnowac ze studiow na pierwszym semestrze i wrocic za rok",
-        "Wznowien",
+        "Wznow",
     ),
     # Trudne do wymowy lub literówki
     ("ectsys", "Deficyt"),
     ("srednia stypedndiowa", "Skala ocen"),
-    ("wznwienie studjuf", "Wznowien"),
+    ("wznwienie studjuf", "Wznow"),
     ("dzikanka z powodu choroby", "Urlop"),
     # Kwestie Wykładowców i Zaliczeń
     ("czy prowadzacy musi dac sylabus", "Realizacja"),

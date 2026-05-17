@@ -28,6 +28,14 @@ Ten dokument definiuje docelową architekturę techniczną i standardy inżynier
 
 - `DONE` Usunięcie globalnych instancji w plikach (np. `wyszukiwarka` w `app.py`) na rzecz wzorca DI. Przekazywanie obiektów do serwisów za pomocą kontenera (klasa `Container`).
 
+### 1.5 Separacja danych słownikowych od logiki (Data vs Code)
+- `DONE` Przeniesienie twardo zakodowanych słowników (`SYNONIMY`, `ROZSZERZENIA`) z `core/slowniki.py` do zewnętrznych plików konfiguracyjnych TOML ładowanych przez warstwę infrastruktury przy użyciu natywnego parsera `tomllib`.
+- **Korzyść:** Kod `core/` staje się całkowicie deklaratywny i wolny od surowych danych, spełniając zasady Clean Architecture.
+
+### 1.6 Pełna eliminacja proceduralnego wrappera bazy danych (`core/bd.py`)
+- `TODO` Całkowite zastąpienie odwołań do funkcji proceduralnych w `core/bd.py` bezpośrednimi wywołaniami do repozytoriów wstrzykiwanych przez Kontener DI.
+- **Korzyść:** Ujednolicenie architektury bazodanowej zgodnie z DDD. Serwisy aplikacyjne i routery będą korzystać wyłącznie z wstrzykiwanych instancji `PytaniaRepository` oraz `FeedbackRepository` z `domain/repositories/`, eliminując przestarzałą warstwę proceduralnego wrappera.
+
 ---
 
 ## 2. Optymalizacja i Czystość Kodu

@@ -29,3 +29,7 @@ Thumbs.db
 # --- Agenci AI ---
 .agents/
 .gemini/
+
+# --- Pliki Tymczasowe i Szkice ---
+tests/debug_*.py
+scratch/

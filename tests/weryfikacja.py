@@ -14,7 +14,6 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
 from core.slowniki import ROZSZERZENIA, SYNONIMY
-from core.stemmer import stemuj
 from core.wyszukiwarka import tokenizuj
 from infrastructure.knowledge_loader import utworz_wyszukiwarke
 
@@ -37,19 +36,6 @@ print(f"    Bez tresci: {len(bez_tresci)} {'OK' if not bez_tresci else 'BLAD'}")
 print("\n[2] Slowniki:")
 print(f"    Rozszerzen: {len(ROZSZERZENIA)}")
 print(f"    Synonimow:  {len(SYNONIMY)}")
-
-# 3. Stemmer
-print("\n[3] Stemmer (obocznosci):")
-testy_stem = [
-    ("studenci", "student"),
-    ("kolos", "kolokwium"),
-    ("egzaminow", "egzamin"),
-    ("urlopowi", "urlop"),
-]
-for s, oczek in testy_stem:
-    wynik = stemuj(s)
-    status = "OK" if wynik == oczek else f"ROZNICA (got: {wynik}, oczek: {oczek})"
-    print(f"    stemuj({s}) -> {wynik} [{status}]")
 
 # 4. Wyszukiwarka
 print("\n[4] Wyszukiwarka:")

@@ -4,6 +4,20 @@ Wszystkie istotne zmiany w projekcie są odnotowywane w tym pliku zgodnie ze sta
 
 ---
 
+## [2.4.0] - 2026-05-17
+### Dodano
+- **Wyszukiwarka (Korekcja Fonetyczna - 2.4)**: Wdrożenie uproszczeń fonetycznych języka polskiego (Homophonic Polish Fuzzy Search). Słowa zawierające wyłącznie błędy ortograficzne (np. `rezignacja`, `gurny`, `hrobry`) są korygowane w czasie O(1).
+- **Potok NLP**: Przebudowanie kolejności tokenizacji (Stopwords -> Korekcja literówek -> Synonimy), co odblokowało korekcję literówek na synonimach i studenckim slangu (np. `dzekansky` -> `dziekański`).
+- **Skrypt Walidacyjny (3.4)**: Utworzenie `tests/validate_dictionaries.py` w celu wykrywania cykli, błędów składni, nieoczyszczonych kluczy i łańcuchów normalizacji w bazie słowników.
+- **Integracja CI/CD**: Dodanie automatycznego testu spójności słowników TOML do potoku GitHub Actions (`testy.yml`).
+- **Testy**: Rozszerzenie bazy testowej `tests/test.py` o trudne pytania fonetyczne w `TESTY_TRUDNE`.
+
+### Naprawiono
+- **Słowniki (UTF-8 i Mojibake)**: Przekonwertowanie `synonimy.toml` i `rozszerzenia.toml` z formatu CP1250 na poprawny UTF-8. Usunięto cichą korupcję polskich znaków (mojibake) i przywrócono działanie martwym dotąd kluczom (np. `"dyplom ukonczenia"`, `"srednia wazona"`), co podniosło celność wyszukiwarki do **108/153** testów.
+- **Normalizacja (Usunięcie konfliktu)**: Wyeliminowanie błędnego mapowania `"punkty" = "ocena"`, które tworzyło cykle i konflikty logiczne.
+
+---
+
 ## [2.3.0] - 2026-05-10
 ### Dodano
 - **Struktura (Root Migration & Cleanup)**: Pełne przeniesienie projektu do roota. Reorganizacja plików pomocniczych do folderów `/docs` (dokumentacja), `/docs/research` (notatki) oraz `/deployment` (Docker/Gunicorn).

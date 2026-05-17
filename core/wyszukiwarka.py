@@ -65,33 +65,88 @@ def levenshtein(a: str, b: str) -> int:
 
 # Cache korekcji literówek – raz obliczone, zapamiętane na całą sesję
 _cache_literowek: dict = {}
+_cache_mapy_fonetycznej: dict[int, dict[str, str]] = {}
+
+
+def uprosc_fonetycznie(slowo: str) -> str:
+    """
+    Upraszcza słowo fonetycznie do porównań tolerancyjnych dla błędów ortograficznych w j. polskim.
+    Obsługuje ch->h, rz->z, sz->s, cz->c, o->u, i->y, j->y.
+    """
+    # Najpierw usuwamy polskie znaki dla ujednolicenia (np. ó -> o, ż -> z)
+    slowo = usun_polskie_znaki(slowo.lower())
+    slowo = slowo.replace("ch", "h")
+    slowo = slowo.replace("rz", "z")
+    slowo = slowo.replace("sz", "s")
+    slowo = slowo.replace("cz", "c")
+    slowo = slowo.replace("o", "u")
+    slowo = slowo.replace("i", "y")
+    slowo = slowo.replace("j", "y")
+    return slowo
+
+
+def _pobierz_mape_fonetyczna(slownik: set[str] | dict[str, float]) -> dict[str, str]:
+    """Generuje i cache'uje mapę uproszczeń fonetycznych dla słownika."""
+    slownik_id = id(slownik)
+    if slownik_id in _cache_mapy_fonetycznej:
+        return _cache_mapy_fonetycznej[slownik_id]
+
+    mapa = {}
+    for s in slownik:
+        uf = uprosc_fonetycznie(s)
+        # Zachowujemy oryginalne słowo dla danej formy fonetycznej
+        if uf not in mapa:
+            mapa[uf] = s
+    _cache_mapy_fonetycznej[slownik_id] = mapa
+    return mapa
 
 
 def popraw_literowke(
     slowo: str, slownik: set[str] | dict[str, float], max_odleglosc: int = 1
 ) -> str:
     """
-    jeśli słowo nie jest w słowniku, znajdź najbliższe przez Levenshteina.
-    Wynik jest cachowany – to samo słowo nie jest przeliczane ponownie.
+    Koryguje literówki z uwzględnieniem fonetyki języka polskiego.
+    Używa szybkiej ścieżki O(1) dla dokładnych dopasowań homofonicznych,
+    a dla pozostałych liczy dystans Levenshteina na uproszczonych formach fonetycznych.
     """
     if slowo in slownik:
         return slowo
     if slowo in _cache_literowek:
         return _cache_literowek[slowo]
 
-    # Dla dłuższych słów pozwalamy na większy błąd (np. pisanie na telefonie)
+    # 1. Szybka ścieżka O(1): dokładne dopasowanie fonetyczne
+    mapa_fonetyczna = _pobierz_mape_fonetyczna(slownik)
+    slowo_fonetycznie = uprosc_fonetycznie(slowo)
+    if slowo_fonetycznie in mapa_fonetyczna:
+        poprawione = mapa_fonetyczna[slowo_fonetycznie]
+        _cache_literowek[slowo] = poprawione
+        return poprawione
+
+    # 2. Ścieżka Levenshteina: fuzzy matching na formach fonetycznych
+    # Dla dłuższych słów pozwalamy na większy błąd
     aktualna_odleglosc = 2 if len(slowo) > 8 else max_odleglosc
 
-    # filtruj kandydatów po długości PRZED Levenshteinem (duże przyspieszenie)
+    # Filtrujemy kandydatów po pierwszej literze fonetycznej oraz długości
     kandydaci = [
         s
         for s in slownik
-        if abs(len(s) - len(slowo)) <= aktualna_odleglosc and s[0] == slowo[0]
+        if abs(len(s) - len(slowo)) <= aktualna_odleglosc
+        and uprosc_fonetycznie(s)[0] == slowo_fonetycznie[0]
     ]
-    najlepszy = min(kandydaci, key=lambda s: levenshtein(slowo, s), default=None)
+
+    najlepszy = None
+    najlepsza_odleglosc = aktualna_odleglosc + 1
+
+    for k in kandydaci:
+        k_fonetycznie = uprosc_fonetycznie(k)
+        odl = levenshtein(slowo_fonetycznie, k_fonetycznie)
+        if odl < najlepsza_odleglosc:
+            najlepsza_odleglosc = odl
+            najlepszy = k
+
     wynik = (
         najlepszy
-        if (najlepszy and levenshtein(slowo, najlepszy) <= aktualna_odleglosc)
+        if (najlepszy and najlepsza_odleglosc <= aktualna_odleglosc)
         else slowo
     )
     _cache_literowek[slowo] = wynik
@@ -158,7 +213,7 @@ STOPWORDS = {
 }
 
 
-def tokenizuj(tekst: str) -> list[str]:
+def tokenizuj(tekst: str, slownik_korekcji: set[str] | None = None) -> list[str]:
     """
     rozbija tekst na liste slow (tokenow).
     usuwa interpunkcje, zamienia na male litery,
@@ -169,11 +224,21 @@ def tokenizuj(tekst: str) -> list[str]:
     tekst = re.sub(r"[^\w\s]", " ", tekst)
 
     slowa = tekst.split()
-    return [
-        normalizuj(s)
-        for s in slowa
-        if s not in STOPWORDS and (len(s) > 1 or s.isdigit())
+    # 1. Filtrujemy stopwords i krótkie tokeny najpierw
+    filtrowane = [
+        s for s in slowa if s not in STOPWORDS and (len(s) > 1 or s.isdigit())
     ]
+
+    wyniki = []
+    for s in filtrowane:
+        # 2. Korygujemy literówki
+        if slownik_korekcji:
+            s = popraw_literowke(s, slownik_korekcji)
+        # 3. Normalizujemy synonimami
+        s = normalizuj(s)
+        wyniki.append(s)
+
+    return wyniki
 
 
 # ── Krok 2: budowanie macierzy TF-IDF ────────────────────────────────────────
@@ -460,11 +525,11 @@ class Wyszukiwarka:
             if trafienie:
                 return [trafienie]
 
-        # tokenizuj BEZ stemmera – żeby ROZSZERZENIA mogły dopasować klucze
-        tokeny_pytania = tokenizuj(pytanie)
+        # tokenizuj z korekcją literówek (w tym na synonimach) PRZED normalizacją
+        slownik_korekcji = set(self.idf.keys()) | set(SYNONIMY.keys())
+        tokeny_pytania = tokenizuj(pytanie, slownik_korekcji)
         if not tokeny_pytania:
             return []
-        tokeny_pytania = [popraw_literowke(t, self.idf) for t in tokeny_pytania]
 
         rozszerzenie = []
         for tok in tokeny_pytania:
