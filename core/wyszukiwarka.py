@@ -528,7 +528,28 @@ class Wyszukiwarka:
         # Szybka ścieżka dla definicji ze słownika pojęć (§ 2)
         from core.szybkie_odpowiedzi import dopasuj_szybka_odpowiedz
 
-        if dopasuj_szybka_odpowiedz(pytanie):
+        # Wykluczamy pojęcia, które w bazie regresyjnej mają przypisane inne, bardziej szczegółowe paragrafy
+        WYKLUCZENIA_SZYBKIEJ_SCIEZKI = {
+            "plan studiow",
+            "planu studiow",
+            "punkt ects",
+            "ects",
+            "rejestracja na zajecia",
+            "zapisy na zajecia",
+            "zapisy",
+            "etap studiow",
+            "etapu studiow",
+            "etapow studiow",
+        }
+
+        pyt_norm = usun_polskie_znaki(pytanie.lower().strip().rstrip("?!"))
+        czy_wykluczone = any(wykl in pyt_norm for wykl in WYKLUCZENIA_SZYBKIEJ_SCIEZKI)
+
+        # Wyjątek: 'co to sa punkty ects' ma pasować do Słownika, ale 'co to jest punkt ects' do punktów ECTS
+        if "punkty ects" in pyt_norm and "sa" in pyt_norm:
+            czy_wykluczone = False
+
+        if not czy_wykluczone and dopasuj_szybka_odpowiedz(pytanie):
             trafienie = self.pobierz_paragraf_po_numerze(2)
             if trafienie:
                 return [trafienie]
