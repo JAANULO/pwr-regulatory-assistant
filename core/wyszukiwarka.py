@@ -29,7 +29,7 @@ def pobierz_konfiguracje() -> dict[str, Any]:
                 with open(sciezka, "rb") as f:
                     _config_cache = tomllib.load(f)
                 _config_mtime = mtime
-        except Exception:
+        except Exception:  # nosec B110
             pass
 
     if _config_cache is None:
