@@ -60,6 +60,7 @@ def utworz_wyszukiwarke(plik_bazy: str) -> "Wyszukiwarka":
     slowniki = [
         os.path.join(data_dir, "synonimy.toml"),
         os.path.join(data_dir, "rozszerzenia.toml"),
+        os.path.join(data_dir, "config.toml"),
     ]
     pliki_sledzone = list(aktywne_pliki) + [s for s in slowniki if os.path.exists(s)]
     baza_mtime = max(os.path.getmtime(p) for p in pliki_sledzone)

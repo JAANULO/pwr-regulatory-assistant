@@ -66,13 +66,12 @@ Ten dokument zawiera wizję rozwoju projektu, uporządkowaną według poziomu tr
 - **Implementacja:** Wdrożenie uproszczonego algorytmu upraszczania fonetycznego (np. zamiana `ch`->`h`, `rz`->`z`, `sz`->`s`, `ó`->`u` na kopiach słów) przed obliczeniem odległości Levenshteina. Zapewni to bezbłędne znajdowanie synonimów nawet przy grubych błędach ortograficznych (np. "rezygnacja" wpisane jako "rezignacja").
 
 ### 2.5 Zwiększanie poprawności wyszukiwania (Term Boosting)
-- `TODO` Poprawa trafności zapytań poprzez wzmacnianie unikalnych słów kluczowych o krytycznym znaczeniu regulaminowym.
+- `DONE` Poprawa trafności zapytań poprzez wzmacnianie unikalnych słów kluczowych o krytycznym znaczeniu regulaminowym.
 - **Implementacja:** Dodanie mechanizmu wagowania unikalnych terminów (np. `deficyt`, `ects`, `komisyjny`, `urlop`, `skreslenie`) w `Wyszukiwarka.szukaj()`. Jeśli w zapytaniu pojawi się zdefiniowane słowo kluczowe, jego wartość IDF w wektorze BM25 zostanie dynamicznie pomnożona (np. `* 3.0`), gwarantując, że asystent precyzyjnie trafi w odpowiedni paragraf pomimo obecności innych, ogólnych słów w zdaniu.
 
 ---
 
 ## Poziom 3: Architektura i Use Cases (Trudne)
-
 
 
 ### 3.2 Algorytmiczny "Did you mean?"
@@ -93,7 +92,7 @@ Ten dokument zawiera wizję rozwoju projektu, uporządkowaną według poziomu tr
    3. Walidację duplikatów kluczy i pustych wartości. Zintegrowanie skryptu z GitHub Actions
 
 ### 3.5 Obsługa złożonych zapytań konwersacyjnych (Conversational Queries & Query Segmentation)
- - `TODO` Poprawa radzenia sobie z długimi wypracowaniami studenckimi (tzw. "conversational queries") zawierającymi szum informacyjny.
+ - `DONE` Poprawa radzenia sobie z długimi wypracowaniami studenckimi (tzw. "conversational queries") zawierającymi szum informacyjny.
  - **Implementacja:** Wdrożenie dwuetapowej analizy zapytania w `Wyszukiwarka.szukaj()`:
    1. Podział długiego zapytania użytkownika na pojedyncze zdania (Query Segmentation).
    2. Ocenianie każdego zdania niezależnie przy użyciu BM25 i sumowanie ich wektorów podobieństwa (z pominięciem powitań/szumu grzecznościowego), aby zapobiec "rozmywaniu" trafności zapytań.
@@ -131,6 +130,10 @@ Ten dokument zawiera wizję rozwoju projektu, uporządkowaną według poziomu tr
  - `TODO` Rozbudowany system raportowania błędów dla administratora w przypadku awarii hostingu.
  - **Implementacja (Backend):** Endpoint `/health` zwracający stan połączenia z bazą, dostępność plików JSON oraz status procesów.
  - **Implementacja (UI):** Specjalny widok "Admin Debug" (dostępny po tokenie), który pokazuje logi błędów serwera bezpośrednio w przeglądarce, gdy API zwraca 500 lub brak połączenia.
+
+ ### 6.2 Wydzielenie promptów LLM do pliku konfiguracyjnego (Prompt Engineering Decoupling)
+ - `DONE` Przeniesienie wszystkich wielolinijkowych szablonów promptów (do generowania pytań, oceniania trafności, analizy błędów) z kodu źródłowego `tests/auto_tester.py` do zewnętrznego pliku `tests/prompts.toml`.
+ - **Implementacja:** Odczytywanie pliku `tests/prompts.toml` przy starcie auto-testera i dynamiczne uzupełnianie zmiennych szablonu za pomocą funkcji `.format()` lub modułu `string.Template`. Ułatwi to dostrajanie zachowania modeli AI bez ingerencji w logikę skryptu Pythona.
 
 ---
 

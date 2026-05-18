@@ -47,15 +47,16 @@ def waliduj_slowniki():
     plik_synonimow = os.path.join(root_dir, "data", "synonimy.toml")
     plik_rozszerzen = os.path.join(root_dir, "data", "rozszerzenia.toml")
     plik_slownika = os.path.join(root_dir, "data", "slownik.toml")
+    plik_promptow = os.path.join(base_dir, "prompts.toml")
 
     bledy = []
 
     print("=== Uruchamiam Walidację Spójności Słowników ===")
 
     # 1. Sprawdzenie istnienia plików
-    for plik in [plik_synonimow, plik_rozszerzen, plik_slownika]:
+    for plik in [plik_synonimow, plik_rozszerzen, plik_slownika, plik_promptow]:
         if not os.path.exists(plik):
-            bledy.append(f"Plik słownika nie istnieje: {plik}")
+            bledy.append(f"Plik słownika/konfiguracji nie istnieje: {plik}")
 
     if bledy:
         wypisz_bledy_i_wyjdz(bledy)
@@ -84,6 +85,14 @@ def waliduj_slowniki():
     except Exception as e:
         bledy.append(f"Błąd składni w slownik.toml: {e}")
         slownik_pojec = {}
+
+    try:
+        with open(plik_promptow, "rb") as f:
+            prompty = tomllib.load(f)
+        print("  [OK] prompts.toml załadowany pomyślnie.")
+    except Exception as e:
+        bledy.append(f"Błąd składni w prompts.toml: {e}")
+        prompty = {}
 
     if bledy:
         wypisz_bledy_i_wyjdz(bledy)
@@ -161,6 +170,24 @@ def waliduj_slowniki():
             if var != normal_var:
                 bledy.append(
                     f"slownik.toml: Wariant '{var}' pojęcia '{k}' nie jest znormalizowany! Powinien brzmieć: '{normal_var}'."
+                )
+
+    # 4.6. Walidacja formatu promptów w prompts.toml
+    print("Walidacja struktury i kluczy w prompts.toml...")
+    for sekcja in ["generation", "evaluation", "error_analysis"]:
+        if sekcja not in prompty:
+            bledy.append(f"prompts.toml: Brak wymaganej sekcji '{sekcja}'.")
+        else:
+            if not isinstance(prompty[sekcja], dict) or "prompt" not in prompty[sekcja]:
+                bledy.append(
+                    f"prompts.toml: Sekcja '{sekcja}' musi zawierać klucz 'prompt'."
+                )
+            elif (
+                not isinstance(prompty[sekcja]["prompt"], str)
+                or not prompty[sekcja]["prompt"].strip()
+            ):
+                bledy.append(
+                    f"prompts.toml: Klucz 'prompt' w sekcji '{sekcja}' nie może być pustym tekstem."
                 )
 
     # 5. Wykrywanie cykli i wieloetapowych łańcuchów w synonimy.toml

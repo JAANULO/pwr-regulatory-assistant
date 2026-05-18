@@ -4,6 +4,21 @@ Wszystkie istotne zmiany w projekcie są odnotowywane w tym pliku zgodnie ze sta
 
 ---
 
+## [2.7.0] - 2026-05-18
+### Dodano
+- **Separacja Hiperparametrów Wyszukiwarki (Krok 1.7)**: Wydzielenie 46 konfigurowalnych parametrów (BM25, term boosts, statyczne i dynamiczne wagi rozdziałów) z kodu źródłowego silnika `core/wyszukiwarka.py` do deklaratywnego pliku `data/config.toml` z inwalidacją cache `.pkl` oraz bezinwazyjnym RAM-buforowaniem I/O.
+- **Wydzielenie Promptów LLM (Krok 6.2)**: Przeniesienie wszystkich wielolinijkowych promptów i szablonów API Gemini ze skryptu `tests/auto_tester.py` do dedykowanego pliku `tests/prompts.toml` wraz z automatyczną walidacją w `tests/validate_dictionaries.py` i dynamicznym formatowaniem `.format()`.
+- **Obsługa zapytań konwersacyjnych (Krok 3.5)**: Wdrożenie segmentacji zapytań na zdania, filtracji szumu grzecznościowego oraz agregacji podobieństwa Maximum-Weighted Sum w celu doskonałej analizy długich, zawiłych pytań studenckich.
+- **Wzmocnienie unikalnych pojęć (Term Boosting - Krok 2.5)**: Dynamiczne wzmacnianie wag krytycznych regulaminowo pojęć (np. deficyt, ects, komisyjny, urlop, skreślenie, wystawianie) w celu zapobiegania rozmywaniu cech (cosinusowej dilucji).
+- **Zbiór testów konwersacyjnych**: Dodanie 9 rozbudowanych scenariuszy testowych z `długie_pytania.txt` do oficjalnego pakietu `tests/test.py`.
+
+### Ulepszono
+- **Skuteczność algorytmu**: Osiągnięcie rekordowych **73.0% precyzji (111/152)** w `tests/test_diff.py` — co stanowi ogromny skok **+9 poprawy przy zerowych (0) regresjach**!
+- **Kompatybilność słowników**: Zintegrowano zaawansowaną korektę fleksyjną w `data/synonimy.toml` i `data/rozszerzenia.toml` (np. odmiany słów *deficyt*, *kolokwium*, *warunki* oraz precyzyjne naprowadzanie dla *rewersu*).
+
+### Naprawiono
+- **Odporność środowiskowa**: Zabezpieczono dynamiczne wyliczanie `mapa_wag` na wypadek pustej bazy danych współczynników w środowisku bezserwerowym (np. GitHub Actions / testy jednostkowe), pobierając strukturę bezpośrednio z fragmentów bazy wiedzy.
+
 ## [2.5.0] - 2026-05-17
 ### Dodano
 - **Karty Szybkiej Odpowiedzi (Słownik pojęć - 2.3)**: Wdrożenie mechanizmu natychmiastowego serwowania oficjalnych definicji z § 2 regulaminu studiów PWr (np. absolwent, student, punkty ECTS) w 100% poprawnej polszczyźnie (bez mojibake).

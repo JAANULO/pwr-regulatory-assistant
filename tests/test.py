@@ -236,6 +236,72 @@ TESTY_P5_UZUPELNIAJACE = [
 ]
 
 
+# P6: Złożone pytania konwersacyjne (§ 3.5 z PLAN.md)
+TESTY_CONVERSATIONAL = [
+    # 1. Kolokwium vs sesja -> § 17. Zaliczanie przedmiotu
+    (
+        "Czy kolokwium z przedmiotu, który kończy się zaliczeniem z oceną (a nie egzaminem) musi być przed sesją czy to jest dobra wola prowadzącego, który zrobi je, np. w ostatnim tygodniu zajęć?",
+        "Zaliczanie przedmiotu",
+    ),
+    # 2. Obecność na egzaminie / poprawka -> § 18. Egzaminy
+    (
+        "Czy obecność na pierwszym terminie egzaminu w sesji jest obowiązkowa? I czy nie będąc na pierwszym terminie można przystąpić do egzaminu poprawkowego?",
+        "Egzaminy",
+    ),
+    # 3. Brak wglądu do prac -> § 20. Wystawianie ocen
+    (
+        "Prowadzący nie chce pokazać mi mojej pracy. Czy czasem nie jest tak, że student powinien mieć wgląd do swoich prac/kolokwiów, egzaminów?",
+        "Wystawianie ocen",
+    ),
+    # 4. Grupa kursów -> § 13. Przedmioty i zajęcia
+    ("Co to jest grupa kursów?", "Przedmioty i zajęcia"),
+    # 5. Zdalny tryb nauczania -> § 13. Przedmioty i zajęcia
+    ("Co można rozumieć pod hasłem: „zdalny tryb nauczania”?", "Przedmioty i zajęcia"),
+    # 6. Deficyt punktów ECTS -> § 26. Zaliczenie etapu studiów
+    ("Mam zbyt duży deficyt punktów ECTS co mam zrobić?", "Zaliczenie etapu"),
+    # 7. Projekt inżynierski na innej uczelni -> § 35. Praca dyplomowa
+    (
+        "Czy mogę realizować swój projekt inżynierski na innej uczelni?",
+        "Praca dyplomowa",
+    ),
+    # 8. Brak rewersu / ocena z laboratorium -> § 20. Wystawianie ocen
+    (
+        "Prowadzący odmówił mi wpisania oceny z laboratorium, ponieważ nie przyniosłam tzw. Rewersu podpisanego przez panią laborantkę. Co mam zrobić?",
+        "Wystawianie ocen",
+    ),
+    # 9. Zmiana warunków zaliczenia pod koniec -> § 16. Realizacja zajęć
+    (
+        "Prowadzący pod koniec jednego z kursów zmienił warunki jego zaliczenia, czy tak w ogóle można?",
+        "Realizacja zajęć",
+    ),
+    # 10. Egzamin komisyjny -> § 21. Egzamin komisyjny
+    (
+        "Uważam, że ocena z mojego egzaminu została wystawiona niesprawiedliwie. Prowadzący odnosił się do mnie bardzo stronniczo podczas odpowiedzi ustnej. Czy mogę wnioskować o ponowne sprawdzenie mojej wiedzy przed jakąś komisją?",
+        "Egzamin komisyjny",
+    ),
+    # 11. Urlop dziekański -> § 30. Urlopy
+    (
+        "Znalazłem się w bardzo trudnej sytuacji życiowej i muszę na jakiś czas przerwać naukę. Słyszałem, że dziekan może wyrazić zgodę na przerwę w studiowaniu. Gdzie i kiedy powinienem złożyć odpowiedni wniosek w tej sprawie?",
+        "Urlopy",
+    ),
+    # 12. Rejestracja na zajęcia -> § 14. Zapisy (rejestracja) na zajęcia
+    (
+        "Chciałbym zapisać się na zajęcia w nadchodzącym semestrze. Niestety system USOS ciągle mi się zawiesza i nie mogę dokonać rejestracji. Do kogo mam się zgłosić, jeśli minie oficjalny termin zapisów?",
+        "Zapisy (rejestracja)",
+    ),
+    # 13. Wznowienie studiów -> § 34. Wznowienia studiów, przywrócenie praw studenta
+    (
+        "Zostałem skreślony z listy studentów na trzecim semestrze z powodu niezaliczenia etapu. Minął już rok i bardzo chciałbym wrócić na uczelnię, aby dokończyć studia. Na jakich warunkach mogę ubiegać się o ponowne przyjęcie?",
+        "Wznowienia",
+    ),
+    # 14. Powtarzanie przedmiotu -> § 22. Powtarzanie przedmiotu
+    (
+        "Niestety nie udało mi się zaliczyć kursu z analizy matematycznej w tym semestrze. Wiem, że muszę go powtórzyć przy kolejnej okazji. Czy będę musiał za to zapłacić i kiedy mogę ponownie zapisać się na ten przedmiot?",
+        "Powtarzanie przedmiotu",
+    ),
+]
+
+
 # Wybierz zakres testow:
 
 # TESTY = TESTY_LATWE
@@ -246,6 +312,7 @@ TESTY = (
     + TESTY_REGRESYJNE
     + TESTY_P4_ROZBUDOWANE
     + TESTY_P5_UZUPELNIAJACE
+    + TESTY_CONVERSATIONAL
 )
 
 

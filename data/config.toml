@@ -1,0 +1,90 @@
+# ==============================================================================
+# KONFIGURACJA HIPERPARAMETRÓW WYSZUKIWARKI REGULAMINU PWR
+# Liczba parametrów łącznie: 46 (3 w [bm25] + 32 w [term_boosts] + 3 w [mapa_wag_statyczna] + 8 w [mapa_wag_dynamiczna])
+# ==============================================================================
+
+[bm25]
+# ==============================================================================
+# Parametry bazowe algorytmu BM25 (Best Match 25) oraz wagowanie synonimów.
+# Liczba parametrów: 3
+# ==============================================================================
+# k1: Parametr nasycenia (term frequency saturation). Określa, jak szybko kolejne 
+# powtórzenia tego samego słowa w dokumencie przestają podwyższać jego wynik. 
+# Zazwyczaj z przedziału [1.2, 2.0].
+k1 = 1.5
+
+# b: Parametr normalizacji długości dokumentu. Określa, jak mocno długość paragrafu 
+# wpływa na jego karanie (dłuższe teksty są karane, bo słowa mogą pojawić się tam 
+# przez przypadek). Zazwyczaj z przedziału [0.5, 0.8].
+b = 0.75
+
+# synonimy_waga: Mnożnik wagi słów dodanych do zapytania poprzez synonimy lub 
+# rozszerzenia słownikowe. Chroni przed zdominowaniem zapytania przez synonimy.
+synonimy_waga = 0.85
+
+
+[term_boosts]
+# ==============================================================================
+# Wzmocnienia unikalnych słów kluczowych (Term Boosting).
+# Mnożniki wagi IDF dla słów o kluczowym znaczeniu regulaminowym, dzięki którym
+# słowa te mają wyższy priorytet niż zwykłe słowa potoczne czy grzecznościowe.
+# Liczba parametrów: 32
+# ==============================================================================
+deficyt = 3.0
+ects = 2.0
+komisyjny = 2.5
+urlop = 2.0
+skreslenie = 1.0
+wystawianie = 3.0
+dyplom = 2.0
+wznowienie = 3.0
+praktyki = 2.0
+kolokwium = 3.5
+sesja = 2.5
+wglad = 4.0
+rewersu = 3.5
+rewers = 3.5
+sylabus = 2.5
+zdalny = 3.5
+grupa = 2.5
+kursow = 2.5
+zajec = 2.0
+prawa = 2.0
+obowiazki = 2.0
+warunki = 2.0
+zaliczenia = 2.0
+usprawiedliwic = 2.0
+nieobecnosc = 2.0
+srednia = 2.0
+rejestracja = 2.0
+zapisy = 2.0
+oplaty = 2.0
+dyplomowy = 2.0
+laboratorium = 2.5
+laborantke = 2.5
+
+
+[mapa_wag_statyczna]
+# ==============================================================================
+# Statyczne mnożniki dla wybranych rozdziałów i paragrafów.
+# Stałe podbicie punktacji dla kluczowych dokumentów regulaminu, które zawierają 
+# uniwersalne pojęcia i powinny częściej pojawiać się na szczycie wyników.
+# Liczba parametrów: 3
+# ==============================================================================
+"Realizacja zajęć" = 1.45
+"Zaliczenie etapu" = 1.15
+"Zaliczanie przedmiotu" = 1.32
+
+
+[mapa_wag_dynamiczna]
+# ==============================================================================
+# Dynamiczne mnożniki warunkowe.
+# Podnoszą wagę (mnożnik) określonego paragrafu wyłącznie w sytuacji, gdy w zapytaniu 
+# użytkownika wystąpi powiązany ze sprawą token (po normalizacji). zapobiega to 
+# fałszywym dopasowaniom dla innych, niezwiązanych pytań.
+# Liczba parametrów: 8 (4 dynamiczne mnożniki + 4 powiązane tokeny aktywujące)
+# ==============================================================================
+"Egzamin komisyjny" = { token = "komisyjny", mnoznik = 2.0 }
+"Wznowienia" = { token = "wznowienie", mnoznik = 1.85 }
+"Powtarzanie" = { token = "powtarzanie", mnoznik = 1.35 }
+"Odpłatność" = { token = "oplaty", mnoznik = 1.35 }

@@ -46,6 +46,7 @@ Instead of generating answers from memory, it uses a **RAG (Retrieval-Augmented 
 - **Levenshtein Distance** — custom implementation for typo correction.
 - **Intent Classifier** — extracts numbers, dates, and consequences from paragraphs.
 - **Diagnostics API** — built-in tools for production monitoring and error tracing.
+- **Configuration & Hyperparameters** — **46 parameters** fully decoupled into [**`data/config.toml`**](data/config.toml) for easy tuning (BM25 constants, custom term boosts, static & dynamic chapter weights).
 - **Release History** — track changes in [docs/CHANGELOG.md](docs/CHANGELOG.md).
 
 ### Mini-GPT Research (Archived/Moved)
@@ -157,6 +158,13 @@ python app.py
 | Rozmiar zestawu testowego | 150 pytań |
 | Trafność (właściwy paragraf) | **103/150 (68.6%)** |
 | Czas odpowiedzi | < 50 ms |
+
+### Konfiguracja i Hiperparametry
+Wyszukiwarka posiada **46 konfigurowalnych parametrów** wydzielonych całkowicie z kodu do deklaratywnego pliku [**`data/config.toml`**](data/config.toml). Pozwala to na precyzyjne strojenie silnika bez modyfikacji logiki Pythona:
+- **`[bm25]`** (3 parametry): współczynniki `k1`, `b` oraz mnożnik wagi synonimów `synonimy_waga`.
+- **`[term_boosts]`** (32 parametry): podbicia wag IDF dla specyficznych słów kluczowych regulaminu (np. `deficyt`, `ects`, `komisyjny`).
+- **`[mapa_wag_statyczna]`** (3 parametry): stałe podbicia punktacji dla najważniejszych rozdziałów.
+- **`[mapa_wag_dynamiczna]`** (8 parametrów): warunkowe podbicia rozdziałów aktywowane obecnością powiązanych tokenów w zapytaniu (np. podbicie "Odpłatność" tylko gdy student pyta o opłaty).
 
 ---
 

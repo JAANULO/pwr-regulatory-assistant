@@ -1,0 +1,69 @@
+# tests/prompts.toml
+# Szablony promptów LLM dla automatycznego testera (Gemini)
+
+[generation]
+# Prompt używany do generowania realistycznych pytań na bazie wczytanych tytułów rozdziałów regulaminu.
+# Parametry formatowania:
+# - {liczba}: Łączna liczba pytań do wygenerowania (np. 6)
+# - {podzial}: Liczba pytań na kategorię (np. 2)
+# - {tytuly_json}: Lista tytułów rozdziałów w formacie JSON
+prompt = """Jesteś studentem Politechniki Wrocławskiej.
+Wygeneruj dokładnie {liczba} różnych, realistycznych pytań, które student mógłby zadać o regulamin studiów. Pytania muszą dotyczyć wyłącznie tych paragrafów:
+{tytuly_json}
+
+Chcę, aby wygenerowane pytania były podzielone na trzy kategorie (po {podzial} pytań każda):
+
+1. **Kategoria SLANG & POTOCZNOŚCI**: Pytania pisane potocznym, luźnym językiem studenckim z użyciem slangu. Używaj słów takich jak: "warun", "uwalić / uwaliłem", "kasa / hajs / płacić", "dziekanka", "wywalenie / skreślenie", "tyły / deficyt".
+   * Przykład: "Co się stanie jak mam duże tyły w ECTSach i uwaliłem kolejny semestr, wywalą mnie?"
+   
+2. **Kategoria § 2 SŁOWNIK POJĘĆ**: Pytania sprawdzające definicje prawne zawarte w "§ 2. Słownik pojęć" (np. absolwent, student, cykl kształcenia, etap studiów, karta przedmiotu, różnice programowe itp.).
+   * Przykład: "Kto w rozumieniu regulaminu uczelni jest traktowany jako absolwent?"
+
+3. **Kategoria ZŁOŻONE / KILKUZDANIOWE**: Pytania długie, konwersacyjne (2-3 zdania), opisujące sytuację życiową studenta, po której następuje konkretne pytanie regulaminowe.
+   * Przykład: "Mam bardzo trudną sytuację w rodzinie i nie jestem w stanie podejść do sesji. Chcę na jakiś czas odpocząć od nauki, żeby wszystko poukładać. Kiedy i na jakich zasadach mogę wnioskować o urlop?"
+
+Zwróć TYLKO listę JSON bez żadnego dodatkowego tekstu ani formatowania markdown (tylko czysty JSON list):
+["pytanie 1", "pytanie 2", ...]"""
+
+
+[evaluation]
+# Prompt do oceny trafności odpowiedzi dopasowanej przez silnik wyszukiwarki BM25.
+# Parametry formatowania:
+# - {pytanie}: Pytanie zadane przez studenta
+# - {tytul}: Tytuł paragrafu dopasowanego przez wyszukiwarkę
+# - {podobienstwo_procent}: Procent podobieństwa cosinusowego (np. 85%)
+prompt = """Oceń czy paragraf regulaminu pasuje do pytania studenta.
+
+Pytanie: "{pytanie}"
+Znaleziony paragraf: "{tytul}"
+Podobieństwo BM25: {podobienstwo_procent}%
+
+Zwróć TYLKO JSON:
+{{
+  "trafny": true,
+  "komentarz": "jedno zdanie dlaczego tak lub nie",
+  "oczekiwany_paragraf": null
+}}"""
+
+
+[error_analysis]
+# Prompt używany do analizowania błędnych dopasowań i sugerowania rozszerzeń słownikowych.
+# Parametry formatowania:
+# - {bledy_json}: Lista błędów w formacie JSON
+# - {kontekst_json}: Treści i kontekst oczekiwanych paragrafów w formacie JSON
+prompt = """Analizujesz błędy systemu wyszukiwania BM25 dla regulaminu PWr.
+System używa słownika rozszerzeń zapytań (ROZSZERZENIA) w pliku data/rozszerzenia.toml, który mapuje słowa kluczowe z pytań na unikalne słowa z właściwych paragrafów.
+
+Błędne odpowiedzi:
+{bledy_json}
+
+Treści oczekiwanych paragrafów:
+{kontekst_json}
+
+Dla każdego błędu zaproponuj nowy wpis do słownika ROZSZERZENIA.
+Wpisy powinny mapować słowa kluczowe z pytania na unikalne słowa z właściwego paragrafu.
+
+Zwróć TYLKO słownik Python (bez żadnego dodatkowego tekstu):
+{{
+    "słowo_z_pytania": "unikalne słowa z właściwego paragrafu",
+}}"""

@@ -8,8 +8,39 @@ import math
 import os
 import re
 import time
+import tomllib
 from collections import Counter
 from typing import Any
+
+_config_cache: dict[str, Any] | None = None
+_config_mtime: float = 0.0
+
+
+def pobierz_konfiguracje() -> dict[str, Any]:
+    global _config_cache, _config_mtime
+    sciezka = os.path.join(os.path.dirname(__file__), "..", "data", "config.toml")
+    if not os.path.exists(sciezka):
+        sciezka = os.path.join("data", "config.toml")
+
+    if os.path.exists(sciezka):
+        try:
+            mtime = os.path.getmtime(sciezka)
+            if _config_cache is None or mtime > _config_mtime:
+                with open(sciezka, "rb") as f:
+                    _config_cache = tomllib.load(f)
+                _config_mtime = mtime
+        except Exception:
+            pass
+
+    if _config_cache is None:
+        _config_cache = {
+            "bm25": {"k1": 1.5, "b": 0.75, "synonimy_waga": 0.85},
+            "term_boosts": {},
+            "mapa_wag_statyczna": {},
+            "mapa_wag_dynamiczna": {},
+        }
+    return _config_cache
+
 
 try:
     from core.bd import pobierz_wspolczynniki_zbiorczo
@@ -303,8 +334,9 @@ def zbuduj_wektory_bm25(
     Kluczowa różnica: tf jest normalizowane przez długość dokumentu.
     Wzór: idf * (tf * (k1+1)) / (tf + k1 * (1 - b + b * dl/avgdl))
     """
-    k1 = custom_k1 if custom_k1 is not None else BM25_K1
-    b = custom_b if custom_b is not None else BM25_B
+    cfg = pobierz_konfiguracje()
+    k1 = custom_k1 if custom_k1 is not None else cfg["bm25"].get("k1", 1.5)
+    b = custom_b if custom_b is not None else cfg["bm25"].get("b", 0.75)
     avgdl = sum(len(t) for t in wszystkie_tokeny) / max(len(wszystkie_tokeny), 1)
 
     wektory = []
@@ -361,6 +393,72 @@ def podobienstwo_cosinusowe(
         return 0.0
 
     return iloczyn / (dlugosc_a * dlugosc_b)
+
+
+def podziel_pytanie_na_zdania(pytanie: str) -> list[str]:
+    """
+    Dzieli pytanie użytkownika na pojedyncze zdania (Query Segmentation).
+    Zabezpiecza przed fałszywym podziałem na skrótach z kropką (np., tzw., tzn., itp., itd.).
+    """
+    # Popularne skróty w języku polskim
+    skroty = r"\b(np|tzw|tzn|itp|itd|art|ust|pkt|r|poz|prof|dr)\."
+
+    # Zamiana kropki po skrótach na tymczasowy marker
+    tekst = re.sub(
+        skroty, lambda m: m.group(1) + "TEMPdot", pytanie, flags=re.IGNORECASE
+    )
+
+    # Dzielimy po kropce, pytajniku lub wykrzykniku, po których następuje spacja lub koniec tekstu
+    podzielone = re.split(r"[.?!]\s*(?=[A-ZŁŚŻŹa-złśżź]|$)", tekst)
+
+    zdania = []
+    for z in podzielone:
+        z_czyste = z.replace("TEMPdot", ".").strip()
+        if z_czyste:
+            zdania.append(z_czyste)
+    return zdania
+
+
+def czy_zdanie_to_szum(zdanie: str) -> bool:
+    """
+    Sprawdza, czy zdanie jest szumem grzecznościowym lub potocznym zwrotem bez wartości kluczowych.
+    """
+    zdanie_norm = usun_polskie_znaki(zdanie.lower().strip().rstrip("?!."))
+
+    SZUMY = {
+        "co mam zrobic",
+        "co robic",
+        "pomocy",
+        "pomoc",
+        "mam pytanie",
+        "witam",
+        "dzien dobry",
+        "czesc",
+        "hej",
+        "siema",
+        "chcialbym zapytac",
+        "chcialbym sie dowiedziec",
+        "czy ktos wie",
+        "pozdrawiam",
+        "z gory dziekuje",
+        "z góry dziękuję",
+        "co teraz",
+        "i co teraz",
+        "co z tym zrobic",
+        "czy tak mozna",
+        "czy tak w ogole mozna",
+        "czy to prawda",
+    }
+
+    if zdanie_norm in SZUMY:
+        return True
+
+    # Krótkie zdania o małej wartości bez unikalnych słów
+    tokeny = tokenizuj(zdanie)
+    if len(tokeny) <= 2:
+        return True
+
+    return False
 
 
 # ── Glowna klasa wyszukiwarki ─────────────────────────────────────────────────
@@ -554,56 +652,158 @@ class Wyszukiwarka:
             if trafienie:
                 return [trafienie]
 
-        # tokenizuj z korekcją literówek (w tym na synonimach) PRZED normalizacją
-        slownik_korekcji = set(self.idf.keys()) | set(SYNONIMY.keys())
-        tokeny_pytania = tokenizuj(pytanie, slownik_korekcji)
-        if not tokeny_pytania:
-            return []
+        # Segmentacja zapytania na zdania
+        surowe_zdania = podziel_pytanie_na_zdania(pytanie)
+        aktywne_zdania = [z for z in surowe_zdania if not czy_zdanie_to_szum(z)]
 
-        rozszerzenie = []
-        for tok in tokeny_pytania:
-            if tok in ROZSZERZENIA:
-                dodatkowe = tokenizuj(ROZSZERZENIA[tok])
-                rozszerzenie.extend(dodatkowe)
+        # Jeśli brak aktywnych zdań po filtracji, cofamy się do pełnego pytania
+        if not aktywne_zdania:
+            aktywne_zdania = [pytanie]
 
-        pytanie_lower = usun_polskie_znaki(pytanie.lower())
-        for fraza, rozszerzenie_frazy in ROZSZERZENIA.items():
-            if " " in fraza and fraza in pytanie_lower:
-                rozszerzenie.extend(tokenizuj(rozszerzenie_frazy))
+        # --- Faza dla Laboratorium (Wczytanie parametrów) ---
+        cfg = pobierz_konfiguracje()
+        bm25_cfg = cfg.get("bm25", {})
+        k1_default = float(bm25_cfg.get("k1", 1.5))
+        b_default = float(bm25_cfg.get("b", 0.75))
+        synonimy_waga = float(bm25_cfg.get("synonimy_waga", 0.85))
 
-        tokeny_pytania = tokeny_pytania + rozszerzenie
-        tf_pytania = oblicz_tf(tokeny_pytania)
-
-        # --- Faza dla Laboratorium ---
-        synonimy_waga = 1.0
         wektory_bazy = self.wektory
         if virtual_params:
-            synonimy_waga = float(virtual_params.get("synonym_weight", 1.0))
-            k1_lab = float(virtual_params.get("bm25_k1", BM25_K1))
-            b_lab = float(virtual_params.get("bm25_b", BM25_B))
-            if k1_lab != BM25_K1 or b_lab != BM25_B:
+            synonimy_waga = float(virtual_params.get("synonym_weight", synonimy_waga))
+            k1_lab = float(virtual_params.get("bm25_k1", k1_default))
+            b_lab = float(virtual_params.get("bm25_b", b_default))
+            if k1_lab != k1_default or b_lab != b_default:
                 wektory_bazy = zbuduj_wektory_bm25(
                     self.wszystkie_tokeny, self.idf, custom_k1=k1_lab, custom_b=b_lab
                 )
 
-        wektor_pytania = {}
-        for slowo, tf_val in tf_pytania.items():
-            finalny_tf = tf_val * synonimy_waga if slowo in rozszerzenie else tf_val
-            wektor_pytania[slowo] = finalny_tf * self.idf.get(slowo, 0)
+        slownik_korekcji = set(self.idf.keys()) | set(SYNONIMY.keys())
+        wszystkie_tokeny_pytania = []
+        for zdanie in aktywne_zdania:
+            tokeny_z = tokenizuj(zdanie, slownik_korekcji)
+            rozszerzenie = []
+            for tok in tokeny_z:
+                if tok in ROZSZERZENIA:
+                    rozszerzenie.extend(tokenizuj(ROZSZERZENIA[tok]))
+            zdanie_lower = usun_polskie_znaki(zdanie.lower())
+            for fraza, rozszerzenie_frazy in ROZSZERZENIA.items():
+                if " " in fraza and fraza in zdanie_lower:
+                    rozszerzenie.extend(tokenizuj(rozszerzenie_frazy))
+            wszystkie_tokeny_pytania.extend(tokeny_z + rozszerzenie)
+        wszystkie_tokeny_pytania_set = set(wszystkie_tokeny_pytania)
 
-        # Słownik zbiorczy nazywamy 'mapa_wag'
-        mapa_wag = _pobierz_mapa_wag_cached()
-        wyniki = []
+        mapa_wag_stat = cfg.get("mapa_wag_statyczna", {})
+        mapa_wag_dyn = cfg.get("mapa_wag_dynamiczna", {})
 
-        for i, wf in enumerate(wektory_bazy):
-            podstawa = podobienstwo_cosinusowe(wektor_pytania, wf)
-            tytul = self.fragmenty[i]["tytul"]
+        db_wag = _pobierz_mapa_wag_cached()
+        mapa_wag = {}
+        for f in self.fragmenty:
+            tytul = f["tytul"]
+            v = db_wag.get(tytul, 1.0)
 
-            # Ciągłe uczenie: modyfikujemy wynik na podstawie historii bazy SQLite
-            mnoznik = mapa_wag.get(tytul, 1.0)
-            wynik_koncowy = podstawa * mnoznik
+            # 1. Statyczne wagi rozdziałów
+            for klucz, mnoznik in mapa_wag_stat.items():
+                if klucz in tytul:
+                    v *= mnoznik
 
-            wyniki.append((wynik_koncowy, i))
+            # 2. Dynamiczne wagi rozdziałów aktywowane tokenami w zapytaniu
+            for klucz, warunek in mapa_wag_dyn.items():
+                if klucz in tytul:
+                    token_aktywujacy = warunek.get("token")
+                    mnoznik = warunek.get("mnoznik", 1.0)
+                    if token_aktywujacy in wszystkie_tokeny_pytania_set:
+                        v *= mnoznik
+
+            mapa_wag[tytul] = v
+
+        if len(aktywne_zdania) == 1:
+            # Szybka, standardowa ścieżka jednozdaniowa (100% zgodności regresyjnej)
+            zdanie = aktywne_zdania[0]
+            tokeny_pytania = tokenizuj(zdanie, slownik_korekcji)
+            if not tokeny_pytania:
+                return []
+
+            rozszerzenie = []
+            for tok in tokeny_pytania:
+                if tok in ROZSZERZENIA:
+                    dodatkowe = tokenizuj(ROZSZERZENIA[tok])
+                    rozszerzenie.extend(dodatkowe)
+
+            pytanie_lower = usun_polskie_znaki(zdanie.lower())
+            for fraza, rozszerzenie_frazy in ROZSZERZENIA.items():
+                if " " in fraza and fraza in pytanie_lower:
+                    rozszerzenie.extend(tokenizuj(rozszerzenie_frazy))
+
+            tokeny_pytania = tokeny_pytania + rozszerzenie
+            tf_pytania = oblicz_tf(tokeny_pytania)
+
+            wektor_pytania = {}
+            term_boosts = cfg.get("term_boosts", {})
+            for slowo, tf_val in tf_pytania.items():
+                finalny_tf = tf_val * synonimy_waga if slowo in rozszerzenie else tf_val
+                boost = term_boosts.get(slowo, 1.0)
+                wektor_pytania[slowo] = finalny_tf * self.idf.get(slowo, 0) * boost
+
+            wyniki = []
+            for i, wf in enumerate(wektory_bazy):
+                podstawa = podobienstwo_cosinusowe(wektor_pytania, wf)
+                tytul = self.fragmenty[i]["tytul"]
+                mnoznik = mapa_wag.get(tytul, 1.0)
+                wynik_koncowy = podstawa * mnoznik
+                wyniki.append((wynik_koncowy, i))
+        else:
+            # Ścieżka wielozdaniowa (Conversational Multi-sentence Scoring)
+            wektory_zdan = []
+            term_boosts = cfg.get("term_boosts", {})
+            for zdanie in aktywne_zdania:
+                tokeny_zdania = tokenizuj(zdanie, slownik_korekcji)
+                if not tokeny_zdania:
+                    continue
+
+                rozszerzenie = []
+                for tok in tokeny_zdania:
+                    if tok in ROZSZERZENIA:
+                        dodatkowe = tokenizuj(ROZSZERZENIA[tok])
+                        rozszerzenie.extend(dodatkowe)
+
+                zdanie_lower = usun_polskie_znaki(zdanie.lower())
+                for fraza, rozszerzenie_frazy in ROZSZERZENIA.items():
+                    if " " in fraza and fraza in zdanie_lower:
+                        rozszerzenie.extend(tokenizuj(rozszerzenie_frazy))
+
+                tokeny_zdania = tokeny_zdania + rozszerzenie
+                tf_zdania = oblicz_tf(tokeny_zdania)
+
+                wektor_zdania = {}
+                for slowo, tf_val in tf_zdania.items():
+                    finalny_tf = (
+                        tf_val * synonimy_waga if slowo in rozszerzenie else tf_val
+                    )
+                    boost = term_boosts.get(slowo, 1.0)
+                    wektor_zdania[slowo] = finalny_tf * self.idf.get(slowo, 0) * boost
+                wektory_zdan.append(wektor_zdania)
+
+            if not wektory_zdan:
+                return []
+
+            wyniki = []
+            for i, wf in enumerate(wektory_bazy):
+                podobienstwa = [
+                    podobienstwo_cosinusowe(wekt, wf) for wekt in wektory_zdan
+                ]
+
+                # Scalanie podobieństw: Maximum-Weighted Sum
+                if podobienstwa:
+                    max_pod = max(podobienstwa)
+                    reszta_pod = sum(p for p in podobienstwa if p != max_pod)
+                    podstawa = max_pod + 0.25 * reszta_pod
+                else:
+                    podstawa = 0.0
+
+                tytul = self.fragmenty[i]["tytul"]
+                mnoznik = mapa_wag.get(tytul, 1.0)
+                wynik_koncowy = podstawa * mnoznik
+                wyniki.append((wynik_koncowy, i))
 
         wyniki.sort(reverse=True)
 

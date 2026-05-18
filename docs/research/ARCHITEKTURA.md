@@ -36,6 +36,10 @@ Ten dokument definiuje docelową architekturę techniczną i standardy inżynier
 - `TODO` Całkowite zastąpienie odwołań do funkcji proceduralnych w `core/bd.py` bezpośrednimi wywołaniami do repozytoriów wstrzykiwanych przez Kontener DI.
 - **Korzyść:** Ujednolicenie architektury bazodanowej zgodnie z DDD. Serwisy aplikacyjne i routery będą korzystać wyłącznie z wstrzykiwanych instancji `PytaniaRepository` oraz `FeedbackRepository` z `domain/repositories/`, eliminując przestarzałą warstwę proceduralnego wrappera.
 
+### 1.7 Separacja parametrów wyszukiwania (Konfiguracja hiperparametrów)
+- `TODO` Wyodrębnienie wszystkich twardo zakodowanych parametrów wyszukiwania (np. mnożniki `mapa_wag`, boostingi słów w `TERM_BOOSTS`, stałe `bm25_k1` oraz `bm25_b`) z pliku `core/wyszukiwarka.py` do zewnętrznego pliku konfiguracyjnego `data/config.toml`.
+- **Korzyść:** Umożliwi w pełni naukowe strojenie celności wyszukiwarki (np. w symulacji laboratoryjnej) poprzez edycję pojedynczego pliku deklaratywnego bez ingerencji w kod źródłowy silnika. Zapobiega to ryzyku uszkodzenia składni kodu w Pythonie podczas eksperymentów.
+
 ---
 
 ## 2. Optymalizacja i Czystość Kodu

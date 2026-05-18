@@ -16,6 +16,35 @@ import os
 import re
 import sys
 import time
+import tomllib
+
+_prompts_cache = None
+
+
+def pobierz_prompty() -> dict:
+    global _prompts_cache
+    if _prompts_cache is not None:
+        return _prompts_cache
+
+    sciezka = os.path.join(os.path.dirname(__file__), "prompts.toml")
+    if not os.path.exists(sciezka):
+        sciezka = "tests/prompts.toml"
+
+    if os.path.exists(sciezka):
+        try:
+            with open(sciezka, "rb") as f:
+                _prompts_cache = tomllib.load(f)
+        except Exception:
+            pass
+
+    if _prompts_cache is None:
+        _prompts_cache = {
+            "generation": {"prompt": "Jesteś studentem..."},
+            "evaluation": {"prompt": "Oceń czy paragraf..."},
+            "error_analysis": {"prompt": "Analizujesz błędy..."},
+        }
+    return _prompts_cache
+
 
 # Ustawienie ścieżek przed importami lokalnymi
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -54,7 +83,7 @@ BASE_DIR = PROJECT_ROOT
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
 os.makedirs(LOGS_DIR, exist_ok=True)  # Tworzy folder logs, jeśli nie istnieje
 
-LICZBA_PYTAN = 3
+LICZBA_PYTAN = 6
 PLIK_WYNIKOW = os.path.join(LOGS_DIR, "auto_test_wyniki.json")
 PLIK_POPRAWEK = os.path.join(LOGS_DIR, "auto_test_poprawki.py")
 
@@ -110,36 +139,26 @@ def parsuj_json(tekst: str):
 
 def generuj_pytania(baza: list, liczba: int) -> list:
     tytuły = [p["tytul"] for p in baza]
-    prompt = f"""Jesteś studentem Politechniki Wrocławskiej.
-Wygeneruj {liczba} różnych, realistycznych pytań które student mógłby zadać
-o regulamin studiów. Pytania muszą dotyczyć tych paragrafów:
-{json.dumps(tytuły, ensure_ascii=False)}
-
-Pisz pytania potocznie i różnorodnie, np:
-- "co mi grozi jak obleje egzamin"
-- "ile razy mozna powtarzac przedmiot"
-- "kiedy mozna wziac wolne od studiow"
-
-Zwróć TYLKO listę JSON bez żadnego dodatkowego tekstu:
-["pytanie 1", "pytanie 2", ...]"""
+    prompty = pobierz_prompty()
+    szablon = prompty["generation"]["prompt"]
+    prompt = szablon.format(
+        liczba=liczba,
+        podzial=liczba // 3 if liczba >= 3 else 1,
+        tytuly_json=json.dumps(tytuły, ensure_ascii=False),
+    )
 
     tekst = zapytaj_gemini(prompt)
     return parsuj_json(tekst)
 
 
 def ocen_odpowiedz(pytanie: str, tytul: str, podobienstwo: float) -> dict:
-    prompt = f"""Oceń czy paragraf regulaminu pasuje do pytania studenta.
-
-Pytanie: "{pytanie}"
-Znaleziony paragraf: "{tytul}"
-Podobieństwo BM25: {podobienstwo * 100:.0f}%
-
-Zwróć TYLKO JSON:
-{{
-  "trafny": true,
-  "komentarz": "jedno zdanie dlaczego tak lub nie",
-  "oczekiwany_paragraf": null
-}}"""
+    prompty = pobierz_prompty()
+    szablon = prompty["evaluation"]["prompt"]
+    prompt = szablon.format(
+        pytanie=pytanie,
+        tytul=tytul,
+        podobienstwo_procent=f"{podobienstwo * 100:.0f}",
+    )
 
     try:
         tekst = zapytaj_gemini(prompt)
@@ -165,22 +184,12 @@ def analizuj_bledy(bledy: list, baza: list) -> str:
                     kontekst[p["tytul"]] = p["tresc"][:300]
                     break
 
-    prompt = f"""Analizujesz błędy systemu wyszukiwania BM25 dla regulaminu PWr.
-    System używa słownika rozszerzeń zapytań (ROZSZERZENIA) w pliku core/slowniki.py, który mapuje słowa kluczowe z pytań na unikalne słowa z właściwych paragrafów.
-
-Błędne odpowiedzi:
-{json.dumps(bledy, ensure_ascii=False, indent=2)}
-
-Treści oczekiwanych paragrafów:
-{json.dumps(kontekst, ensure_ascii=False, indent=2)}
-
-Dla każdego błędu zaproponuj nowy wpis do słownika ROZSZERZENIA.
-Wpisy powinny mapować słowa kluczowe z pytania na unikalne słowa z właściwego paragrafu.
-
-Zwróć TYLKO słownik Python (bez żadnego dodatkowego tekstu):
-{{
-    "słowo_z_pytania": "unikalne słowa z właściwego paragrafu",
-}}"""
+    prompty = pobierz_prompty()
+    szablon = prompty["error_analysis"]["prompt"]
+    prompt = szablon.format(
+        bledy_json=json.dumps(bledy, ensure_ascii=False, indent=2),
+        kontekst_json=json.dumps(kontekst, ensure_ascii=False, indent=2),
+    )
 
     try:
         return zapytaj_gemini(prompt)
@@ -248,8 +257,8 @@ def uruchom():
             continue
 
         wynik = rezultaty[0]
-        tytul = wynik["tytul"]
-        podobienstwo = wynik["podobienstwo"]
+        tytul = wynik.tytul
+        podobienstwo = wynik.podobienstwo
         print(f"  → {tytul} ({podobienstwo * 100:.0f}%)")
 
         ocena = ocen_odpowiedz(pytanie, tytul, podobienstwo)
