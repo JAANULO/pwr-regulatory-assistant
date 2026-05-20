@@ -37,8 +37,8 @@ Ten dokument definiuje docelową architekturę techniczną i standardy inżynier
 - **Korzyść:** Ujednolicenie architektury bazodanowej zgodnie z DDD. Serwisy aplikacyjne i routery będą korzystać wyłącznie z wstrzykiwanych instancji `PytaniaRepository` oraz `FeedbackRepository` z `domain/repositories/`, eliminując przestarzałą warstwę proceduralnego wrappera.
 
 ### 1.7 Separacja parametrów wyszukiwania (Konfiguracja hiperparametrów)
-- `TODO` Wyodrębnienie wszystkich twardo zakodowanych parametrów wyszukiwania (np. mnożniki `mapa_wag`, boostingi słów w `TERM_BOOSTS`, stałe `bm25_k1` oraz `bm25_b`) z pliku `core/wyszukiwarka.py` do zewnętrznego pliku konfiguracyjnego `data/config.toml`.
-- **Korzyść:** Umożliwi w pełni naukowe strojenie celności wyszukiwarki (np. w symulacji laboratoryjnej) poprzez edycję pojedynczego pliku deklaratywnego bez ingerencji w kod źródłowy silnika. Zapobiega to ryzyku uszkodzenia składni kodu w Pythonie podczas eksperymentów.
+- `DONE` Wyodrębnienie wszystkich parametrów wyszukiwania (stałe BM25 `k1` i `b`, siła synonimów, mapy wag statycznych i dynamicznych oraz boosting słów) do zewnętrznego pliku `data/config.toml`.
+- **Implementacja:** Stworzono system dynamicznego wczytywania `data/config.toml` przy użyciu wbudowanej biblioteki `tomllib`. Silnik wyszukiwarki automatycznie wykrywa zmiany w pliku TOML (za pomocą sprawdzania czasu modyfikacji pliku `mtime` bez konieczności restartu aplikacji), co pozwala na natychmiastowe strojenie hiperparametrów w locie, w tym z poziomu panelu laboratoryjnego.
 
 ---
 

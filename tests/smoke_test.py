@@ -40,11 +40,39 @@ def run_test():
                 data = response.json()
                 if "odpowiedz" in data or "wstep" in data:
                     print(
-                        f"[OK] Proba {i + 1}: Serwer odpowiedzial poprawnie!",
+                        f"[OK] Proba {i + 1}: Serwer odpowiedzial poprawnie na /zapytaj!",
                         flush=True,
                     )
-                    success = True
-                    break
+
+                    # Test manifestu PWA
+                    manifest_url = "http://localhost:5005/static/manifest.json"
+                    print(
+                        f"Sprawdzanie pliku manifestu PWA pod: {manifest_url}...",
+                        flush=True,
+                    )
+                    manifest_resp = requests.get(manifest_url, timeout=5)
+                    if manifest_resp.status_code == 200:
+                        m_data = manifest_resp.json()
+                        if (
+                            m_data.get("display") == "standalone"
+                            and m_data.get("start_url") == "/"
+                        ):
+                            print(
+                                "[OK] Manifest PWA zostal poprawnie zwalidowany!",
+                                flush=True,
+                            )
+                            success = True
+                            break
+                        else:
+                            print(
+                                f"[BLAD] Manifest PWA ma niepoprawna strukture: {m_data}",
+                                flush=True,
+                            )
+                    else:
+                        print(
+                            f"[BLAD] Serwer zwrocil status {manifest_resp.status_code} dla manifest.json",
+                            flush=True,
+                        )
             else:
                 print(
                     f"Proba {i + 1}/{max_retries}: Serwer zwrocil status {response.status_code}",

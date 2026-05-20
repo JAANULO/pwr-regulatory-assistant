@@ -937,7 +937,8 @@
         padding: 6px 10px;
       }
 
-      #btn-clear span {
+      #btn-clear span,
+      #btn-options span {
         display: none;
       }
     }

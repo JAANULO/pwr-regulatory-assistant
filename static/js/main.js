@@ -590,3 +590,39 @@ const chatEl= document.getElementById('chat');
       inputEl.value = pytanie; // Wstaw treść
       wyslij();              // Przekaż od razu do bota
     }
+
+    // Obsługa gestów swipe dla bocznego menu (Sidebar) - Mobile First
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    document.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      touchEndY = e.changedTouches[0].screenY;
+      obsluzGestSwipe();
+    }, { passive: true });
+
+    function obsluzGestSwipe() {
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+      
+      // Sprawdzamy czy gest był poziomy i odpowiednio długi (min. 80px)
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 80) {
+        const sidebar = document.getElementById('sidebar');
+        const isOpen = sidebar.classList.contains('open');
+        
+        if (diffX > 0 && !isOpen && touchStartX < 40) {
+          // Swipe w prawo przy lewej krawędzi ekranu -> Otwórz sidebar
+          toggleSidebar();
+        } else if (diffX < 0 && isOpen) {
+          // Swipe w lewo przy otwartym sidebarze -> Zamknij sidebar
+          toggleSidebar();
+        }
+      }
+    }

@@ -96,6 +96,41 @@ for token, opis in checks:
     obecny = token in js_content
     print(f"    {opis}: {'OK' if obecny else 'BRAK'}")
 
+# 8. PWA i Mobilność (PLAN 1.2)
+print("\n[8] PWA i Mobilnosc (PLAN 1.2):")
+manifest_path = os.path.join(ROOT_DIR, "static", "manifest.json")
+index_path = os.path.join(ROOT_DIR, "templates", "index.html")
+
+if os.path.exists(manifest_path):
+    try:
+        manifest_data = json.load(open(manifest_path, encoding="utf-8"))
+        has_standalone = manifest_data.get("display") == "standalone"
+        has_start_url = manifest_data.get("start_url") == "/"
+        print(
+            f"    manifest.json:  OK (display={manifest_data.get('display')}, start_url={manifest_data.get('start_url')})"
+        )
+        print(
+            f"    Walidacja PWA:  {'OK' if (has_standalone and has_start_url) else 'BLAD'}"
+        )
+    except Exception as e:
+        print(f"    manifest.json:  BLAD parsowania JSON - {e}")
+else:
+    print("    manifest.json:  BRAK PLIKU")
+
+if os.path.exists(index_path):
+    index_content = open(index_path, encoding="utf-8").read()
+    has_link = 'rel="manifest"' in index_content
+    print(f"    index.html link:{'OK' if has_link else 'BRAK linku manifestu'}")
+else:
+    print("    index.html:     BRAK PLIKU")
+
+has_touch = (
+    "touchstart" in js_content
+    and "touchend" in js_content
+    and "obsluzGestSwipe" in js_content
+)
+print(f"    Gesty dotykowe: {'OK' if has_touch else 'BRAK w main.js'}")
+
 print("\n" + "=" * 55)
 print("  KONIEC WERYFIKACJI")
 print("=" * 55)

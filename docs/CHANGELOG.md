@@ -4,6 +4,17 @@ Wszystkie istotne zmiany w projekcie są odnotowywane w tym pliku zgodnie ze sta
 
 ---
 
+## [2.8.0] - 2026-05-20
+### Dodano
+- **Responsywność i Mobilność (Krok 1.2)**: Wdrożenie pliku manifestu PWA (`static/manifest.json`) umożliwiającego uruchamianie aplikacji w trybie `standalone` na urządzeniach mobilnych (bez ramki przeglądarki).
+- **Gesty Swipe (Mobile First)**: Dodanie zaawansowanej obsługi gestów dotykowych (przeciągnięcie palcem od lewej krawędzi) do płynnego otwierania i zamykania bocznego panelu historii na smartfonach.
+- **Automatyczna Weryfikacja**: Rozszerzenie skryptu `tests/weryfikacja.py` o pełną walidację manifestu PWA oraz gestów dotykowych w kodzie JS.
+- **Integracja CI/CD**: Wpięcie walidacji PWA i responsywności bezpośrednio do potoku GitHub Actions (`testy.yml`).
+
+### Ulepszono
+- **Adaptacja Nagłówka**: Dodanie stylów responsywnych dla urządzeń o szerokości poniżej 600px — ukrywanie napisów przycisków w nagłówku na rzecz samych czytelnych ikon (opcje, nowy czat).
+- **Analiza Architektury (Krok 1.7)**: Potwierdzenie pełnej separacji parametrów wyszukiwania w pliku `data/config.toml` (dynamiczne wczytywanie i hot-reload wag BM25).
+
 ## [2.7.0] - 2026-05-18
 ### Dodano
 - **Separacja Hiperparametrów Wyszukiwarki (Krok 1.7)**: Wydzielenie 46 konfigurowalnych parametrów (BM25, term boosts, statyczne i dynamiczne wagi rozdziałów) z kodu źródłowego silnika `core/wyszukiwarka.py` do deklaratywnego pliku `data/config.toml` z inwalidacją cache `.pkl` oraz bezinwazyjnym RAM-buforowaniem I/O.

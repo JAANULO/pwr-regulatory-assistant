@@ -9,6 +9,7 @@
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap"
     rel="stylesheet">
   <link rel="icon" type="image/png" href="/static/favicon.png">
+  <link rel="manifest" href="/static/manifest.json">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -27,11 +28,11 @@
     </div>
     <button id="btn-clear" onclick="wyczyscChat()" data-tooltip="Nowy Czat"
       style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:11px;font-family:'JetBrains Mono',monospace;transition:all 0.15s;">
-      ✕ nowy czat
+      ✕ <span>nowy czat</span>
     </button>
     <button id="btn-options" onclick="otworzOpcje()" data-tooltip="Opcje i ustawienia"
       style="margin-left:12px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-family:'JetBrains Mono',monospace;transition:all 0.15s;">
-      ⚙ opcje
+      ⚙ <span>opcje</span>
     </button>
     <div class="status-dot" style="margin-left:12px;"></div>
   </header>
@@ -56,7 +57,7 @@
         <strong>Informacje o projekcie</strong><br />
         Autor: <a href="https://github.com/JAANULO" target="_blank"
           style="color:var(--accent); text-decoration:none; font-weight:bold;">Janusz Andrzejewski</a><br />
-        Wersja: 2.0 (Vector Space Model BM25)
+        Wersja: 2.8.0 (Vector Space Model BM25)
       </div>
     </div>
   </div>

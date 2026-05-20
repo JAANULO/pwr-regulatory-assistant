@@ -44,6 +44,9 @@ jobs:
       - name: Walidacja spójności słowników (TOML Integrity)
         run: python tests/validate_dictionaries.py
 
+      - name: Walidacja spójności kodu i PWA (weryfikacja.py)
+        run: python tests/weryfikacja.py
+
       - name: Linter – ruff (PEP8 + błędy składni)
         run: python -m ruff check .
 

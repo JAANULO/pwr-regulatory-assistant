@@ -28,8 +28,8 @@ Ten dokument zawiera wizję rozwoju projektu, uporządkowaną według poziomu tr
 - `DONE` Migracja `ADMIN_TOKEN` oraz ścieżek baz danych do pliku `.env` (python-dotenv).
 
  ### 1.2 Responsywność i Mobilność (Mobile First)
- - `TODO` Dostosowanie interfejsu do urządzeń mobilnych (Aplikacja webowa/PWA).
- - **Implementacja:** Meta-tagi viewport, elastyczne kontenery (Flexbox/Grid), obsługa gestów dotykowych dla bocznego menu.
+ - `DONE` Dostosowanie interfejsu do urządzeń mobilnych (Aplikacja webowa/PWA) dla głównego widoku programu.
+ - **Implementacja:** Utworzono manifest PWA (`manifest.json`), podpięto go w nagłówku `<head>`, owinięto teksty przycisków w tagi `<span>` i zaimplementowano w `style.css` ich ukrywanie na smartfonach. Dodano także natywną obsługę gestów przeciągania (swipe) w `main.js` do otwierania i zamykania historii.
 
  ### 1.3 Separacja danych słownikowych (Synonimy i Rozszerzenia do TOML)
  - `DONE` Wyodrębnienie `SYNONIMY` oraz `ROZSZERZENIA` z pliku `core/slowniki.py` do zewnętrznych plików TOML w folderze `data/`.
