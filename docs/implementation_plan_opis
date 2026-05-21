@@ -1,0 +1,33 @@
+# Plan wdrożenia: Oczyszczenie projektu z nienaturalnych struktur AI
+
+Plan ten opisuje kroki niezbędne do usunięcia zbędnych wrapperów, uproszczenia komentarzy na bardziej inżynierskie i akademickie oraz doprecyzowania typowania danych w kluczowych modułach algorytmicznych.
+
+## User Review Required
+
+> [!IMPORTANT]
+> Zmiany obejmują modyfikację modułu `core/wyszukiwarka.py`. Wszelkie wywołania `oblicz_idf` oraz `zbuduj_wektory` w innych modułach (np. `infrastructure/knowledge_loader.py` i `core/indeks_zdan.py`) zostaną zastąpione bezpośrednimi wywołaniami zaktualizowanych, czystych funkcji, co usunie martwy kod kompatybilności wstecznej wyprodukowany przez AI.
+
+## Proposed Changes
+
+### Core Engine
+
+#### [MODIFY] [wyszukiwarka.py](file:///c:/Users/atona/Documents/GitHub/model/core/wyszukiwarka.py)
+*   Usunięcie zduplikowanych funkcji wrapperów: `oblicz_idf` (l. 321) oraz `zbuduj_wektory` (l. 361) i pozostawienie tylko jednej, czystej implementacji BM25.
+*   Dodanie precyzyjnego typowania dla cache słownikowych, np. `_cache_literowek: dict[str, str] = {}`.
+*   Zastąpienie nienaturalnych i poetyckich komentarzy AI (np. *"błąd samotnej wyspy"*, *"kółko potężniejsze"*, *"zgodność regresyjna"*) terminami o charakterze akademickim i inżynierskim.
+*   Zastąpienie magicznej liczby `8` w linii 158 nazwaną stałą konfiguracyjną lub parametrem.
+
+#### [MODIFY] [knowledge_loader.py](file:///c:/Users/atona/Documents/GitHub/model/infrastructure/knowledge_loader.py)
+*   Aktualizacja importów i wywołań w loaderze z `oblicz_idf` / `zbuduj_wektory` na zunifikowane nazwy funkcji.
+
+#### [MODIFY] [indeks_zdan.py](file:///c:/Users/atona/Documents/GitHub/model/core/indeks_zdan.py)
+*   Aktualizacja importów i wywołań w indeksie zdań na zunifikowane nazwy funkcji.
+
+## Verification Plan
+
+### Automated Tests
+- Uruchomienie istniejącego zestawu testów ewaluacyjnych w celu weryfikacji regresji:
+  `python tests/test.py`
+  Wszystkie 129 z 170 testów (lub więcej po ujednoliceniu) muszą przejść bezbłędnie.
+- Uruchomienie testu integracyjnego typu smoke:
+  `python tests/smoke_test.py`
