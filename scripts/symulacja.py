@@ -17,7 +17,7 @@ import pathlib
 import random
 import sys
 import tomllib
-from typing import Any
+from typing import Any, Iterator
 
 # Zapewnienie importów z katalogu głównego projektu
 ROOT_DIR = str(pathlib.Path(__file__).resolve().parents[1])
@@ -154,7 +154,7 @@ def load_base_config() -> dict[str, Any]:
 
 def _generate_param_grid(
     flat_cfg: dict[str, Any],
-) -> "itertools.product[tuple[Any, ...]]":
+) -> Iterator[dict[str, Any]]:
     """
     Dla każdego parametru liczbowego generuje warianty:
       int  → [v-step, v, v+step]
@@ -165,20 +165,26 @@ def _generate_param_grid(
 
     for key, val in flat_cfg.items():
         if isinstance(val, int):
-            step = max(1, abs(val) // 5)
-            variants = sorted({val - step, val, val + step})
+            step_int = max(1, abs(val) // 5)
+            param_options.append((key, sorted({val - step_int, val, val + step_int})))
         elif isinstance(val, float):
-            step = max(0.05, abs(val) * 0.2)
-            variants = sorted(
-                {round(val - step, 3), round(val, 3), round(val + step, 3)}
+            step_float = max(0.05, abs(val) * 0.2)
+            param_options.append(
+                (
+                    key,
+                    sorted(
+                        {
+                            round(val - step_float, 3),
+                            round(val, 3),
+                            round(val + step_float, 3),
+                        }
+                    ),
+                )
             )
-        else:
-            continue
-        param_options.append((key, variants))
 
     if not param_options:
         # Zwracamy jeden pusty kombos
-        return itertools.product(*([[{}]]))  # type: ignore[return-value]
+        return iter([{}])
 
     keys = [k for k, _ in param_options]
     values = [opts for _, opts in param_options]
@@ -195,11 +201,13 @@ def _count_combinations(flat_cfg: dict[str, Any]) -> int:
     total = 1
     for val in flat_cfg.values():
         if isinstance(val, int):
-            step = max(1, abs(val) // 5)
-            total *= len({val - step, val, val + step})
+            step_int = max(1, abs(val) // 5)
+            total *= len({val - step_int, val, val + step_int})
         elif isinstance(val, float):
-            step = max(0.05, abs(val) * 0.2)
-            total *= len({round(val - step, 3), round(val, 3), round(val + step, 3)})
+            step_float = max(0.05, abs(val) * 0.2)
+            total *= len(
+                {round(val - step_float, 3), round(val, 3), round(val + step_float, 3)}
+            )
     return total
 
 
@@ -322,7 +330,7 @@ def run_grid_search(
     # Lazy sampling: jeśli za dużo – losujemy indeksy, nie ładujemy wszystkiego
     if total_combos > max_combinations:
         random.seed(42)
-        chosen_indices = set()
+        chosen_indices: set[int] = set()
         while len(chosen_indices) < max_combinations:
             chosen_indices.add(random.randint(0, total_combos - 1))  # nosec B311
 
