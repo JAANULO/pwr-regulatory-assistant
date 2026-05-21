@@ -1,0 +1,44 @@
+# ==============================================================================
+# KONFIGURACJA SŁÓW I FRAZ POMOCNICZYCH DLA SZYBKICH ODPOWIEDZI (§ 2 słownika)
+# ==============================================================================
+
+# Sygnały pytania o definicję (wyrazy i zwroty rozpoczynające zapytanie)
+sygnaly_prefix = [
+    "co to jest",
+    "co to sa",
+    "co to za",
+    "co to",
+    "co oznacza",
+    "czym jest",
+    "czym sa",
+    "kim jest",
+    "kto to",
+    "wyjasnij",
+    "definicja",
+    "znaczenie",
+    "wyjasnij pojecie",
+    "co rozumie sie przez pojecie",
+    "co to wlasciwie jest",
+    "powiedz mi co to",
+    "pojecie",
+    "okreslenie",
+    "slowo",
+    "zwrot",
+]
+
+# Modyfikatory pojęć (sufiksy doprecyzowujące)
+modyfikatory_suffix = [
+    "w rozumieniu regulaminu",
+    "w regulaminie",
+    "na studiach",
+    "w regulaminie studiow",
+    "studiow",
+    "regulaminu",
+    "pojecie",
+    "okreslenie",
+    "slowo",
+]
+
+[czyszczenie_podmiotu]
+slowa = ["jest", "sa", "za", "pod", "przez", "o", "w", "na", "dla", "to"]
+

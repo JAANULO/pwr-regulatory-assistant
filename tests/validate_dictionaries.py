@@ -44,9 +44,9 @@ def waliduj_slowniki():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     root_dir = os.path.dirname(base_dir)
 
-    plik_synonimow = os.path.join(root_dir, "data", "synonimy.toml")
-    plik_rozszerzen = os.path.join(root_dir, "data", "rozszerzenia.toml")
-    plik_slownika = os.path.join(root_dir, "data", "slownik.toml")
+    plik_synonimow = os.path.join(root_dir, "data", "config", "synonimy.toml")
+    plik_rozszerzen = os.path.join(root_dir, "data", "config", "rozszerzenia.toml")
+    plik_slownika = os.path.join(root_dir, "data", "config", "slownik.toml")
     plik_promptow = os.path.join(base_dir, "prompts.toml")
 
     bledy = []

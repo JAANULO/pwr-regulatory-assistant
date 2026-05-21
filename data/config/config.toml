@@ -1,0 +1,183 @@
+# ==============================================================================
+# KONFIGURACJA HIPERPARAMETRÓW WYSZUKIWARKI REGULAMINU PWR
+# Liczba parametrów łącznie: 46 (3 w [bm25] + 32 w [term_boosts] + 3 w [mapa_wag_statyczna] + 8 w [mapa_wag_dynamiczna])
+# ==============================================================================
+
+[bm25]
+# ==============================================================================
+# Parametry bazowe algorytmu BM25 (Best Match 25) oraz wagowanie synonimów.
+# Liczba parametrów: 3
+# ==============================================================================
+# k1: Parametr nasycenia (term frequency saturation). Określa, jak szybko kolejne 
+# powtórzenia tego samego słowa w dokumencie przestają podwyższać jego wynik. 
+# Zazwyczaj z przedziału [1.2, 2.0].
+k1 = 1.5
+
+# b: Parametr normalizacji długości dokumentu. Określa, jak mocno długość paragrafu 
+# wpływa na jego karanie (dłuższe teksty są karane, bo słowa mogą pojawić się tam 
+# przez przypadek). Zazwyczaj z przedziału [0.5, 0.8].
+b = 0.75
+
+# synonimy_waga: Mnożnik wagi słów dodanych do zapytania poprzez synonimy lub 
+# rozszerzenia słownikowe. Chroni przed zdominowaniem zapytania przez synonimy.
+synonimy_waga = 0.85
+
+
+[term_boosts]
+# ==============================================================================
+# Wzmocnienia unikalnych słów kluczowych (Term Boosting).
+# Mnożniki wagi IDF dla słów o kluczowym znaczeniu regulaminowym, dzięki którym
+# słowa te mają wyższy priorytet niż zwykłe słowa potoczne czy grzecznościowe.
+# Liczba parametrów: 32
+# ==============================================================================
+deficyt = 3.0
+ects = 2.0
+komisyjny = 2.5
+urlop = 2.0
+skreslenie = 1.0
+wystawianie = 3.0
+dyplom = 2.0
+wznowienie = 3.0
+praktyki = 2.0
+kolokwium = 3.5
+sesja = 2.5
+wglad = 4.0
+rewersu = 3.5
+rewers = 3.5
+sylabus = 2.5
+zdalny = 3.5
+grupa = 2.5
+kursow = 2.5
+zajec = 2.0
+prawa = 2.0
+obowiazki = 2.0
+warunki = 2.0
+zaliczenia = 2.0
+usprawiedliwic = 2.0
+nieobecnosc = 2.0
+srednia = 2.0
+rejestracja = 2.0
+zapisy = 2.0
+oplaty = 2.0
+dyplomowy = 2.0
+laboratorium = 2.5
+laborantke = 2.5
+
+
+[mapa_wag_statyczna]
+# ==============================================================================
+# Statyczne mnożniki dla wybranych rozdziałów i paragrafów.
+# Stałe podbicie punktacji dla kluczowych dokumentów regulaminu, które zawierają 
+# uniwersalne pojęcia i powinny częściej pojawiać się na szczycie wyników.
+# Liczba parametrów: 3
+# ==============================================================================
+"Realizacja zajęć" = 1.45
+"Zaliczenie etapu" = 1.15
+"Zaliczanie przedmiotu" = 1.32
+
+
+[mapa_wag_dynamiczna]
+# ==============================================================================
+# Dynamiczne mnożniki warunkowe.
+# Podnoszą wagę (mnożnik) określonego paragrafu wyłącznie w sytuacji, gdy w zapytaniu 
+# użytkownika wystąpi powiązany ze sprawą token (po normalizacji). zapobiega to 
+# fałszywym dopasowaniom dla innych, niezwiązanych pytań.
+# Liczba parametrów: 8 (4 dynamiczne mnożniki + 4 powiązane tokeny aktywujące)
+# ==============================================================================
+"Egzamin komisyjny" = { token = "komisyjny", mnoznik = 2.0 }
+"Wznowienia" = { token = "wznowienie", mnoznik = 1.85 }
+"Powtarzanie" = { token = "powtarzanie", mnoznik = 1.35 }
+"Odpłatność" = { token = "oplaty", mnoznik = 1.35 }
+
+
+[nlp]
+# ==============================================================================
+# Parametry przetwarzania języka naturalnego (NLP) i indeksowania.
+# ==============================================================================
+# prog_dlugosci_slowa_korekcja: Minimalna długość słowa (w liczbie znaków), dla którego 
+# uruchamiane jest wyszukiwanie i poprawianie literówek za pomocą dystansu Levenshteina.
+# Krótsze słowa nie są poprawiane ze względu na wysokie ryzyko błędnych dopasowań.
+prog_dlugosci_slowa_korekcja = 8
+
+# tytul_mnoznik: Współczynnik powtórzenia tytułu fragmentu podczas indeksowania TF-IDF/BM25.
+# Zwiększa znaczenie słów kluczowych zawartych w nagłówku rozdziału w stosunku do treści.
+tytul_mnoznik = 3
+
+
+[wyszukiwanie_wielozdaniowe]
+# ==============================================================================
+# Parametry wyszukiwania konwersacyjnego dla zapytań wielozdaniowych.
+# ==============================================================================
+# waga_pobocznych_zdan: Współczynnik dla metody Maximum-Weighted Sum.
+# Określa, jak mocno pozostałe (poboczne) zdania w zapytaniu wielozdaniowym 
+# wpływają na ostateczny wynik punktowy rozdziału. Wartość z zakresu [0.0, 1.0].
+waga_pobocznych_zdan = 0.25
+
+
+[slownik_pojec]
+# ==============================================================================
+# Parametry weryfikacji słownika pojęć z § 2 regulaminu (szybkie odpowiedzi).
+# ==============================================================================
+# min_dlugosc_korekty: Minimalna długość słowa w zapytaniu definicyjnym,
+# od której dopuszczona jest tolerancja na błędy (literówki).
+min_dlugosc_korekty = 4
+
+# max_dystans_levenshteina: Maksymalny dopuszczalny dystans edycyjny Levenshteina
+# przy dopasowywaniu jednowyrazowych pojęć w słowniku.
+max_dystans_levenshteina = 1
+
+
+[szumy_i_wykluczenia]
+# Szumy i frazy potoczne do ignorowania w NLP
+szumy = [
+    "co mam zrobic", "co robic", "pomocy", "pomoc", "mam pytanie", "witam", 
+    "dzien dobry", "czesc", "hej", "siema", "chcialbym zapytac", 
+    "chcialbym sie dowiedziec", "czy ktos wie", "pozdrawiam", 
+    "z gory dziekuje", "z góry dziękuję", "co teraz", "i co teraz", 
+    "co z tym zrobic", "czy tak mozna", "czy tak w ogole mozna", "czy to prawda"
+]
+
+# Wykluczenia z szybkiej ścieżki
+wykluczenia_szybkiej_sciezki = [
+    "plan studiow", "planu studiow", "punkt ects", "ects", "rejestracja na zajecia",
+    "zapisy na zajecia", "zapisy", "etap studiow", "etapu studiow", "etapow studiow"
+]
+
+fraza_wyjatku_ects = "punkty ects"
+fraza_wyjatku_ects_pomoc = "sa"
+zrodla_ignorowane = ["Wszystkie dokumenty", "odlacz"]
+
+sygnaly_kontekstu = [
+    "a co jak", "a jesli", "a jezeli", "co jak", "co jesli", "a co jesli",
+    "i co wtedy", "co wtedy", "a wtedy", "a jak nie", "jak nie zdam",
+    "jak obleje", "co jak nie", "a czy moge", "czy wtedy", "co z tym", "i co z"
+]
+
+frazy_ocen_ile_dni = ["ile dni", "miedzy terminami"]
+frazy_ocen_odstep = ["odstęp", "odstep", "pięciodniowym", "pieciodniowym"]
+
+
+[komunikaty_serwera]
+puste_pytanie = "Puste pytanie"
+brak_dostepu = "Brak dostępu!"
+zly_token = "Brak dostępu! Podaj prawidłowy token w adresie, np: /admin?token=dev-token-zmien-mnie"
+zle_dane_wejsciowe = "Złe dane wejściowe"
+komunikat_disambiguation = "Och! Twoje zapytanie jest delikatnie ogólnikowe i dotyka stref dwóch podobnych tematów. O który dokładnie ustęp Ci chodzi?"
+brak_trafienia = "Nie znalazłem dokładnej odpowiedzi w regulaminie."
+propozycja_pre = " Może chodzi o: "
+propozycja_post = "?"
+sukces_synonim_wstrzyknieto = "Wstrzyknięto do RAM: {klucz} -> {wartosc} (Działa natychmiastowo!)"
+blad_lab_delta_brak = "Brak"
+blad_lab_delta_error = "ERROR"
+blad_inicjalizacji_bazy = "❌ Błąd inicjalizacji: "
+blad_serwera = "❌ Błąd serwera: "
+
+
+[naglowki_csv]
+czas = "Czas"
+pytanie_uzytkownika = "Pytanie Uzytkownika"
+tytul_paragrafu = "Tytul Paragrafu"
+podobienstwo = "Podobienstwo"
+odpowiedz_bota = "Odpowiedz Bota"
+ocena_kciuka = "Ocena Kciuka (-1 zla)"
+raport_nazwa = "raport_pytan_pwr.csv"

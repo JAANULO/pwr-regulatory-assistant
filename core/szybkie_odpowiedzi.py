@@ -26,7 +26,7 @@ def _wczytaj_slownik_pojec() -> dict[str, str]:
     """
     base_dir = os.path.dirname(os.path.abspath(__file__))
     root_dir = os.path.dirname(base_dir)
-    sciezka_pliku = os.path.join(root_dir, "data", "slownik.toml")
+    sciezka_pliku = os.path.join(root_dir, "data", "config", "slownik.toml")
 
     if not os.path.exists(sciezka_pliku):
         raise FileNotFoundError(
@@ -53,40 +53,36 @@ def _wczytaj_slownik_pojec() -> dict[str, str]:
 # Inicjalizacja słownika pojęć (ładowana jednorazowo przy imporcie modułu)
 SLOWNIK_POJEC = _wczytaj_slownik_pojec()
 
-SYGNALY_PREFIX = [
-    "co to jest",
-    "co to sa",
-    "co to za",
-    "co to",
-    "co oznacza",
-    "czym jest",
-    "czym sa",
-    "kim jest",
-    "kto to",
-    "wyjasnij",
-    "definicja",
-    "znaczenie",
-    "wyjasnij pojecie",
-    "co rozumie sie przez pojecie",
-    "co to wlasciwie jest",
-    "powiedz mi co to",
-    "pojecie",
-    "okreslenie",
-    "slowo",
-    "zwrot",
-]
+_cfg_szybkie_cache: dict[str, list[str]] | None = None
+_cfg_szybkie_mtime: float = 0.0
 
-MODYFIKATORY_SUFFIX = [
-    "w rozumieniu regulaminu",
-    "w regulaminie",
-    "na studiach",
-    "w regulaminie studiow",
-    "studiow",
-    "regulaminu",
-    "pojecie",
-    "okreslenie",
-    "slowo",
-]
+
+def pobierz_konfiguracje_szybkich_odpowiedzi() -> dict[str, list[str]]:
+    global _cfg_szybkie_cache, _cfg_szybkie_mtime
+    sciezka = os.path.join(
+        os.path.dirname(__file__), "..", "data", "config", "szybkie_odpowiedzi.toml"
+    )
+    if not os.path.exists(sciezka):
+        sciezka = os.path.join("data", "config", "szybkie_odpowiedzi.toml")
+
+    if not os.path.exists(sciezka):
+        raise FileNotFoundError(
+            f"Krytyczny błąd: Plik konfiguracji szybkich odpowiedzi nie istnieje w lokalizacji: {os.path.abspath(sciezka)}"
+        )
+
+    try:
+        mtime = os.path.getmtime(sciezka)
+        if _cfg_szybkie_cache is None or mtime > _cfg_szybkie_mtime:
+            with open(sciezka, "rb") as f:
+                _cfg_szybkie_cache = tomllib.load(f)
+            _cfg_szybkie_mtime = mtime
+    except Exception as e:
+        if _cfg_szybkie_cache is None:
+            raise RuntimeError(
+                f"Krytyczny błąd podczas wczytywania konfiguracji szybkich odpowiedzi TOML ({sciezka}): {e}"
+            )
+
+    return _cfg_szybkie_cache
 
 
 def oczysc_do_podmiotu(pyt_norm: str) -> str:
@@ -94,11 +90,15 @@ def oczysc_do_podmiotu(pyt_norm: str) -> str:
     Ekstrahuje główny podmiot zapytania definicyjnego poprzez usunięcie
     powszechnych prefiksów pytających oraz sufiksów modyfikujących w pętli.
     """
+    cfg_szybkie = pobierz_konfiguracje_szybkich_odpowiedzi()
+    sygnaly_prefix = cfg_szybkie.get("sygnaly_prefix", [])
+    modyfikatory_suffix = cfg_szybkie.get("modyfikatory_suffix", [])
+
     # 1. Usuwanie prefiksów w pętli
     zmieniono = True
     while zmieniono:
         zmieniono = False
-        for pref in SYGNALY_PREFIX:
+        for pref in sygnaly_prefix:
             if pyt_norm.startswith(pref):
                 pyt_norm = pyt_norm[len(pref) :].strip()
                 zmieniono = True
@@ -108,14 +108,17 @@ def oczysc_do_podmiotu(pyt_norm: str) -> str:
     zmieniono = True
     while zmieniono:
         zmieniono = False
-        for suff in MODYFIKATORY_SUFFIX:
+        for suff in modyfikatory_suffix:
             if pyt_norm.endswith(suff):
                 pyt_norm = pyt_norm[: -len(suff)].strip()
                 zmieniono = True
                 break
 
     # 3. Usuwanie pojedynczych słów pomocniczych na początku i na końcu
-    pyt_norm = re.sub(r"\b(jest|sa|za|pod|przez|o|w|na|dla|to)\b", "", pyt_norm).strip()
+    slowa_czyszczenia = cfg_szybkie.get("czyszczenie_podmiotu", {}).get("slowa", [])
+    if slowa_czyszczenia:
+        wzorzec = r"\b(" + "|".join(re.escape(s) for s in slowa_czyszczenia) + r")\b"
+        pyt_norm = re.sub(wzorzec, "", pyt_norm).strip()
     return pyt_norm
 
 
@@ -124,10 +127,20 @@ def dopasuj_szybka_odpowiedz(pytanie: str) -> str | None:
     Weryfikuje, czy pytanie dotyczy definicji jednego z pojęć z § 2.
     Jeśli tak, zwraca bezbłędną zrekonstruowaną definicję.
     """
+    from core.wyszukiwarka import pobierz_konfiguracje
+
+    cfg = pobierz_konfiguracje()
+    cfg_slownik = cfg.get("slownik_pojec", {})
+    min_dlugosc_korekty = cfg_slownik.get("min_dlugosc_korekty", 4)
+    max_dystans_levenshteina = cfg_slownik.get("max_dystans_levenshteina", 1)
+
     pyt_norm = usun_polskie_znaki(pytanie.lower().strip().rstrip("?!"))
 
+    cfg_szybkie = pobierz_konfiguracje_szybkich_odpowiedzi()
+    sygnaly_prefix = cfg_szybkie.get("sygnaly_prefix", [])
+
     # Sprawdzamy obecność jawnego sygnału pytania o definicję
-    jest_zapytanie_definicji = any(sygnal in pyt_norm for sygnal in SYGNALY_PREFIX)
+    jest_zapytanie_definicji = any(sygnal in pyt_norm for sygnal in sygnaly_prefix)
 
     # Jeśli brak jawnego sygnału, sprawdzamy czy zapytanie jest bardzo krótkie (1-2 słowa)
     if not jest_zapytanie_definicji:
@@ -159,11 +172,14 @@ def dopasuj_szybka_odpowiedz(pytanie: str) -> str | None:
             if podmiot == klucz:
                 return SLOWNIK_POJEC[klucz]
 
-            # Tolerancja na literówki (Levenshtein 1 dla słów >= 4 znaków)
-            if len(klucz) >= 4 and len(podmiot) >= 4:
+            # Tolerancja na literówki (Levenshtein)
+            if (
+                len(klucz) >= min_dlugosc_korekty
+                and len(podmiot) >= min_dlugosc_korekty
+            ):
                 from core.wyszukiwarka import levenshtein
 
-                if levenshtein(podmiot, klucz) <= 1:
+                if levenshtein(podmiot, klucz) <= max_dystans_levenshteina:
                     return SLOWNIK_POJEC[klucz]
 
     return None

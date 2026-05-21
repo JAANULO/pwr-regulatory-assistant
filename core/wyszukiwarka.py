@@ -18,9 +18,11 @@ _config_mtime: float = 0.0
 
 def pobierz_konfiguracje() -> dict[str, Any]:
     global _config_cache, _config_mtime
-    sciezka = os.path.join(os.path.dirname(__file__), "..", "data", "config.toml")
+    sciezka = os.path.join(
+        os.path.dirname(__file__), "..", "data", "config", "config.toml"
+    )
     if not os.path.exists(sciezka):
-        sciezka = os.path.join("data", "config.toml")
+        sciezka = os.path.join("data", "config", "config.toml")
 
     if os.path.exists(sciezka):
         try:
@@ -38,6 +40,9 @@ def pobierz_konfiguracje() -> dict[str, Any]:
             "term_boosts": {},
             "mapa_wag_statyczna": {},
             "mapa_wag_dynamiczna": {},
+            "nlp": {"prog_dlugosci_slowa_korekcja": 8, "tytul_mnoznik": 3},
+            "wyszukiwanie_wielozdaniowe": {"waga_pobocznych_zdan": 0.25},
+            "slownik_pojec": {"min_dlugosc_korekty": 4, "max_dystans_levenshteina": 1},
         }
     return _config_cache
 
@@ -51,7 +56,9 @@ except ImportError:
     from .slowniki import ROZSZERZENIA, SYNONIMY
     from ..domain.models import WynikWyszukiwania  # type: ignore
 
-PLIK_BAZY = os.path.join(os.path.dirname(__file__), "..", "data", "baza_wiedzy.json")
+PLIK_BAZY = os.path.join(
+    os.path.dirname(__file__), "..", "data", "kb", "baza_wiedzy.json"
+)
 MAPA_WAG_TTL = 60
 _mapa_wag_cache: dict[str, Any] = {"ts": 0.0, "data": {}}
 
@@ -95,7 +102,7 @@ def levenshtein(a: str, b: str) -> int:
 
 
 # Cache korekcji literówek – raz obliczone, zapamiętane na całą sesję
-_cache_literowek: dict = {}
+_cache_literowek: dict[str, str] = {}
 _cache_mapy_fonetycznej: dict[int, dict[str, str]] = {}
 
 
@@ -155,7 +162,9 @@ def popraw_literowke(
 
     # 2. Ścieżka Levenshteina: fuzzy matching na formach fonetycznych
     # Dla dłuższych słów pozwalamy na większy błąd
-    aktualna_odleglosc = 2 if len(slowo) > 8 else max_odleglosc
+    cfg = pobierz_konfiguracje()
+    prog_dlugosci = cfg.get("nlp", {}).get("prog_dlugosci_slowa_korekcja", 8)
+    aktualna_odleglosc = 2 if len(slowo) > prog_dlugosci else max_odleglosc
 
     # Filtrujemy kandydatów po pierwszej literze fonetycznej oraz długości
     kandydaci = [
@@ -318,11 +327,6 @@ def oblicz_idf_bm25(wszystkie_tokeny: list[list[str]]) -> dict[str, float]:
     return idf
 
 
-def oblicz_idf(wszystkie_tokeny: list[list[str]]) -> dict[str, float]:
-    """zachowane dla kompatybilności — używa BM25"""
-    return oblicz_idf_bm25(wszystkie_tokeny)
-
-
 def zbuduj_wektory_bm25(
     wszystkie_tokeny: list[list[str]],
     idf: dict[str, float],
@@ -356,16 +360,6 @@ def zbuduj_wektory_bm25(
         wektory.append(wektor)
 
     return wektory
-
-
-def zbuduj_wektory(
-    wszystkie_tokeny: list[list[str]],
-    idf: dict[str, float],
-    custom_k1: float | None = None,
-    custom_b: float | None = None,
-) -> list[dict[str, float]]:
-    """zachowane dla kompatybilności — używa BM25 z opcją custom_params params"""
-    return zbuduj_wektory_bm25(wszystkie_tokeny, idf, custom_k1, custom_b)
 
 
 # ── Krok 3: podobienstwo cosinusowe ──────────────────────────────────────────
@@ -425,32 +419,10 @@ def czy_zdanie_to_szum(zdanie: str) -> bool:
     """
     zdanie_norm = usun_polskie_znaki(zdanie.lower().strip().rstrip("?!."))
 
-    SZUMY = {
-        "co mam zrobic",
-        "co robic",
-        "pomocy",
-        "pomoc",
-        "mam pytanie",
-        "witam",
-        "dzien dobry",
-        "czesc",
-        "hej",
-        "siema",
-        "chcialbym zapytac",
-        "chcialbym sie dowiedziec",
-        "czy ktos wie",
-        "pozdrawiam",
-        "z gory dziekuje",
-        "z góry dziękuję",
-        "co teraz",
-        "i co teraz",
-        "co z tym zrobic",
-        "czy tak mozna",
-        "czy tak w ogole mozna",
-        "czy to prawda",
-    }
+    cfg = pobierz_konfiguracje()
+    szumy = set(cfg.get("szumy_i_wykluczenia", {}).get("szumy", []))
 
-    if zdanie_norm in SZUMY:
+    if zdanie_norm in szumy:
         return True
 
     # Krótkie zdania o małej wartości bez unikalnych słów
@@ -503,7 +475,7 @@ class Wyszukiwarka:
                 if len(A) < 3 or len(B) < 3:
                     continue  # śmieci i przyimki
                 if A == B:
-                    continue  # Odrzuca błąd samotnej wyspy (słowo łączące się same ze sobą)
+                    continue  # Zabezpieczenie przed pętlami własnymi (autorelacja tokenu)
                 # Sortowanie, żeby kolejność słów (A->B czy B->A) nie grała roli
                 para = tuple(sorted([A, B]))
                 bigramy[para] += 1  # type: ignore
@@ -530,7 +502,7 @@ class Wyszukiwarka:
 
         nodes = []
         for wezel in wezly_set:
-            # Im więcej powiązań przechodzi przez słowo, tym kółko jest potężniejsze
+            # Skalowanie rozmiaru węzła na podstawie stopnia węzła (node degree)
             wielkosc = 10 + min(wystapienia_wezlow[wezel] * 1.5, 40)
             nodes.append(
                 {
@@ -626,25 +598,21 @@ class Wyszukiwarka:
         # Szybka ścieżka dla definicji ze słownika pojęć (§ 2)
         from core.szybkie_odpowiedzi import dopasuj_szybka_odpowiedz
 
+        cfg = pobierz_konfiguracje()
+
         # Wykluczamy pojęcia, które w bazie regresyjnej mają przypisane inne, bardziej szczegółowe paragrafy
-        WYKLUCZENIA_SZYBKIEJ_SCIEZKI = {
-            "plan studiow",
-            "planu studiow",
-            "punkt ects",
-            "ects",
-            "rejestracja na zajecia",
-            "zapisy na zajecia",
-            "zapisy",
-            "etap studiow",
-            "etapu studiow",
-            "etapow studiow",
-        }
+        wykluczenia_cfg = cfg.get("szumy_i_wykluczenia", {})
+        wykluczenia_szybkiej = set(
+            wykluczenia_cfg.get("wykluczenia_szybkiej_sciezki", [])
+        )
 
         pyt_norm = usun_polskie_znaki(pytanie.lower().strip().rstrip("?!"))
-        czy_wykluczone = any(wykl in pyt_norm for wykl in WYKLUCZENIA_SZYBKIEJ_SCIEZKI)
+        czy_wykluczone = any(wykl in pyt_norm for wykl in wykluczenia_szybkiej)
 
         # Wyjątek: 'co to sa punkty ects' ma pasować do Słownika, ale 'co to jest punkt ects' do punktów ECTS
-        if "punkty ects" in pyt_norm and "sa" in pyt_norm:
+        fraza_ects = wykluczenia_cfg.get("fraza_wyjatku_ects", "punkty ects")
+        fraza_ects_pomoc = wykluczenia_cfg.get("fraza_wyjatku_ects_pomoc", "sa")
+        if fraza_ects in pyt_norm and fraza_ects_pomoc in pyt_norm:
             czy_wykluczone = False
 
         if not czy_wykluczone and dopasuj_szybka_odpowiedz(pytanie):
@@ -717,7 +685,7 @@ class Wyszukiwarka:
             mapa_wag[tytul] = v
 
         if len(aktywne_zdania) == 1:
-            # Szybka, standardowa ścieżka jednozdaniowa (100% zgodności regresyjnej)
+            # Standardowa ścieżka dla zapytań jednozdaniowych
             zdanie = aktywne_zdania[0]
             tokeny_pytania = tokenizuj(zdanie, slownik_korekcji)
             if not tokeny_pytania:
@@ -796,7 +764,10 @@ class Wyszukiwarka:
                 if podobienstwa:
                     max_pod = max(podobienstwa)
                     reszta_pod = sum(p for p in podobienstwa if p != max_pod)
-                    podstawa = max_pod + 0.25 * reszta_pod
+                    waga_pobocznych = cfg.get("wyszukiwanie_wielozdaniowe", {}).get(
+                        "waga_pobocznych_zdan", 0.25
+                    )
+                    podstawa = max_pod + waga_pobocznych * reszta_pod
                 else:
                     podstawa = 0.0
 
@@ -825,7 +796,12 @@ class Wyszukiwarka:
         ]
 
         # Filtrowanie po zrodle (dropdown z frontendu)
-        if zrodlo and zrodlo not in ("Wszystkie dokumenty", "odlacz", "", None):
+        zrodla_ignorowane = set(
+            cfg.get("szumy_i_wykluczenia", {}).get(
+                "zrodla_ignorowane", ["Wszystkie dokumenty", "odlacz"]
+            )
+        )
+        if zrodlo and zrodlo not in zrodla_ignorowane and zrodlo not in ("", None):
             kandydaci = [k for k in kandydaci if k.zrodlo == zrodlo]
 
         return kandydaci[:n_wynikow]

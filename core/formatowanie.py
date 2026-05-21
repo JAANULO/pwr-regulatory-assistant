@@ -7,6 +7,17 @@ import random
 import re
 import sys
 
+# W Pythonie 3.11+ tomllib jest częścią biblioteki standardowej
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    try:
+        import tomli as tomllib  # type: ignore
+    except ImportError:
+        raise ImportError(
+            "Dla wersji Pythona starszych niż 3.11 wymagana jest biblioteka 'tomli'."
+        )
+
 from .wyszukiwarka import tokenizuj as _tokenizuj
 
 if __name__ != "__main__":
@@ -19,88 +30,38 @@ else:
         from domain.models import WynikWyszukiwania
 
 
-# ── słowa kluczowe do wykrywania tematu pytania ───────────────────────────────
+# ── wczytywanie konfiguracji formatowania ─────────────────────────────────────
 
-TEMATY = {
-    "egzamin": [
-        "egzamin",
-        "egzaminu",
-        "egzaminie",
-        "zdać",
-        "zdawać",
-        "oblać",
-        "podejść",
-        "termin",
-        "poprawka",
-        "sesja",
-        "nie zdam",
-        "nie zdałem",
-    ],
-    "zaliczenie": ["zaliczenie", "zaliczyć", "zaliczenia", "kolokwium", "sprawdzian"],
-    "urlop": ["urlop", "urlopu", "urlopie", "dziekański", "zdrowotny", "przerwa"],
-    "skreślenie": ["skreślenie", "skreślić", "wydalenie", "skreślony", "skreslanym"],
-    "praca_dyplomowa": [
-        "praca",
-        "dyplomowa",
-        "dyplomowej",
-        "inżynierska",
-        "magisterska",
-        "dyplom",
-        "antyplagiat",
-        "obron",
-    ],
-    "ocena": [
-        "ocena",
-        "oceny",
-        "ocenę",
-        "średnia",
-        "wynik",
-        "pięć",
-        "cztery",
-        "trzy",
-        "niedostateczny",
-        "oblicza",
-    ],
-    "nieobecność": [
-        "nieobecność",
-        "nieobecności",
-        "opuścić",
-        "opuszczać",
-        "nie przyjść",
-        "opuściłem",
-        "byłem chory",
-    ],
-    "powtarzanie": ["powtarzać", "powtórzyć", "powtarzanie", "drugi raz", "ponownie"],
-    "wznowienie": [
-        "wznowić",
-        "wznowienie",
-        "wznowienia",
-        "wznowieniu",
-        "przywrócenie",
-        "przywrócić",
-        "po skreśleniu",
-    ],
-}
+_cfg_formatowanie_cache: dict | None = None
+_cfg_formatowanie_mtime: float = 0.0
 
-WSTEPY = {
-    "egzamin": "📝 W sprawie egzaminów regulamin mówi:\n",
-    "zaliczenie": "📝 W kwestii zaliczeń regulamin mówi:\n",
-    "urlop": "🏖️ Jeśli chodzi o urlopy studenckie:\n",
-    "skreślenie": "⚠️ W sprawie skreślenia z listy studentów:\n",
-    "praca_dyplomowa": "📄 Jeśli chodzi o pracę dyplomową:\n",
-    "ocena": "📊 W kwestii ocen i wyników:\n",
-    "nieobecność": "📅 Jeśli chodzi o nieobecności na zajęciach:\n",
-    "powtarzanie": "🔄 W kwestii powtarzania przedmiotów:\n",
-    "domyślny": "📋 Zgodnie z regulaminem studiów PWr:\n",
-    "wznowienie": "🔄 W sprawie wznowienia studiów regulamin mówi:\n",
-}
 
-ZACHETY = [
-    "Jeśli masz dodatkowe pytania – pytaj!",
-    "Możesz zapytać bardziej szczegółowo.",
-    "W razie wątpliwości warto też zapytać w dziekanacie.",
-    "Pamiętaj że w sprawach formalnych dziekanat zawsze pomoże.",
-]
+def pobierz_konfiguracje_formatowania() -> dict:
+    global _cfg_formatowanie_cache, _cfg_formatowanie_mtime
+    sciezka = os.path.join(
+        os.path.dirname(__file__), "..", "data", "config", "formatowanie.toml"
+    )
+    if not os.path.exists(sciezka):
+        sciezka = os.path.join("data", "config", "formatowanie.toml")
+
+    if not os.path.exists(sciezka):
+        raise FileNotFoundError(
+            f"Krytyczny błąd: Plik konfiguracji formatowania nie istnieje w lokalizacji: {os.path.abspath(sciezka)}"
+        )
+
+    try:
+        mtime = os.path.getmtime(sciezka)
+        if _cfg_formatowanie_cache is None or mtime > _cfg_formatowanie_mtime:
+            with open(sciezka, "rb") as f:
+                _cfg_formatowanie_cache = tomllib.load(f)
+            _cfg_formatowanie_mtime = mtime
+    except Exception as e:
+        if _cfg_formatowanie_cache is None:
+            raise RuntimeError(
+                f"Krytyczny błąd podczas wczytywania konfiguracji formatowania TOML ({sciezka}): {e}"
+            )
+
+    return _cfg_formatowanie_cache
 
 
 # ── funkcje pomocnicze ────────────────────────────────────────────────────────
@@ -109,7 +70,9 @@ ZACHETY = [
 def wykryj_temat(pytanie: str) -> str:
     """wykrywa temat pytania na podstawie słów kluczowych"""
     pytanie_lower = pytanie.lower()
-    for temat, slowa in TEMATY.items():
+    cfg = pobierz_konfiguracje_formatowania()
+    tematy = cfg.get("tematy", {})
+    for temat, slowa in tematy.items():
         if any(s in pytanie_lower for s in slowa):
             return temat
     return "domyślny"
@@ -163,15 +126,15 @@ def wyciagnij_zdania(
 
 def wyciagnij_skale_ocen(tresc: str) -> str:
     """specjalna obsługa – wyciąga tabelę ocen jako czytelne punkty"""
-    oceny = [
-        ("5,0", "bardzo dobry", "90–100%"),
-        ("4,5", "dobry plus", "80–89%"),
-        ("4,0", "dobry", "70–79%"),
-        ("3,5", "dostateczny plus", "60–69%"),
-        ("3,0", "dostateczny", "50–59%"),
-        ("2,0", "niedostateczny", "0–49%"),
-    ]
-    linie = ["  Ocena   Słownie               Próg"]
+    cfg = pobierz_konfiguracje_formatowania()
+    skala_cfg = cfg.get("skala_ocen", {})
+    naglowek = skala_cfg.get("naglowek")
+    oceny = skala_cfg.get("oceny")
+
+    if not naglowek or not oceny:
+        raise KeyError("Brak prawidłowej konfiguracji 'skala_ocen' w pliku TOML")
+
+    linie = [naglowek]
     linie.append("  " + "─" * 38)
     for cyfra, slowo, prog in oceny:
         linie.append(f"  {cyfra:<8} {slowo:<22} {prog}")
@@ -199,11 +162,13 @@ def formatuj_odpowiedz(
       📖 Źródło: § 18. Egzaminy
       💡 Jeśli masz dodatkowe pytania – pytaj!
     """
+    cfg_format = pobierz_konfiguracje_formatowania()
+    szablony = cfg_format.get("szablony", {})
+
     if not wynik_wyszukiwarki:
-        return (
-            "Nie znalazłem informacji na ten temat w regulaminie.\n"
-            "Spróbuj zapytać inaczej lub zajrzyj do dziekanatu."
-        )
+        if "brak_wynikow" not in szablony:
+            raise KeyError("Brak konfiguracji 'brak_wynikow' w sekcji [szablony]")
+        return szablony["brak_wynikow"]
 
     tytul = wynik_wyszukiwarki.tytul
     tresc = wynik_wyszukiwarki.tresc
@@ -211,45 +176,44 @@ def formatuj_odpowiedz(
 
     # za niskie dopasowanie
     if podobienstwo < 0.08:
-        return (
-            "Nie jestem pewien czy mam dokładną odpowiedź na to pytanie.\n"
-            f"Najbliższy temat jaki znalazłem to: {tytul}\n\n"
-            "Sprawdź w dziekanacie lub przejrzyj pełny regulamin."
-        )
+        if "niskie_dopasowanie" not in szablony:
+            raise KeyError("Brak konfiguracji 'niskie_dopasowanie' w sekcji [szablony]")
+        return szablony["niskie_dopasowanie"].format(tytul=tytul)
 
     # dobierz wstęp: najpierw po pytaniu, potem skoryguj po faktycznym tytule paragrafu
+    wstepy = cfg_format.get("wstepy", {})
+
     temat = wykryj_temat(pytanie)
-    wstep = WSTEPY.get(temat, WSTEPY["domyślny"])
+    wstep = wstepy.get(temat, wstepy.get("domyślny", ""))
 
     tytul_lower = tytul.lower()
-    if "oceny za studia" in tytul_lower or "ostateczny wynik studiow" in tytul_lower:
-        wstep = "🎓 W kwestii oceny końcowej studiów regulamin mówi:\n"
-    elif "skala ocen" in tytul_lower:
-        wstep = "📊 W kwestii skali ocen regulamin mówi:\n"
+    wstepy_specjalne = cfg_format.get("wstepy_specjalne", {})
+    wstepy_dopasowanie = cfg_format.get("wstepy_specjalne_dopasowanie", {})
+
+    for klucz, frazy in wstepy_dopasowanie.items():
+        if any(f in tytul_lower for f in frazy):
+            wstep = wstepy_specjalne.get(klucz, wstep)
+            break
 
     # wyciągnij kluczowe zdania i sformatuj jako punkty
     # zdania = wyciagnij_zdania(tresc, max_zdan=3)
 
-    SLOWA_KLUCZOWE = {
-        "tygodni": ["tygodni", "tygodnie", "15", "piętnaście"],
-        "wznow": ["wznowi", "ubiegać", "skreśloną", "wniosek"],
-        "skresla": [
-            "skreśla",
-            "rezygnacji",
-            "niepodjęcia",
-            "niezłożenia",
-            "niepodjęcia studiów",
-        ],
-        "egzamin": ["dwukrotnego", "termin", "prawo do"],
-        "urlop": ["urlop zdrowotny", "urlop dziekański", "udziela"],
-    }
+    slowa_kluczowe = cfg_format.get("slowa_kluczowe", {})
 
     tokeny_pyt = _tokenizuj(pytanie)
-    if "skala ocen" in tytul.lower():
+
+    jest_skala = False
+    wstepy_dopasowanie = cfg_format.get("wstepy_specjalne_dopasowanie", {})
+    for f in wstepy_dopasowanie.get("skala_ocen", []):
+        if f in tytul.lower():
+            jest_skala = True
+            break
+
+    if jest_skala:
         zdania = [wyciagnij_skale_ocen(tresc)]
     else:
         slowa = None
-        for fraza, kluczowe in SLOWA_KLUCZOWE.items():
+        for fraza, kluczowe in slowa_kluczowe.items():
             if fraza in pytanie.lower():
                 slowa = kluczowe
                 break
@@ -257,7 +221,8 @@ def formatuj_odpowiedz(
             tresc, max_zdan=3, szukaj=slowa, pytanie_tokeny=tokeny_pyt
         )
 
-    zacheta = random.choice(ZACHETY) if podobienstwo > 0.2 else None  # nosec B311
+    zachety = cfg_format.get("zachety", [])
+    zacheta = random.choice(zachety) if podobienstwo > 0.2 and zachety else None  # nosec B311
 
     # Pokaż "pełny paragraf" tylko jeśli punkty to < 40% treści
     # Logika wyświetlania pełnego paragrafu jest realizowana na froncie

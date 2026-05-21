@@ -10,16 +10,32 @@ if TYPE_CHECKING:
 
 
 def utworz_wyszukiwarke(plik_bazy: str) -> "Wyszukiwarka":
-    from core.wyszukiwarka import Wyszukiwarka, tokenizuj, oblicz_idf, zbuduj_wektory
+    from core.wyszukiwarka import (
+        Wyszukiwarka,
+        tokenizuj,
+        oblicz_idf_bm25,
+        zbuduj_wektory_bm25,
+        pobierz_konfiguracje,
+    )
+
+    cfg = pobierz_konfiguracje()
+    mnoznik_tytulu = int(cfg.get("nlp", {}).get("tytul_mnoznik", 3))
 
     if os.path.isdir(plik_bazy):
         data_dir = plik_bazy
-        json_files = sorted(glob.glob(os.path.join(data_dir, "*.json")))
-        cache = os.path.join(data_dir, "baza_wiedzy_multi_cache.pkl")
+        kb_dir = os.path.join(data_dir, "kb")
+        if os.path.isdir(kb_dir):
+            json_files = sorted(glob.glob(os.path.join(kb_dir, "*.json")))
+        else:
+            json_files = sorted(glob.glob(os.path.join(data_dir, "*.json")))
+        cache = os.path.join(data_dir, "database", "baza_wiedzy_multi_cache.pkl")
+        data_root = data_dir
     else:
-        data_dir = os.path.dirname(os.path.abspath(plik_bazy))
+        data_root = os.path.dirname(os.path.abspath(plik_bazy))
+        if os.path.basename(data_root) == "kb":
+            data_root = os.path.dirname(data_root)
         json_files = [plik_bazy]
-        cache = plik_bazy.replace(".json", "_cache.pkl")
+        cache = os.path.join(data_root, "database", "baza_wiedzy_multi_cache.pkl")
 
     if not json_files:
         raise FileNotFoundError(f"Brak plikow JSON do indeksowania w: {plik_bazy}")
@@ -58,9 +74,9 @@ def utworz_wyszukiwarke(plik_bazy: str) -> "Wyszukiwarka":
         )
 
     slowniki = [
-        os.path.join(data_dir, "synonimy.toml"),
-        os.path.join(data_dir, "rozszerzenia.toml"),
-        os.path.join(data_dir, "config.toml"),
+        os.path.join(data_root, "config", "synonimy.toml"),
+        os.path.join(data_root, "config", "rozszerzenia.toml"),
+        os.path.join(data_root, "config", "config.toml"),
     ]
     pliki_sledzone = list(aktywne_pliki) + [s for s in slowniki if os.path.exists(s)]
     baza_mtime = max(os.path.getmtime(p) for p in pliki_sledzone)
@@ -78,11 +94,11 @@ def utworz_wyszukiwarke(plik_bazy: str) -> "Wyszukiwarka":
         print("Budowanie indeksu TF-IDF...")
         wszystkie_tokeny = []
         for f in fragmenty:
-            sklejka = (f["tytul"] + " ") * 3 + f["tresc"]
+            sklejka = (f["tytul"] + " ") * mnoznik_tytulu + f["tresc"]
             wszystkie_tokeny.append(tokenizuj(sklejka))
 
-        idf = oblicz_idf(wszystkie_tokeny)
-        wektory = zbuduj_wektory(wszystkie_tokeny, idf)
+        idf = oblicz_idf_bm25(wszystkie_tokeny)
+        wektory = zbuduj_wektory_bm25(wszystkie_tokeny, idf)
         try:
             with open(cache, "wb") as f_out:
                 pickle.dump((idf, wektory, wszystkie_tokeny), f_out)
@@ -98,16 +114,23 @@ def utworz_wyszukiwarke(plik_bazy: str) -> "Wyszukiwarka":
 
 def utworz_indeks_zdan(plik_bazy: str) -> "IndeksZdan":
     from core.indeks_zdan import IndeksZdan, podziel_na_zdania
-    from core.wyszukiwarka import tokenizuj, oblicz_idf, zbuduj_wektory
+    from core.wyszukiwarka import tokenizuj, oblicz_idf_bm25, zbuduj_wektory_bm25
 
     if os.path.isdir(plik_bazy):
         data_dir = plik_bazy
-        json_files = sorted(glob.glob(os.path.join(data_dir, "*.json")))
-        cache = os.path.join(data_dir, "baza_wiedzy_zdania_cache.pkl")
+        kb_dir = os.path.join(data_dir, "kb")
+        if os.path.isdir(kb_dir):
+            json_files = sorted(glob.glob(os.path.join(kb_dir, "*.json")))
+        else:
+            json_files = sorted(glob.glob(os.path.join(data_dir, "*.json")))
+        cache = os.path.join(data_dir, "database", "baza_wiedzy_zdania_cache.pkl")
+        data_root = data_dir
     else:
-        data_dir = os.path.dirname(os.path.abspath(plik_bazy))
+        data_root = os.path.dirname(os.path.abspath(plik_bazy))
+        if os.path.basename(data_root) == "kb":
+            data_root = os.path.dirname(data_root)
         json_files = [plik_bazy]
-        cache = plik_bazy.replace(".json", "_zdania_cache.pkl")
+        cache = os.path.join(data_root, "database", "baza_wiedzy_zdania_cache.pkl")
 
     fragmenty = []
     aktywne_pliki = []
@@ -142,8 +165,8 @@ def utworz_indeks_zdan(plik_bazy: str) -> "IndeksZdan":
         )
 
     slowniki = [
-        os.path.join(data_dir, "synonimy.toml"),
-        os.path.join(data_dir, "rozszerzenia.toml"),
+        os.path.join(data_root, "config", "synonimy.toml"),
+        os.path.join(data_root, "config", "rozszerzenia.toml"),
     ]
     pliki_sledzone = list(aktywne_pliki) + [s for s in slowniki if os.path.exists(s)]
     baza_mtime = max(os.path.getmtime(p) for p in pliki_sledzone)
@@ -169,8 +192,8 @@ def utworz_indeks_zdan(plik_bazy: str) -> "IndeksZdan":
             )
 
     wszystkie_tokeny = [tokenizuj(z["tekst"]) for z in zdania]
-    idf = oblicz_idf(wszystkie_tokeny)
-    wektory = zbuduj_wektory(wszystkie_tokeny, idf)
+    idf = oblicz_idf_bm25(wszystkie_tokeny)
+    wektory = zbuduj_wektory_bm25(wszystkie_tokeny, idf)
 
     try:
         with open(cache, "wb") as f_out:

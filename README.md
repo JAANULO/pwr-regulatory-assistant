@@ -46,7 +46,7 @@ Instead of generating answers from memory, it uses a **RAG (Retrieval-Augmented 
 - **Levenshtein Distance** — custom implementation for typo correction.
 - **Intent Classifier** — extracts numbers, dates, and consequences from paragraphs.
 - **Diagnostics API** — built-in tools for production monitoring and error tracing.
-- **Configuration & Hyperparameters** — **46 parameters** fully decoupled into [**`data/config.toml`**](data/config.toml) for easy tuning (BM25 constants, custom term boosts, static & dynamic chapter weights).
+- **Configuration & Hyperparameters** — **46 parameters** fully decoupled into [**`data/config/config.toml`**](data/config/config.toml) for easy tuning (BM25 constants, custom term boosts, static & dynamic chapter weights).
 - **Release History** — track changes in [docs/CHANGELOG.md](docs/CHANGELOG.md).
 
 ### Mini-GPT Research (Archived/Moved)
@@ -155,12 +155,12 @@ python app.py
 ### Wyniki testów (v2)
 | Metryka | Wartość |
 |---|---|
-| Rozmiar zestawu testowego | 150 pytań |
-| Trafność (właściwy paragraf) | **103/150 (68.6%)** |
+| Rozmiar zestawu testowego | 157 pytań |
+| Trafność (właściwy paragraf) | **116/157 (73.9%)** |
 | Czas odpowiedzi | < 50 ms |
 
 ### Konfiguracja i Hiperparametry
-Wyszukiwarka posiada **46 konfigurowalnych parametrów** wydzielonych całkowicie z kodu do deklaratywnego pliku [**`data/config.toml`**](data/config.toml). Pozwala to na precyzyjne strojenie silnika bez modyfikacji logiki Pythona:
+Wyszukiwarka posiada **46 konfigurowalnych parametrów** wydzielonych całkowicie z kodu do deklaratywnego pliku [**`data/config/config.toml`**](data/config/config.toml). Pozwala to na precyzyjne strojenie silnika bez modyfikacji logiki Pythona:
 - **`[bm25]`** (3 parametry): współczynniki `k1`, `b` oraz mnożnik wagi synonimów `synonimy_waga`.
 - **`[term_boosts]`** (32 parametry): podbicia wag IDF dla specyficznych słów kluczowych regulaminu (np. `deficyt`, `ects`, `komisyjny`).
 - **`[mapa_wag_statyczna]`** (3 parametry): stałe podbicia punktacji dla najważniejszych rozdziałów.
@@ -184,7 +184,10 @@ Wyszukiwarka posiada **46 konfigurowalnych parametrów** wydzielonych całkowici
 ├── infrastructure/             ← Loadery i infrastruktura
 ├── static/                     ← Frontend (JS, CSS)
 ├── templates/                  ← Frontend (HTML)
-├── data/                       ← Bazy wiedzy (JSON, SQLite)
+├── data/                       ← Konfiguracja, bazy danych, bazy wiedzy (SoC)
+│   ├── config/                 ← Pliki konfiguracyjne TOML
+│   ├── database/               ← Baza SQLite i pliki cache .pkl (ignorowane)
+│   └── kb/                     ← Pliki bazy wiedzy (.json, .pdf)
 └── tests/                      ← Testy i weryfikacja
 ```
 

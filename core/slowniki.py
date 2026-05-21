@@ -22,8 +22,11 @@ else:
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
 
-PLIK_SYNONIMOW = os.path.join(ROOT_DIR, "data", "synonimy.toml")
-PLIK_ROZSZERZEN = os.path.join(ROOT_DIR, "data", "rozszerzenia.toml")
+PLIK_SYNONIMOW = os.path.join(ROOT_DIR, "data", "config", "synonimy.toml")
+PLIK_ROZSZERZEN = os.path.join(ROOT_DIR, "data", "config", "rozszerzenia.toml")
+PLIK_ROZSZERZEN_ZDAN = os.path.join(
+    ROOT_DIR, "data", "config", "rozszerzenia_zdan.toml"
+)
 
 
 def _wczytaj_slownik_toml(sciezka_pliku: str) -> dict[str, str]:
@@ -50,3 +53,4 @@ def _wczytaj_slownik_toml(sciezka_pliku: str) -> dict[str, str]:
 # Inicjalizacja globalnych słowników (ładowana jednorazowo przy imporcie modułu)
 SYNONIMY = _wczytaj_slownik_toml(PLIK_SYNONIMOW)
 ROZSZERZENIA = _wczytaj_slownik_toml(PLIK_ROZSZERZEN)
+ROZSZERZENIA_ZDAN = _wczytaj_slownik_toml(PLIK_ROZSZERZEN_ZDAN)

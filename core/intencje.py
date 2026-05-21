@@ -12,119 +12,80 @@ Typy intencji:
   OGOLNE     – wszystko inne
 """
 
+import os
+import sys
+
+# W Pythonie 3.11+ tomllib jest częścią biblioteki standardowej
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    try:
+        import tomli as tomllib  # type: ignore
+    except ImportError:
+        raise ImportError(
+            "Dla wersji Pythona starszych niż 3.11 wymagana jest biblioteka 'tomli'."
+        )
+
 import re
 
 
-# ── wzorce intencji ───────────────────────────────────────────────────────────
+# ── wczytywanie konfiguracji intencji ─────────────────────────────────────────
 
-INTENCJE = [
-    (
-        "LICZBA",
-        [
-            "ile razy",
-            "ile tygodni",
-            "ile semestr",
-            "ile terminu",
-            "ile godzin",
-            "ile punkt",
-            "ile lat",
-            "ile osob",
-            "ile miesiec",
-            "ile razy mozna",
-        ],
-    ),
-    (
-        "TERMIN",
-        [
-            "kiedy",
-            "do kiedy",
-            "od kiedy",
-            "w jakim terminie",
-            "kiedy mozna",
-            "kiedy trzeba",
-            "kiedy nalezy",
-            "do jakiego",
-            "w jakim czasie",
-            "ile dni",
-        ],
-    ),
-    (
-        "TAK_NIE",
-        [
-            "czy moge",
-            "czy mozna",
-            "czy wolno",
-            "czy jest",
-            "czy trzeba",
-            "czy musze",
-            "czy student moze",
-            "czy da sie",
-            "czy istnieje",
-        ],
-    ),
-    (
-        "SKUTEK",
-        [
-            "co grozi",
-            "co sie stanie",
-            "jakie konsekwencje",
-            "co mi grozi",
-            "co bedzie",
-            "co jezeli",
-            "co jak",
-            "co jesli",
-            "jakie sa skutki",
-        ],
-    ),
-    (
-        "PROCEDURA",
-        [
-            "jak",
-            "w jaki sposob",
-            "jak mozna",
-            "jak sie",
-            "jak zlozyc",
-            "jak uzyskac",
-            "jak wznowic",
-            "jak oblicza",
-            "jak liczyc",
-        ],
-    ),
-    (
-        "DEFINICJA",
-        [
-            "co to jest",
-            "co to",
-            "czym jest",
-            "co oznacza",
-            "co to znaczy",
-            "definicja",
-            "co rozumiemy",
-        ],
-    ),
-]
+_cfg_full_cache: dict | None = None
+_cfg_intencje_mtime: float = 0.0
+
+
+def pobierz_pelna_konfiguracje() -> dict:
+    global _cfg_full_cache, _cfg_intencje_mtime
+    sciezka = os.path.join(
+        os.path.dirname(__file__), "..", "data", "config", "intencje.toml"
+    )
+    if not os.path.exists(sciezka):
+        sciezka = os.path.join("data", "config", "intencje.toml")
+
+    if not os.path.exists(sciezka):
+        raise FileNotFoundError(
+            f"Krytyczny błąd: Plik konfiguracji intencji nie istnieje w lokalizacji: {os.path.abspath(sciezka)}"
+        )
+
+    try:
+        mtime = os.path.getmtime(sciezka)
+        if _cfg_full_cache is None or mtime > _cfg_intencje_mtime:
+            with open(sciezka, "rb") as f:
+                _cfg_full_cache = tomllib.load(f)
+            _cfg_intencje_mtime = mtime
+    except Exception as e:
+        if _cfg_full_cache is None:
+            raise RuntimeError(
+                f"Krytyczny błąd podczas wczytywania konfiguracji intencji TOML ({sciezka}): {e}"
+            )
+
+    return _cfg_full_cache
+
+
+def pobierz_konfiguracje_intencji() -> list[tuple[str, list[str]]]:
+    cfg = pobierz_pelna_konfiguracje()
+    intencje_dict = cfg.get("intencje", {})
+    lista_intencji = []
+    for typ, wzorce in intencje_dict.items():
+        lista_intencji.append((typ, list(wzorce)))
+    return lista_intencji
 
 
 def wykryj_intencje(pytanie: str) -> str:
     """Zwraca typ intencji dla pytania."""
     p = pytanie.lower()
-    p = re.sub(
-        r"[ąćęłńóśźż]",
-        lambda m: {
-            "ą": "a",
-            "ć": "c",
-            "ę": "e",
-            "ł": "l",
-            "ń": "n",
-            "ó": "o",
-            "ś": "s",
-            "ź": "z",
-            "ż": "z",
-        }[m.group()],
-        p,
-    )
+    cfg = pobierz_pelna_konfiguracje()
+    mapa_diakrytyczne = cfg.get("diakrytyczne", {})
+    if mapa_diakrytyczne:
+        p = re.sub(
+            r"[" + "".join(mapa_diakrytyczne.keys()) + "]",
+            lambda m: mapa_diakrytyczne[m.group()],
+            p,
+        )
 
-    for typ, wzorce in INTENCJE:
+    intencje = pobierz_konfiguracje_intencji()
+    for typ, wzorce in intencje:
         if any(w in p for w in wzorce):
             return typ
     return "OGOLNE"
@@ -132,55 +93,19 @@ def wykryj_intencje(pytanie: str) -> str:
 
 # ── ekstrakcja wartości z odpowiedzi ─────────────────────────────────────────
 
-# liczby słownie → cyfry
-LICZBY_SLOWNIE = {
-    "raz": "1",
-    "jeden": "1",
-    "jedna": "1",
-    "dwa razy": "2",
-    "dwa": "2",
-    "dwie": "2",
-    "dwoch": "2",
-    "dwukrotnie": "2",
-    "dwukrotnego": "2",
-    "dwukrotnego skladania": "2",
-    "dwoch terminow": "2",
-    "dwoch termin": "2",
-    "trzy razy": "3",
-    "trzy": "3",
-    "trzech": "3",
-    "trzykrotnie": "3",
-    "trzecia realizacja": "3",
-    "trzeciej realizacji": "3",
-    "dopuszcza sie druga oraz trzecia": "3",
-    "druga oraz trzecia": "3",
-    "pieciodniowym": "5",
-    "pięciodniowym": "5",
-    "trzeciego dnia": "3",
-    "druga oraz trzecia": "3",
-    "drugą oraz trzecią": "3",
-    "trzecia realizacja": "3",
-    "trzecią realizację": "3",
-    "cztery": "4",
-    "czterech": "4",
-    "piec": "5",
-    "pięć": "5",
-    "pieciu": "5",
-    "szesc": "6",
-    "sześć": "6",
-    "siedem": "7",
-    "osiem": "8",
-    "dziewiec": "9",
-    "dziesiec": "10",
-    "pietnastu": "15",
-    "piętnastu": "15",
-    "trzynastu": "13",
-    "trzynascie": "13",
-}
-
 
 def _usun_ogonki(tekst: str) -> str:
-    return tekst.translate(str.maketrans("ąćęłńóśźżĄĆĘŁŃÓŚŹŻ", "acelnoszzACELNOSZZ"))
+    cfg = pobierz_pelna_konfiguracje()
+    mapa = cfg.get("diakrytyczne", {})
+    if not mapa:
+        return tekst.translate(
+            str.maketrans("ąćęłńóśźżĄĆĘŁŃÓŚŹŻ", "acelnoszzACELNOSZZ")
+        )
+    src = "".join(mapa.keys())
+    dst = "".join(mapa.values())
+    src += src.upper()
+    dst += dst.upper()
+    return tekst.translate(str.maketrans(src, dst))
 
 
 def wyciagnij_liczbe(tekst: str) -> str | None:
@@ -190,23 +115,16 @@ def wyciagnij_liczbe(tekst: str) -> str | None:
     tekst_czysty = re.sub(r"\bpkt\.?\s*\d+", "", tekst_czysty)
     tekst_czysty = re.sub(r"\bart\.?\s*\d+", "", tekst_czysty)
     tekst_czysty = re.sub(r"§\s*\d+", "", tekst_czysty)
-    tekst_czysty = re.sub(
-        r"\b(czwartego|czwarty|czwartej|czterech)\s+tygodni\w*", "", tekst_czysty
-    )
-    tekst_czysty = re.sub(
-        r"\b(pierwszego|drugiego|trzeciego|czwartego|piątego|szóstego)\s+dnia\b",
-        "",
-        tekst_czysty,
-    )
-    tekst_czysty = re.sub(
-        r"\b(pierwszego|drugiego|trzeciego|czwartego|piątego)\s+tygodnia\b",
-        "",
-        tekst_czysty,
-    )
+
+    cfg = pobierz_pelna_konfiguracje()
+    wzorce_czyszczenia = cfg.get("czyszczenie", {}).get("wzorce", [])
+    for wzorzec in wzorce_czyszczenia:
+        tekst_czysty = re.sub(wzorzec, "", tekst_czysty)
 
     # krok 2 – sprawdź słownik (bez ogonków żeby "trzecią"→"trzecia" pasowało)
     tekst_lower = _usun_ogonki(tekst_czysty.lower())
-    for slowo, cyfra in LICZBY_SLOWNIE.items():
+    liczby_slownie = cfg.get("liczby_slownie", {})
+    for slowo, cyfra in liczby_slownie.items():
         # \b = granica słowa – "raz" nie trafia w "realizację"
         if re.search(r"\b" + re.escape(slowo) + r"\b", tekst_lower):
             return cyfra
@@ -221,26 +139,16 @@ def wyciagnij_liczbe(tekst: str) -> str | None:
 
 def wyciagnij_termin(tekst: str) -> str | None:
     """Wyciąga termin/datę z tekstu."""
-    wzorce = [
-        r"do\s+(\d+)\s+(stycznia|lutego|marca|kwietnia|maja|czerwca|lipca|sierpnia|września|października|listopada|grudnia)",
-        r"(\d+)\s+dni\s+robocz\w+",
-        r"(\d+)\s+dni\s+kalendarzow\w+",
-        r"w\s+ciągu\s+(\d+)\s+dni",
-        r"nie\s+później\s+niż\s+(.{5,40}?)[\.,]",
-        r"do\s+końca\s+(.{5,40}?)[\.,]",
-        r"najpóźniej\s+do\s+(.{5,40}?)[\.,]",
-        r"w\s+terminie\s+(.{5,40}?)[\.,]",
-        r"(trzeciego\s+dnia\s+roboczego\s+.{5,40}?)[\.,]",
-        r"co\s+najmniej\s+(\w+\s+dniow\w+\s+odstep\w*)",
-        r"co\s+najmniej\s+(\w+\s+dniowym\s+odstep\w*)",
-        r"pieciodniowym\s+odstep\w*",
-        r"pięciodniowym\s+odstep\w*",
-        r"co\s+najmniej\s+pięciodniowym\s+odstępem",
-        r"co\s+najmniej\s+pieciodniowym\s+odstepem",
-    ]
-    # specjalny przypadek – "pięciodniowym odstępem" bez wzorca
-    if re.search(r"pi[eę]ciodniow\w+\s+odst[eę]p\w*", tekst, re.IGNORECASE):
-        return "co najmniej 5 dni"
+    cfg = pobierz_pelna_konfiguracje()
+    terminy_cfg = cfg.get("terminy", {})
+    wzorce = terminy_cfg.get("wzorce", [])
+    specjalne = terminy_cfg.get("specjalne", {})
+
+    specjalny_wzorzec = specjalne.get("wzorzec", r"pi[eę]ciodniow\w+\s+odst[eę]p\w*")
+    specjalna_odpowiedz = specjalne.get("odpowiedz", "co najmniej 5 dni")
+
+    if re.search(specjalny_wzorzec, tekst, re.IGNORECASE):
+        return specjalna_odpowiedz
     for wzorzec in wzorce:
         m = re.search(wzorzec, tekst, re.IGNORECASE)
         if m:
@@ -252,72 +160,72 @@ def generuj_skrot(intencja: str, pytanie: str, zdanie: str) -> str | None:
     """
     Generuje krótką, konkretną odpowiedź na podstawie intencji.
     Zwraca None jeśli nie udało się wyciągnąć wartości.
-
-    Przykłady:
-      LICZBA  + "ile razy egzamin" → "2 razy"
-      TERMIN  + "kiedy sesja"      → "nie później niż 15 lipca"
-      TAK_NIE + "czy mogę urlop"   → "Tak – masz do tego prawo"
     """
+    cfg = pobierz_pelna_konfiguracje()
+    klucze = cfg.get("skroty_klucze", {})
+    szablony = cfg.get("szablony", {})
+
     if intencja == "LICZBA":
         liczba = wyciagnij_liczbe(zdanie)
         if liczba:
             p = pytanie.lower()
-            if any(s in p for s in ["egzamin", "podejsc", "termin"]):
-                return f"Możesz podejść **{liczba} razy**."
-            if any(s in p for s in ["urlop", "semestr"]):
-                return f"Maksymalnie **{liczba}** w całym toku studiów."
-            if any(s in p for s in ["powtarzac", "przedmiot"]):
-                return f"Możesz powtarzać **{liczba} razy** (na więcej potrzeba zgody Rektora)."
-            if any(s in p for s in ["wznow"]):
-                return f"Możesz wznowić studia maksymalnie **{liczba} razy**."
-            return f"Odpowiedź: **{liczba}**."
+            szablony_liczba = szablony.get("liczba", {})
+            if any(s in p for s in klucze.get("liczba_egzamin", [])):
+                return szablony_liczba.get(
+                    "egzamin", "Możesz podejść **{liczba} razy**."
+                ).format(liczba=liczba)
+            if any(s in p for s in klucze.get("liczba_urlop", [])):
+                return szablony_liczba.get(
+                    "urlop", "Maksymalnie **{liczba}** w całym toku studiów."
+                ).format(liczba=liczba)
+            if any(s in p for s in klucze.get("liczba_powtorz", [])):
+                return szablony_liczba.get(
+                    "powtorz",
+                    "Możesz powtarzać **{liczba} razy** (na więcej potrzeba zgody Rektora).",
+                ).format(liczba=liczba)
+            if any(s in p for s in klucze.get("liczba_wznow", [])):
+                return szablony_liczba.get(
+                    "wznow", "Możesz wznowić studia maksymalnie **{liczba} razy**."
+                ).format(liczba=liczba)
+            return szablony_liczba.get("domyslny", "Odpowiedź: **{liczba}**.").format(
+                liczba=liczba
+            )
 
     if intencja == "TERMIN":
         termin = wyciagnij_termin(zdanie)
         if termin:
             p = pytanie.lower()
+            szablony_termin = szablony.get("termin", {})
             if "ile dni" in p:
-                return f"Odstęp: **{termin}**."
+                return szablony_termin.get("ile_dni", "Odstęp: **{termin}**.").format(
+                    termin=termin
+                )
             if "kiedy" in p:
-                return f"**{termin}**."
-            return f"Termin: **{termin}**."
+                return szablony_termin.get("kiedy", "**{termin}**.").format(
+                    termin=termin
+                )
+            return szablony_termin.get("domyslny", "Termin: **{termin}**.").format(
+                termin=termin
+            )
 
     if intencja == "TAK_NIE":
         zdanie_lower = zdanie.lower()
-        if any(
-            s in zdanie_lower
-            for s in [
-                "nie może odmówić",
-                "ma prawo",
-                "może",
-                "wolno",
-                "jest uprawniony",
-            ]
-        ):
-            return "**Tak** – masz do tego prawo."
-        if any(
-            s in zdanie_lower
-            for s in ["nie może", "nie wolno", "zabronione", "niedopuszczalne"]
-        ):
-            return "**Nie** – regulamin tego zabrania."
+        szablony_tak_nie = szablony.get("tak_nie", {})
+        if any(s in zdanie_lower for s in klucze.get("tak_slowa", [])):
+            return szablony_tak_nie.get("tak", "**Tak** – masz do tego prawo.")
+        if any(s in zdanie_lower for s in klucze.get("nie_slowa", [])):
+            return szablony_tak_nie.get("nie", "**Nie** – regulamin tego zabrania.")
 
     if intencja == "SKUTEK":
-        if any(
-            s in zdanie.lower()
-            for s in [
-                "skreśl",
-                "niedostateczny",
-                "niezaliczenie",
-                "może stanowić podstawę",
-            ]
-        ):
-            # wyciągnij konkretny skutek
-            m = re.search(
-                r"(podstawę\s+.{10,60}|skutkuje\s+.{10,60}|grozi\s+.{10,60})",
-                zdanie,
-                re.IGNORECASE,
+        if any(s in zdanie.lower() for s in klucze.get("skutek_slowa", [])):
+            wzorzec_ekstrakcji = cfg.get("skutek_ekstrakcja", {}).get(
+                "wzorzec", r"(podstawę\s+.{10,60}|skutkuje\s+.{10,60}|grozi\s+.{10,60})"
             )
+            m = re.search(wzorzec_ekstrakcji, zdanie, re.IGNORECASE)
             if m:
-                return f"Grozi: **{m.group(0).strip()}**."
+                szablon_skutek = szablony.get("skutek", {}).get(
+                    "domyslny", "Grozi: **{skutek}**."
+                )
+                return szablon_skutek.format(skutek=m.group(0).strip())
 
     return None

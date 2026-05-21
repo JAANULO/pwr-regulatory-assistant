@@ -1,0 +1,2 @@
+# Ten plik zapewnia, że pusty katalog data/database/ jest śledzony przez Git.
+# Wygenerowane pliki bazy SQLite (.db) i pamięci podręcznej (.pkl) są ignorowane w .gitignore.

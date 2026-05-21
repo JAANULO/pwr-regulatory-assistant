@@ -344,7 +344,7 @@ def main():
     # Użycie ścieżek bezwzględnych dla stabilności na Windows
     SKRYPT_DIR = os.path.dirname(os.path.abspath(__file__))
     BASE_DIR = os.path.dirname(SKRYPT_DIR)
-    PLIK_BAZY = os.path.join(BASE_DIR, "data", "baza_wiedzy.json")
+    PLIK_BAZY = os.path.join(BASE_DIR, "data", "kb", "baza_wiedzy.json")
 
     if not os.path.exists(PLIK_BAZY):
         print(f"Blad: Nie znaleziono pliku bazy w {PLIK_BAZY}")

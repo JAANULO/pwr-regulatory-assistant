@@ -23,7 +23,7 @@ print("=" * 55)
 
 # 1. Baza wiedzy
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PLIK_BAZY = os.path.join(BASE_DIR, "data", "baza_wiedzy.json")
+PLIK_BAZY = os.path.join(BASE_DIR, "data", "kb", "baza_wiedzy.json")
 
 baza = json.load(open(PLIK_BAZY, encoding="utf-8"))
 print("\n[1] Baza wiedzy:")
@@ -41,7 +41,7 @@ print(f"    Synonimow:  {len(SYNONIMY)}")
 print("\n[4] Wyszukiwarka:")
 
 # Ścieżka bezwzględna do bazy wiedzy
-PLIK_BAZY = os.path.join(ROOT_DIR, "data", "baza_wiedzy.json")
+PLIK_BAZY = os.path.join(ROOT_DIR, "data", "kb", "baza_wiedzy.json")
 w = utworz_wyszukiwarke(PLIK_BAZY)
 print(
     f"    Metoda szukaj(zrodlo=): {'TAK' if 'zrodlo' in str(w.szukaj.__code__.co_varnames) else 'BRAK'}"

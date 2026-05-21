@@ -70,7 +70,7 @@ def _cache_set(pytanie: str, odpowiedz: dict) -> None:
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
-PLIK_BAZY = os.path.join(DATA_DIR, "baza_wiedzy.json")
+PLIK_BAZY = os.path.join(DATA_DIR, "kb", "baza_wiedzy.json")
 PLIK_LOG = os.path.join(BASE_DIR, "logs", "log.txt")
 PROG_PEWNOSCI = 0.15
 
@@ -239,7 +239,7 @@ def zrodla():
     """Zwraca listę dostępnych plików baz wiedzy z folderu /data."""
     import glob
 
-    data_dir = os.path.join(BASE_DIR, "data")
+    data_dir = os.path.join(BASE_DIR, "data", "kb")
     pliki = [
         os.path.basename(f)
         for f in glob.glob(os.path.join(data_dir, "*.json"))

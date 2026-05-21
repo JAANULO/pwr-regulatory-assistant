@@ -83,7 +83,7 @@ BASE_DIR = PROJECT_ROOT
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
 os.makedirs(LOGS_DIR, exist_ok=True)  # Tworzy folder logs, jeśli nie istnieje
 
-LICZBA_PYTAN = 6
+LICZBA_PYTAN = 3
 PLIK_WYNIKOW = os.path.join(LOGS_DIR, "auto_test_wyniki.json")
 PLIK_POPRAWEK = os.path.join(LOGS_DIR, "auto_test_poprawki.py")
 
@@ -225,7 +225,7 @@ def uruchom():
     print("  Gemini + Asystent Regulaminowy PWr")
     print("=" * 55)
 
-    PLIK_BAZY = os.path.join(BASE_DIR, "data", "baza_wiedzy.json")
+    PLIK_BAZY = os.path.join(BASE_DIR, "data", "kb", "baza_wiedzy.json")
 
     with open(PLIK_BAZY, encoding="utf-8") as f:
         baza = json.load(f)

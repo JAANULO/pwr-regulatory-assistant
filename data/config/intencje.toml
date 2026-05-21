@@ -1,0 +1,191 @@
+# ==============================================================================
+# KONFIGURACJA KLASYFIKATORA INTENCJI PYTANIA I EKSTRAKCJI WARTOŚCI
+# ==============================================================================
+
+[intencje]
+LICZBA = [
+    "ile razy",
+    "ile tygodni",
+    "ile semestr",
+    "ile terminu",
+    "ile godzin",
+    "ile punkt",
+    "ile lat",
+    "ile osob",
+    "ile miesiec",
+    "ile razy mozna",
+]
+
+TERMIN = [
+    "kiedy",
+    "do kiedy",
+    "od kiedy",
+    "w jakim terminie",
+    "kiedy mozna",
+    "kiedy trzeba",
+    "kiedy nalezy",
+    "do jakiego",
+    "w jakim czasie",
+    "ile dni",
+]
+
+TAK_NIE = [
+    "czy moge",
+    "czy mozna",
+    "czy wolno",
+    "czy jest",
+    "czy trzeba",
+    "czy musze",
+    "czy student moze",
+    "czy da sie",
+    "czy istnieje",
+]
+
+SKUTEK = [
+    "co grozi",
+    "co sie stanie",
+    "jakie konsekwencje",
+    "co mi grozi",
+    "co bedzie",
+    "co jezeli",
+    "co jak",
+    "co jesli",
+    "jakie sa skutki",
+]
+
+PROCEDURA = [
+    "jak",
+    "w jaki sposob",
+    "jak mozna",
+    "jak sie",
+    "jak zlozyc",
+    "jak uzyskac",
+    "jak wznowic",
+    "jak oblicza",
+    "jak liczyc",
+]
+
+DEFINICJA = [
+    "co to jest",
+    "co to",
+    "czym jest",
+    "co oznacza",
+    "co to znaczy",
+    "definicja",
+    "co rozumiemy",
+]
+
+[liczby_slownie]
+"raz" = "1"
+"jeden" = "1"
+"jedna" = "1"
+"dwa razy" = "2"
+"dwa" = "2"
+"dwie" = "2"
+"dwoch" = "2"
+"dwukrotnie" = "2"
+"dwukrotnego" = "2"
+"dwukrotnego skladania" = "2"
+"dwoch terminow" = "2"
+"dwoch termin" = "2"
+"trzy razy" = "3"
+"trzy" = "3"
+"trzech" = "3"
+"trzykrotnie" = "3"
+"trzecia realizacja" = "3"
+"trzeciej realizacji" = "3"
+"dopuszcza sie druga oraz trzecia" = "3"
+"druga oraz trzecia" = "3"
+"pieciodniowym" = "5"
+"pięciodniowym" = "5"
+"trzeciego dnia" = "3"
+"drugą oraz trzecią" = "3"
+"trzecią realizację" = "3"
+"cztery" = "4"
+"czterech" = "4"
+"piec" = "5"
+"pięć" = "5"
+"pieciu" = "5"
+"szesc" = "6"
+"sześć" = "6"
+"siedem" = "7"
+"osiem" = "8"
+"dziewiec" = "9"
+"dziesiec" = "10"
+"pietnastu" = "15"
+"piętnastu" = "15"
+"trzynastu" = "13"
+"trzynascie" = "13"
+
+[terminy]
+wzorce = [
+    'do\s+(\d+)\s+(stycznia|lutego|marca|kwietnia|maja|czerwca|lipca|sierpnia|września|października|listopada|grudnia)',
+    '(\d+)\s+dni\s+robocz\w+',
+    '(\d+)\s+dni\s+kalendarzow\w+',
+    'w\s+ciągu\s+(\d+)\s+dni',
+    'nie\s+później\s+niż\s+(.{5,40}?)[\.,]',
+    'do\s+końca\s+(.{5,40}?)[\.,]',
+    'najpóźniej\s+do\s+(.{5,40}?)[\.,]',
+    'w\s+terminie\s+(.{5,40}?)[\.,]',
+    '(trzeciego\s+dnia\s+roboczego\s+.{5,40}?)[\.,]',
+    'co\s+najmniej\s+(\w+\s+dniow\w+\s+odstep\w*)',
+    'co\s+najmniej\s+(\w+\s+dniowym\s+odstep\w*)',
+    'pieciodniowym\s+odstep\w*',
+    'pięciodniowym\s+odstep\w*',
+    'co\s+najmniej\s+pięciodniowym\s+odstępem',
+    'co\s+najmniej\s+pieciodniowym\s+odstepem'
+]
+
+[skroty_klucze]
+liczba_egzamin = ["egzamin", "podejsc", "termin"]
+liczba_urlop = ["urlop", "semestr"]
+liczba_powtorz = ["powtarzac", "przedmiot"]
+liczba_wznow = ["wznow"]
+tak_slowa = ["nie może odmówić", "ma prawo", "może", "wolno", "jest uprawniony"]
+nie_slowa = ["nie może", "nie wolno", "zabronione", "niedopuszczalne"]
+skutek_slowa = ["skreśl", "niedostateczny", "niezaliczenie", "może stanowić podstawę"]
+
+[diakrytyczne]
+"ą" = "a"
+"ć" = "c"
+"ę" = "e"
+"ł" = "l"
+"ń" = "n"
+"ó" = "o"
+"ś" = "s"
+"ź" = "z"
+"ż" = "z"
+
+[czyszczenie]
+wzorce = [
+    '\\b(czwartego|czwarty|czwartej|czterech)\\s+tygodni\\w*',
+    '\\b(pierwszego|drugiego|trzeciego|czwartego|piątego|szóstego)\\s+dnia\\b',
+    '\\b(pierwszego|drugiego|trzeciego|czwartego|piątego)\\s+tygodnia\\b'
+]
+
+[terminy.specjalne]
+wzorzec = 'pi[eę]ciodniow\\w+\\s+odst[eę]p\\w*'
+odpowiedz = 'co najmniej 5 dni'
+
+[skutek_ekstrakcja]
+wzorzec = '(podstawę\\s+.{10,60}|skutkuje\\s+.{10,60}|grozi\\s+.{10,60})'
+
+[szablony.liczba]
+egzamin = "Możesz podejść **{liczba} razy**."
+urlop = "Maksymalnie **{liczba}** w całym toku studiów."
+powtorz = "Możesz powtarzać **{liczba} razy** (na więcej potrzeba zgody Rektora)."
+wznow = "Możesz wznowić studia maksymalnie **{liczba} razy**."
+domyslny = "Odpowiedź: **{liczba}**."
+
+[szablony.termin]
+ile_dni = "Odstęp: **{termin}**."
+kiedy = "**{termin}**."
+domyslny = "Termin: **{termin}**."
+
+[szablony.tak_nie]
+tak = "**Tak** – masz do tego prawo."
+nie = "**Nie** – regulamin tego zabrania."
+
+[szablony.skutek]
+domyslny = "Grozi: **{skutek}**."
+

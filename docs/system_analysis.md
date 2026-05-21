@@ -24,8 +24,8 @@ graph LR
         C --> G[formatowanie.py]
     end
     subgraph Warstwa Danych (Storage)
-        D --> H[(baza_wiedzy.json)]
-        C --> I[(asystent.db SQLite)]
+        D --> H[(kb/baza_wiedzy.json)]
+        C --> I[(database/asystent.db SQLite)]
     end
     
     A <-->|JSON POST /zapytaj| B
@@ -113,7 +113,7 @@ Poniższa sekcja wyjaśnia dokładnie rolę kluczowych funkcji i ich wzajemne po
 *   **Co robi:**
     1. Zamienia tokeny pytania na wektor wag przy użyciu pre-kalkulowanego `IDF` (Robertson).
     2. Oblicza podobieństwo cosinusowe (`podobienstwo_cosinusowe`) między wektorem zapytania a wektorami wszystkich paragrafów z bazy wiedzy.
-    3. Pobiera wagi z `config.toml` i nakłada **wagi statyczne** (dla ważnych rozdziałów) oraz **wagi dynamiczne** (podbijane w locie, jeśli zapytanie zawiera specyficzny token, np. *opłaty* podbijają rozdział *Odpłatność*).
+    3. Pobiera wagi z `data/config/config.toml` i nakłada **wagi statyczne** (dla ważnych rozdziałów) oraz **wagi dynamiczne** (podbijane w locie, jeśli zapytanie zawiera specyficzny token, np. *opłaty* podbijają rozdział *Odpłatność*).
 *   **Z kim się łączy:** 
     *   Pobiera wektory dokumentów wygenerowane przez `zbuduj_wektory_bm25` w `infrastructure/knowledge_loader.py`.
     *   Pobiera parametry z `pobierz_konfiguracje()`.

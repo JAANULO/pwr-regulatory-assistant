@@ -4,7 +4,7 @@ Wszystkie istotne zmiany w projekcie są odnotowywane w tym pliku zgodnie ze sta
 
 ---
 
-## [2.8.0] - 2026-05-20
+## [2.8.0] - 2026-05-21
 ### Dodano
 - **Responsywność i Mobilność (Krok 1.2)**: Wdrożenie pliku manifestu PWA (`static/manifest.json`) umożliwiającego uruchamianie aplikacji w trybie `standalone` na urządzeniach mobilnych (bez ramki przeglądarki).
 - **Gesty Swipe (Mobile First)**: Dodanie zaawansowanej obsługi gestów dotykowych (przeciągnięcie palcem od lewej krawędzi) do płynnego otwierania i zamykania bocznego panelu historii na smartfonach.
@@ -12,7 +12,10 @@ Wszystkie istotne zmiany w projekcie są odnotowywane w tym pliku zgodnie ze sta
 - **Integracja CI/CD**: Wpięcie walidacji PWA i responsywności bezpośrednio do potoku GitHub Actions (`testy.yml`).
 
 ### Ulepszono
+- **Refaktoryzacja i Czystość Kodu (BM25 Engine)**: Wyeliminowanie martwych wrapperów `oblicz_idf` oraz `zbuduj_wektory` i przekierowanie wszystkich wywołań w `infrastructure/knowledge_loader.py` bezpośrednio na funkcje `oblicz_idf_bm25` oraz `zbuduj_wektory_bm25`.
 - **Adaptacja Nagłówka**: Dodanie stylów responsywnych dla urządzeń o szerokości poniżej 600px — ukrywanie napisów przycisków w nagłówku na rzecz samych czytelnych ikon (opcje, nowy czat).
+- **Parametryzacja Progu Długości**: Zastąpienie magicznej liczby `8` w korekcji odległości Levenshteina nazwaną stałą modułową `PROG_DLUGOSCI_SLOWA_KOREKCJA`.
+- **Akademickie Sformułowania**: Przekształcenie potocznych komentarzy AI na precyzyjną terminologię akademicką (np. autorelacja tokenów, stopień węzła grafu) oraz dodanie ścisłego typowania dla cache literówek.
 - **Analiza Architektury (Krok 1.7)**: Potwierdzenie pełnej separacji parametrów wyszukiwania w pliku `data/config.toml` (dynamiczne wczytywanie i hot-reload wag BM25).
 
 ## [2.7.0] - 2026-05-18

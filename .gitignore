@@ -9,8 +9,8 @@ __pycache__/
 
 # --- Dane Aplikacji ---
 # Ignorujemy wygenerowane bazy i logi
-data/*.pkl
-data/*.db
+data/database/*.pkl
+data/database/*.db
 logs/
 *.log
 

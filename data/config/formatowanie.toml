@@ -1,0 +1,122 @@
+# ==============================================================================
+# KONFIGURACJA SŁOWNIKÓW TEMATYCZNYCH I FORMATOWANIA ODPOWIEDZI BOTA
+# ==============================================================================
+
+# Słowa kluczowe służące do wykrywania tematu pytania
+[tematy]
+egzamin = [
+    "egzamin",
+    "egzaminu",
+    "egzaminie",
+    "zdać",
+    "zdawać",
+    "oblać",
+    "podejść",
+    "termin",
+    "poprawka",
+    "sesja",
+    "nie zdam",
+    "nie zdałem",
+]
+zaliczenie = ["zaliczenie", "zaliczyć", "zaliczenia", "kolokwium", "sprawdzian"]
+urlop = ["urlop", "urlopu", "urlopie", "dziekański", "zdrowotny", "przerwa"]
+"skreślenie" = ["skreślenie", "skreślić", "wydalenie", "skreślony", "skreslanym"]
+praca_dyplomowa = [
+    "praca",
+    "dyplomowa",
+    "dyplomowej",
+    "inżynierska",
+    "magisterska",
+    "dyplom",
+    "antyplagiat",
+    "obron",
+]
+ocena = [
+    "ocena",
+    "oceny",
+    "ocenę",
+    "średnia",
+    "wynik",
+    "pięć",
+    "cztery",
+    "trzy",
+    "niedostateczny",
+    "oblicza",
+]
+"nieobecność" = [
+    "nieobecność",
+    "nieobecności",
+    "opuścić",
+    "opuszczać",
+    "nie przyjść",
+    "opuściłem",
+    "byłem chory",
+]
+powtarzanie = ["powtarzać", "powtórzyć", "powtarzanie", "drugi raz", "ponownie"]
+wznowienie = [
+    "wznowić",
+    "wznowienie",
+    "wznowienia",
+    "wznowieniu",
+    "przywrócenie",
+    "przywrócić",
+    "po skreśleniu",
+]
+
+# Wstępy z emotikonami do przyjaznych odpowiedzi
+[wstepy]
+egzamin = "📝 W sprawie egzaminów regulamin mówi:\n"
+zaliczenie = "📝 W kwestii zaliczeń regulamin mówi:\n"
+urlop = "🏖️ Jeśli chodzi o urlopy studenckie:\n"
+"skreślenie" = "⚠️ W sprawie skreślenia z listy studentów:\n"
+praca_dyplomowa = "📄 Jeśli chodzi o pracę dyplomową:\n"
+ocena = "📊 W kwestii ocen i wyników:\n"
+"nieobecność" = "📅 Jeśli chodzi o nieobecności na zajęciach:\n"
+powtarzanie = "🔄 W kwestii powtarzania przedmiotów:\n"
+wznowienie = "🔄 W sprawie wznowienia studiów regulamin mówi:\n"
+"domyślny" = "📋 Zgodnie z regulaminem studiów PWr:\n"
+
+# Słowa kluczowe do precyzyjnego wyciągania zdań o określonej tematyce
+[slowa_kluczowe]
+tygodni = ["tygodni", "tygodnie", "15", "piętnaście"]
+wznow = ["wznowi", "ubiegać", "skreśloną", "wniosek"]
+skresla = [
+    "skreśla",
+    "rezygnacji",
+    "niepodjęcia",
+    "niezłożenia",
+    "niepodjęcia studiów",
+]
+egzamin = ["dwukrotnego", "termin", "prawo do"]
+urlop = ["urlop zdrowotny", "urlop dziekański", "udziela"]
+
+# Losowe zwroty zachęty na końcu przyjaznej odpowiedzi
+zachety = [
+    "Jeśli masz dodatkowe pytania – pytaj!",
+    "Możesz zapytać bardziej szczegółowo.",
+    "W razie wątpliwości warto też zapytać w dziekanacie.",
+    "Pamiętaj że w sprawach formalnych dziekanat zawsze pomoże.",
+]
+
+[skala_ocen]
+naglowek = "  Ocena   Słownie               Próg"
+oceny = [
+    ["5,0", "bardzo dobry", "90–100%"],
+    ["4,5", "dobry plus", "80–89%"],
+    ["4,0", "dobry", "70–79%"],
+    ["3,5", "dostateczny plus", "60–69%"],
+    ["3,0", "dostateczny", "50–59%"],
+    ["2,0", "niedostateczny", "0–49%"]
+]
+
+[szablony]
+brak_wynikow = "Nie znalazłem informacji na ten temat w regulaminie.\nSpróbuj zapytać inaczej lub zajrzyj do dziekanatu."
+niskie_dopasowanie = "Nie jestem pewien czy mam dokładną odpowiedź na to pytanie.\nNajbliższy temat jaki znalazłem to: {tytul}\n\nSprawdź w dziekanacie lub przejrzyj pełny regulamin."
+
+[wstepy_specjalne]
+oceny_studia = "🎓 W kwestii oceny końcowej studiów regulamin mówi:\n"
+skala_ocen = "📊 W kwestii skali ocen regulamin mówi:\n"
+
+[wstepy_specjalne_dopasowanie]
+oceny_studia = ["oceny za studia", "ostateczny wynik studiow"]
+skala_ocen = ["skala ocen"]

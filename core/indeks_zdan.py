@@ -75,7 +75,7 @@ class IndeksZdan:
         Zwraca n najbardziej pasujących zdań do pytania.
         Każdy wynik zawiera zdanie + paragraf z którego pochodzi.
         """
-        from .slowniki import ROZSZERZENIA
+        from .slowniki import ROZSZERZENIA, ROZSZERZENIA_ZDAN
 
         try:
             from .wyszukiwarka import usun_polskie_znaki, popraw_literowke
@@ -99,17 +99,7 @@ class IndeksZdan:
                 rozszerzenie.extend(tokenizuj(rozszerzenie_frazy))
 
         # dodatkowe rozszerzenia specyficzne dla indeksu zdań
-        _ROZSZERZENIA_ZDAN = {
-            "ile dni": "pieciodniowym odstepem drugi termin wyznacza",
-            "miedzy terminami": "pieciodniowym odstepem drugi termin wyznacza",
-            "powtarzac przedmiot": "trzecia realizacja dopuszcza druga trzecia",
-            "ile razy powtarzac": "trzecia realizacja dopuszcza druga trzecia",
-            "nie zdam": "niedostateczny nie przystapil zadnym terminow wystawia",
-            "jak nie zdam": "niedostateczny nie przystapil zadnym terminow wystawia",
-            "co jak nie": "niedostateczny nie przystapil zadnym terminow wystawia",
-            "obleje": "niedostateczny nie przystapil zadnym terminow wystawia",
-        }
-        for fraza, rozszerzenie_frazy in _ROZSZERZENIA_ZDAN.items():
+        for fraza, rozszerzenie_frazy in ROZSZERZENIA_ZDAN.items():
             if fraza in pytanie_lower:
                 rozszerzenie.extend(tokenizuj(rozszerzenie_frazy))
 

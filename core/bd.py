@@ -18,7 +18,7 @@ TRYB = DB_BACKEND
 _LOG = logging.getLogger("asystent.db")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PLIK_DB = os.path.join(BASE_DIR, "..", "data", "asystent.db")
+PLIK_DB = os.path.join(BASE_DIR, "..", "data", "database", "asystent.db")
 
 
 if TRYB == "postgres":
