@@ -61,8 +61,31 @@ def run_test():
                                 "[OK] Manifest PWA zostal poprawnie zwalidowany!",
                                 flush=True,
                             )
-                            success = True
-                            break
+                            # Test endpointu /lab/simulate
+                            print("Sprawdzanie endpointu /lab/simulate...", flush=True)
+                            try:
+                                lab_resp = requests.post(
+                                    "http://localhost:5005/lab/simulate",
+                                    json={"max_combinations": 1},
+                                    timeout=30,
+                                )
+                                if lab_resp.status_code == 200:
+                                    print(
+                                        "[OK] Endpoint /lab/simulate dziala poprawnie!",
+                                        flush=True,
+                                    )
+                                    success = True
+                                    break
+                                else:
+                                    print(
+                                        f"[BLAD] Serwer zwrocil status {lab_resp.status_code} dla /lab/simulate",
+                                        flush=True,
+                                    )
+                            except Exception as e:
+                                print(
+                                    f"[BLAD] /lab/simulate wyrzucil wyjatek: {e}",
+                                    flush=True,
+                                )
                         else:
                             print(
                                 f"[BLAD] Manifest PWA ma niepoprawna strukture: {m_data}",

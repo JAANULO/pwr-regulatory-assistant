@@ -309,6 +309,36 @@
         "otrzymany": "§ 35. Praca dyplomowa",
         "sukces": true
     },
+    "co to jest powtazane przedmyotu": {
+        "oczekiwany": "Powtarz",
+        "otrzymany": "§ 22. Powtarzanie przedmiotu",
+        "sukces": true
+    },
+    "kedy mozna vzac urlop dzekansky": {
+        "oczekiwany": "Urlop",
+        "otrzymany": "§ 27. Urlopy",
+        "sukces": true
+    },
+    "czy praca jest spravdzana antyplagyatem": {
+        "oczekiwany": "Dyplom",
+        "otrzymany": "§ 35. Praca dyplomowa",
+        "sukces": true
+    },
+    "kto to jest absolwent?": {
+        "oczekiwany": "Słownik",
+        "otrzymany": "§ 2. Słownik pojęć",
+        "sukces": true
+    },
+    "co oznacza roznice programowe?": {
+        "oczekiwany": "Słownik",
+        "otrzymany": "§ 2. Słownik pojęć",
+        "sukces": true
+    },
+    "co to sa punkty ects?": {
+        "oczekiwany": "Słownik",
+        "otrzymany": "§ 2. Słownik pojęć",
+        "sukces": true
+    },
     "jaka jest skala ocen": {
         "oczekiwany": "Skala",
         "otrzymany": "§ 19. Skala ocen",
@@ -331,7 +361,7 @@
     },
     "co jak zabraknie mi punktow ects": {
         "oczekiwany": "Deficyt",
-        "otrzymany": "§ 19. Skala ocen",
+        "otrzymany": "§ 26. Zaliczenie etapu studiów",
         "sukces": false
     },
     "czy moge przejsc na kolejny semestr z dlugiem ects": {
@@ -351,7 +381,7 @@
     },
     "nie zaplacilem za warunek co teraz": {
         "oczekiwany": "Skreślenie",
-        "otrzymany": "§ 12. Odpłatność za usługi edukacyjne",
+        "otrzymany": "§ 26. Zaliczenie etapu studiów",
         "sukces": false
     },
     "za co uiszcza sie oplaty": {
@@ -381,7 +411,7 @@
     },
     "kiedy wolno zdawac egzamin dyplomowy": {
         "oczekiwany": "Dyplom",
-        "otrzymany": "§ 18. Egzaminy",
+        "otrzymany": "§ 22. Powtarzanie przedmiotu",
         "sukces": false
     },
     "co jesli recenzent wystawi ocene niedostateczna z dyplomu": {
@@ -409,13 +439,13 @@
         "otrzymany": "§ 27. Urlopy",
         "sukces": true
     },
-    "jak napisać podanie o urlop dziekanski": {
+    "jak napisac podanie o urlop dziekanski": {
         "oczekiwany": "Urlop",
         "otrzymany": "§ 27. Urlopy",
         "sukces": true
     },
     "czy moge zrezygnowac ze studiow na pierwszym semestrze i wrocic za rok": {
-        "oczekiwany": "Wznowien",
+        "oczekiwany": "Wznow",
         "otrzymany": "§ 11. Organizacja roku akademickiego",
         "sukces": false
     },
@@ -430,7 +460,7 @@
         "sukces": true
     },
     "wznwienie studjuf": {
-        "oczekiwany": "Wznowien",
+        "oczekiwany": "Wznow",
         "otrzymany": "§ 34. Wznowienia studiów, przywrócenie praw studenta",
         "sukces": true
     },
@@ -441,12 +471,12 @@
     },
     "czy prowadzacy musi dac sylabus": {
         "oczekiwany": "Realizacja",
-        "otrzymany": "§ 13. Przedmioty i zajęcia",
-        "sukces": false
+        "otrzymany": "§ 16. Realizacja zajęć",
+        "sukces": true
     },
     "kto ustanawia kryteria zaliczenia": {
         "oczekiwany": "Realizacja",
-        "otrzymany": "§ 24. Realizacja przedmiotów nieobjętych programem studiów",
+        "otrzymany": "§ 16. Realizacja zajęć",
         "sukces": true
     },
     "ile lat ma sie na ukonczenie studiow inzynierskich": {
@@ -486,8 +516,8 @@
     },
     "jakie sa prawa studenta": {
         "oczekiwany": "Prawa studenta",
-        "otrzymany": "§ 35. Praca dyplomowa",
-        "sukces": false
+        "otrzymany": "§ 6. Prawa studenta",
+        "sukces": true
     },
     "co student moze robic na uczelni": {
         "oczekiwany": "Prawa studenta",
@@ -521,7 +551,7 @@
     },
     "ile punktow ects ma rok studiow": {
         "oczekiwany": "Punkty ECTS",
-        "otrzymany": "§ 19. Skala ocen",
+        "otrzymany": "§ 11. Organizacja roku akademickiego",
         "sukces": false
     },
     "co to jest punkt ects": {
@@ -596,18 +626,18 @@
     },
     "ile tygodni trwaja praktyki zawodowe": {
         "oczekiwany": "Praktyki zawodowe",
-        "otrzymany": "§ 11. Organizacja roku akademickiego",
-        "sukces": false
+        "otrzymany": "§ 23. Praktyki zawodowe",
+        "sukces": true
     },
     "kto moze zwolnic z praktyk": {
         "oczekiwany": "Praktyki zawodowe",
-        "otrzymany": "§ 15. Przenoszenie i uznawanie przedmiotów",
-        "sukces": false
+        "otrzymany": "§ 23. Praktyki zawodowe",
+        "sukces": true
     },
     "czy praca zawodowa zalicza sie jako praktyka": {
         "oczekiwany": "Praktyki zawodowe",
-        "otrzymany": "§ 35. Praca dyplomowa",
-        "sukces": false
+        "otrzymany": "§ 23. Praktyki zawodowe",
+        "sukces": true
     },
     "jak sie rozlicza semestr": {
         "oczekiwany": "Rozliczanie etapu",
@@ -646,13 +676,13 @@
     },
     "kiedy dostaje dyplom ukonczenia": {
         "oczekiwany": "Ukończenie studiów",
-        "otrzymany": "§ 35. Praca dyplomowa",
-        "sukces": false
+        "otrzymany": "§ 39. Ukończenie studiów",
+        "sukces": true
     },
     "co zawiera dyplom ukonczenia studiow": {
         "oczekiwany": "Ukończenie studiów",
-        "otrzymany": "§ 35. Praca dyplomowa",
-        "sukces": false
+        "otrzymany": "§ 39. Ukończenie studiów",
+        "sukces": true
     },
     "kiedy mozna odebrac dyplom": {
         "oczekiwany": "Ukończenie studiów",
@@ -671,17 +701,87 @@
     },
     "co oznacza pojecie student w regulaminie": {
         "oczekiwany": "Słownik",
-        "otrzymany": "§ 19. Skala ocen",
-        "sukces": false
+        "otrzymany": "§ 2. Słownik pojęć",
+        "sukces": true
     },
     "czym jest absolwent w rozumieniu regulaminu": {
         "oczekiwany": "Słownik",
-        "otrzymany": "§ 39. Ukończenie studiów",
-        "sukces": false
+        "otrzymany": "§ 2. Słownik pojęć",
+        "sukces": true
     },
     "co to jest edukacja cl na pwr": {
         "oczekiwany": "Systemy komunikacji",
         "otrzymany": "§ 5. Systemy komunikacji i obsługi elektronicznej toku studiów",
+        "sukces": true
+    },
+    "Czy kolokwium z przedmiotu, który kończy się zaliczeniem z oceną (a nie egzaminem) musi być przed sesją czy to jest dobra wola prowadzącego, który zrobi je, np. w ostatnim tygodniu zajęć?": {
+        "oczekiwany": "Zaliczanie przedmiotu",
+        "otrzymany": "§ 17. Zaliczanie przedmiotu",
+        "sukces": true
+    },
+    "Czy obecność na pierwszym terminie egzaminu w sesji jest obowiązkowa? I czy nie będąc na pierwszym terminie można przystąpić do egzaminu poprawkowego?": {
+        "oczekiwany": "Egzaminy",
+        "otrzymany": "§ 18. Egzaminy",
+        "sukces": true
+    },
+    "Prowadzący nie chce pokazać mi mojej pracy. Czy czasem nie jest tak, że student powinien mieć wgląd do swoich prac/kolokwiów, egzaminów?": {
+        "oczekiwany": "Wystawianie ocen",
+        "otrzymany": "§ 20. Wystawianie ocen",
+        "sukces": true
+    },
+    "Co to jest grupa kursów?": {
+        "oczekiwany": "Przedmioty i zajęcia",
+        "otrzymany": "§ 13. Przedmioty i zajęcia",
+        "sukces": true
+    },
+    "Co można rozumieć pod hasłem: \"zdalny tryb nauczania\"?": {
+        "oczekiwany": "Przedmioty i zajęcia",
+        "otrzymany": "§ 13. Przedmioty i zajęcia",
+        "sukces": true
+    },
+    "Mam zbyt duży deficyt punktów ECTS co mam zrobić?": {
+        "oczekiwany": "Zaliczenie etapu",
+        "otrzymany": "§ 26. Zaliczenie etapu studiów",
+        "sukces": true
+    },
+    "Czy mogę realizować swój projekt inżynierski na innej uczelni?": {
+        "oczekiwany": "Praca dyplomowa",
+        "otrzymany": "§ 35. Praca dyplomowa",
+        "sukces": true
+    },
+    "Prowadzący odmówił mi wpisania oceny z laboratorium, ponieważ nie przyniosłam tzw. Rewersu podpisanego przez panią laborantkę. Co mam zrobić?": {
+        "oczekiwany": "Wystawianie ocen",
+        "otrzymany": "§ 20. Wystawianie ocen",
+        "sukces": true
+    },
+    "Prowadzący pod koniec jednego z kursów zmienił warunki jego zaliczenia, czy tak w ogóle można?": {
+        "oczekiwany": "Realizacja zajęć",
+        "otrzymany": "§ 16. Realizacja zajęć",
+        "sukces": true
+    },
+    "Uważam, że ocena z mojego egzaminu została wystawiona niesprawiedliwie. Prowadzący odnosił się do mnie bardzo stronniczo podczas odpowiedzi ustnej. Czy mogę wnioskować o ponowne sprawdzenie mojej wiedzy przed jakąś komisją?": {
+        "oczekiwany": "Egzamin komisyjny",
+        "otrzymany": "§ 21. Egzamin komisyjny",
+        "sukces": true
+    },
+    "Znalazłem się w bardzo trudnej sytuacji życiowej i muszę na jakiś czas przerwać naukę. Słyszałem, że dziekan może wyrazić zgodę na przerwę w studiowaniu. Gdzie i kiedy powinienem złożyć odpowiedni wniosek w tej sprawie?": {
+        "oczekiwany": "Urlopy",
+        "otrzymany": "§ 27. Urlopy",
+        "sukces": true
+    },
+    "Chciałbym zapisać się na zajęcia w nadchodzącym semestrze. Niestety system USOS ciągle mi się zawiesza i nie mogę dokonać rejestracji. Do kogo mam się zgłosić, jeśli minie oficjalny termin zapisów?": {
+        "oczekiwany": "Zapisy (rejestracja)",
+        "otrzymany": "§ 14. Zapisy (rejestracja) na zajęcia",
+        "sukces": true
+    },
+    "Zostałem skreślony z listy studentów na trzecim semestrze z powodu niezaliczenia etapu. Minął już rok i bardzo chciałbym wrócić na uczelnię, aby dokończyć studia. Na jakich warunkach mogę ubiegać się o ponowne przyjęcie?": {
+        "oczekiwany": "Wznowienia",
+        "otrzymany": "§ 34. Wznowienia studiów, przywrócenie praw studenta",
+        "sukces": true
+    },
+    "Niestety nie udało mi się zaliczyć kursu z analizy matematycznej w tym semestrze. Wiem, że muszę go powtórzyć przy kolejnej okazji. Czy będę musiał za to zapłacić i kiedy mogę ponownie zapisać się na ten przedmiot?": {
+        "oczekiwany": "Powtarzanie przedmiotu",
+        "otrzymany": "§ 22. Powtarzanie przedmiotu",
         "sukces": true
     }
 }

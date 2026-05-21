@@ -105,6 +105,27 @@ def lab_view():
     return render_template("lab.html")
 
 
+@app.route("/lab/simulate", methods=["POST"])
+def lab_simulate():
+    """Uruchamia grid-search optymalizacji parametrów config.toml
+    na podstawie pytań z plików testowych."""
+    from scripts.symulacja import run_grid_search
+
+    dane = request.get_json(force=True) if request.is_json else {}
+    max_combos = int(dane.get("max_combinations", 100))
+    questions_path = dane.get("questions_path", None)
+
+    try:
+        result = run_grid_search(
+            questions_path=questions_path,
+            max_combinations=max_combos,
+        )
+        return jsonify(result), 200
+    except Exception as e:
+        logger.exception("Błąd lab/simulate")
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/zapytaj_symulacja", methods=["POST"])
 def zapytaj_symulacja():
     if container.wyszukiwarka is None:

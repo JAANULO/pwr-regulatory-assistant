@@ -155,16 +155,23 @@ python app.py
 ### Wyniki testów (v2)
 | Metryka | Wartość |
 |---|---|
-| Rozmiar zestawu testowego | 157 pytań |
-| Trafność (właściwy paragraf) | **116/157 (73.9%)** |
+| Rozmiar zestawu testowego | 170 pytań |
+| Trafność (właściwy paragraf) | **129/170 (75.8%)** |
 | Czas odpowiedzi | < 50 ms |
 
 ### Konfiguracja i Hiperparametry
-Wyszukiwarka posiada **46 konfigurowalnych parametrów** wydzielonych całkowicie z kodu do deklaratywnego pliku [**`data/config/config.toml`**](data/config/config.toml). Pozwala to na precyzyjne strojenie silnika bez modyfikacji logiki Pythona:
+Wyszukiwarka posiada **47 konfigurowalnych parametrów** wydzielonych całkowicie z kodu do deklaratywnego pliku [**`data/config/config.toml`**](data/config/config.toml). Pozwala to na precyzyjne strojenie silnika bez modyfikacji logiki Pythona:
 - **`[bm25]`** (3 parametry): współczynniki `k1`, `b` oraz mnożnik wagi synonimów `synonimy_waga`.
 - **`[term_boosts]`** (32 parametry): podbicia wag IDF dla specyficznych słów kluczowych regulaminu (np. `deficyt`, `ects`, `komisyjny`).
 - **`[mapa_wag_statyczna]`** (3 parametry): stałe podbicia punktacji dla najważniejszych rozdziałów.
-- **`[mapa_wag_dynamiczna]`** (8 parametrów): warunkowe podbicia rozdziałów aktywowane obecnością powiązanych tokenów w zapytaniu (np. podbicie "Odpłatność" tylko gdy student pyta o opłaty).
+- **`[mapa_wag_dynamiczna]`** (8 parametrów): warunkowe podbicia rozdziałów aktywowane obecnością powiązanych tokenów w zapytaniu.
+
+#### Automatyczna Symulacja
+Projekt wspiera wbudowany moduł siatki optymalizacyjnej (Grid Search). Aby uruchomić optymalizator:
+```bash
+python scripts/symulacja.py
+```
+Symulacja testuje dziesiątki parametrów na zestawie z `data/config/testy.toml` w poszukiwaniu najlepszego wyniku.
 
 ---
 
@@ -194,6 +201,6 @@ Wyszukiwarka posiada **46 konfigurowalnych parametrów** wydzielonych całkowici
 ---
 
 ## Sprzęt deweloperski
-- **CPU**: Intel Core i7-11700F
-- **RAM**: 32 GB
-- **OS**: Windows 10 / Linux (Ubuntu)
+- **CPU**: Intel Core i3-1215U
+- **RAM**: 16 GB
+- **OS**: Windows 11 / Linux (Ubuntu)

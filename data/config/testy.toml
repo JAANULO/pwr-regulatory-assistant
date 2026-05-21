@@ -1,0 +1,717 @@
+# ==============================================================================
+# PYTANIA TESTOWE WYSZUKIWARKI REGULAMINU PWr
+# Edytuj ten plik aby dodawać/usuwać/zmieniać przypadki testowe.
+# Format każdego testu: { pytanie = "...", oczekiwany = "..." }
+#   - pytanie   : tekst zapytania (tak jak wpisuje student)
+#   - oczekiwany: fragment tytułu paragrafu który powinien trafić (substring, case-insensitive)
+# ==============================================================================
+
+
+# ------------------------------------------------------------------------------
+# ŁATWE – pytania bezpośrednie, jedno słowo kluczowe
+# ------------------------------------------------------------------------------
+
+[[testy_latwe]]
+pytanie = "ile razy mozna podejsc do egzaminu"
+oczekiwany = "Egzamin"
+
+[[testy_latwe]]
+pytanie = "co zrobic jak nie zdam egzaminu"
+oczekiwany = "Egzamin"
+
+[[testy_latwe]]
+pytanie = "czy moge zdawac egzamin przed sesja"
+oczekiwany = "Egzamin"
+
+[[testy_latwe]]
+pytanie = "ile dni miedzy pierwszym a drugim terminem"
+oczekiwany = "Egzamin"
+
+[[testy_latwe]]
+pytanie = "kto moze uniewaznic egzamin"
+oczekiwany = "Egzamin"
+
+[[testy_latwe]]
+pytanie = "czy moge poprawic egzamin"
+oczekiwany = "Egzamin"
+
+[[testy_latwe]]
+pytanie = "kiedy jest poprawka egzaminu"
+oczekiwany = "Egzamin"
+
+[[testy_latwe]]
+pytanie = "egzamni"
+oczekiwany = "Egzamin"
+
+[[testy_latwe]]
+pytanie = "co to jest egzamin komisyjny"
+oczekiwany = "komisyjny"
+
+[[testy_latwe]]
+pytanie = "ile mam czasu na wniosek komisyjny"
+oczekiwany = "komisyjny"
+
+[[testy_latwe]]
+pytanie = "kto jest w komisji egzaminacyjnej"
+oczekiwany = "komisyjny"
+
+[[testy_latwe]]
+pytanie = "czy moge miec obserwatora na egzaminie"
+oczekiwany = "komisyjny"
+
+[[testy_latwe]]
+pytanie = "co grozi za nieobecnosci"
+oczekiwany = "Realizacja"
+
+[[testy_latwe]]
+pytanie = "co grozi jak nie chodze na zajecia"
+oczekiwany = "Realizacja"
+
+[[testy_latwe]]
+pytanie = "ile nieobecnosci mozna miec"
+oczekiwany = "Realizacja"
+
+[[testy_latwe]]
+pytanie = "mam 3 nieobecnosci czy to duzo"
+oczekiwany = "Realizacja"
+
+[[testy_latwe]]
+pytanie = "jak usprawiedliwic nieobecnosc"
+oczekiwany = "Realizacja"
+
+[[testy_latwe]]
+pytanie = "kto ustala limit nieobecnosci"
+oczekiwany = "Realizacja"
+
+[[testy_latwe]]
+pytanie = "jakie sa oceny w regulaminie"
+oczekiwany = "Skala"
+
+[[testy_latwe]]
+pytanie = "ile procent na piatke"
+oczekiwany = "Skala"
+
+[[testy_latwe]]
+pytanie = "ile procent na czworke"
+oczekiwany = "Skala"
+
+[[testy_latwe]]
+pytanie = "ile procent na trojke"
+oczekiwany = "Skala"
+
+[[testy_latwe]]
+pytanie = "ile procent na cztery i pol"
+oczekiwany = "Skala"
+
+[[testy_latwe]]
+pytanie = "jaka jest najnizsza ocena zaliczajaca"
+oczekiwany = "Skala"
+
+[[testy_latwe]]
+pytanie = "kiedy mozna wziac urlop dziekanski"
+oczekiwany = "Urlop"
+
+[[testy_latwe]]
+pytanie = "urlop zdrowotny jak dostac"
+oczekiwany = "Urlop"
+
+[[testy_latwe]]
+pytanie = "czy moge wziac urlop bo jestem w ciazy"
+oczekiwany = "Urlop"
+
+[[testy_latwe]]
+pytanie = "ile urlopow dziekanskich moge wziac"
+oczekiwany = "Urlop"
+
+[[testy_latwe]]
+pytanie = "czy podczas urlopu mam prawa studenta"
+oczekiwany = "Urlop"
+
+[[testy_latwe]]
+pytanie = "urlop?"
+oczekiwany = "Urlop"
+
+[[testy_latwe]]
+pytanie = "kiedy mozna zostac skreslanym"
+oczekiwany = "Skreśl"
+
+[[testy_latwe]]
+pytanie = "jak zlozyc rezygnacje ze studiow"
+oczekiwany = "Skreśl"
+
+[[testy_latwe]]
+pytanie = "co grozi za niezapisanie sie na zajecia"
+oczekiwany = "Skreśl"
+
+[[testy_latwe]]
+pytanie = "jak wznowic studia po skreslanym"
+oczekiwany = "Wznow"
+
+[[testy_latwe]]
+pytanie = "ile razy mozna wznowic studia"
+oczekiwany = "Wznow"
+
+[[testy_latwe]]
+pytanie = "ile mam czasu na wznowienie studiow"
+oczekiwany = "Wznow"
+
+[[testy_latwe]]
+pytanie = "jak wznowic studia"
+oczekiwany = "Wznow"
+
+[[testy_latwe]]
+pytanie = "co to jest powtarzanie przedmiotu"
+oczekiwany = "Powtarz"
+
+[[testy_latwe]]
+pytanie = "ile razy mozna powtarzac przedmiot"
+oczekiwany = "Powtarz"
+
+[[testy_latwe]]
+pytanie = "czy powtarzanie jest platne"
+oczekiwany = "Powtarz"
+
+[[testy_latwe]]
+pytanie = "kiedy mozna powtarzac semestr"
+oczekiwany = "Powtarz"
+
+[[testy_latwe]]
+pytanie = "jak wyglada praca dyplomowa"
+oczekiwany = "Dyplom"
+
+[[testy_latwe]]
+pytanie = "ile osob moze pisac wspolna prace"
+oczekiwany = "Dyplom"
+
+[[testy_latwe]]
+pytanie = "czy praca jest sprawdzana antyplagiatem"
+oczekiwany = "Dyplom"
+
+[[testy_latwe]]
+pytanie = "w jakim jezyku pisze sie prace dyplomowa"
+oczekiwany = "Dyplom"
+
+[[testy_latwe]]
+pytanie = "kto to jest promotor"
+oczekiwany = "Dyplom"
+
+[[testy_latwe]]
+pytanie = "jak dlugo trwa semestr"
+oczekiwany = "Organ"
+
+[[testy_latwe]]
+pytanie = "ile tygodni ma semestr"
+oczekiwany = "Organ"
+
+[[testy_latwe]]
+pytanie = "kiedy konczy sie sesja letnia"
+oczekiwany = "Organ"
+
+[[testy_latwe]]
+pytanie = "ile dni trwa sesja egzaminacyjna"
+oczekiwany = "Organ"
+
+[[testy_latwe]]
+pytanie = "jak oblicza sie srednia ocen"
+oczekiwany = "Skala ocen"
+
+[[testy_latwe]]
+pytanie = "kiedy dostane wyróznienie"
+oczekiwany = "Oceny za"
+
+[[testy_latwe]]
+pytanie = "jak liczona jest ocena koncowa studiow"
+oczekiwany = "Oceny za"
+
+[[testy_latwe]]
+pytanie = "ile wazy ocena z pracy dyplomowej"
+oczekiwany = "Oceny za"
+
+[[testy_latwe]]
+pytanie = "jak policzyc koncowy wynik studiow"
+oczekiwany = "Oceny za"
+
+[[testy_latwe]]
+pytanie = "czy ocena pracy dyplomowej liczy sie do wyniku"
+oczekiwany = "Oceny za"
+
+[[testy_latwe]]
+pytanie = "jak wyglada praktyka zawodowa"
+oczekiwany = "Praktyk"
+
+[[testy_latwe]]
+pytanie = "czy moge zaliczyc praktyke bez odbywania"
+oczekiwany = "Praktyk"
+
+
+# ------------------------------------------------------------------------------
+# TRUDNE – potoczne sformułowania, literówki fonetyczne
+# ------------------------------------------------------------------------------
+
+[[testy_trudne]]
+pytanie = "egzamni"
+oczekiwany = "Egzamin"
+
+[[testy_trudne]]
+pytanie = "ak liczona jest ocena koncowa studiow"
+oczekiwany = "Oceny za"
+
+[[testy_trudne]]
+pytanie = "ile wazy ocena z pracy dyplomowej"
+oczekiwany = "Oceny za"
+
+[[testy_trudne]]
+pytanie = "jak policzyc koncowy wynik studiow"
+oczekiwany = "Oceny za"
+
+[[testy_trudne]]
+pytanie = "czy da sie miec obserwatora na egzaminie"
+oczekiwany = "komisyjny"
+
+[[testy_trudne]]
+pytanie = "co grozi jak nie chodze na zajecia"
+oczekiwany = "Realizacja"
+
+[[testy_trudne]]
+pytanie = "jak dlugo trwa semestr"
+oczekiwany = "Organ"
+
+[[testy_trudne]]
+pytanie = "urlop?"
+oczekiwany = "Urlop"
+
+[[testy_trudne]]
+pytanie = "jak wznowic studia po skresleniu"
+oczekiwany = "Wznow"
+
+[[testy_trudne]]
+pytanie = "czy praca dyplomowa ma antyplagiat"
+oczekiwany = "Dyplom"
+
+[[testy_trudne]]
+pytanie = "co to jest powtazane przedmyotu"
+oczekiwany = "Powtarz"
+
+[[testy_trudne]]
+pytanie = "kedy mozna vzac urlop dzekansky"
+oczekiwany = "Urlop"
+
+[[testy_trudne]]
+pytanie = "czy praca jest spravdzana antyplagyatem"
+oczekiwany = "Dyplom"
+
+[[testy_trudne]]
+pytanie = "kto to jest absolwent?"
+oczekiwany = "Słownik"
+
+[[testy_trudne]]
+pytanie = "co oznacza roznice programowe?"
+oczekiwany = "Słownik"
+
+[[testy_trudne]]
+pytanie = "co to sa punkty ects?"
+oczekiwany = "Słownik"
+
+
+# ------------------------------------------------------------------------------
+# REGRESYJNE – paragrafy które model często myli
+# ------------------------------------------------------------------------------
+
+[[testy_regresyjne]]
+pytanie = "jaka jest skala ocen"
+oczekiwany = "Skala"
+
+[[testy_regresyjne]]
+pytanie = "ile procent na piatke"
+oczekiwany = "Skala"
+
+[[testy_regresyjne]]
+pytanie = "jak liczona jest ocena koncowa studiow"
+oczekiwany = "Oceny za"
+
+[[testy_regresyjne]]
+pytanie = "czy ocena pracy dyplomowej liczy sie do wyniku"
+oczekiwany = "Oceny za"
+
+[[testy_regresyjne]]
+pytanie = "ile dni miedzy terminami egzaminu"
+oczekiwany = "Egzamin"
+
+[[testy_regresyjne]]
+pytanie = "co to jest egzamin komisyjny"
+oczekiwany = "komisyjny"
+
+[[testy_regresyjne]]
+pytanie = "kto jest w komisji egzaminacyjnej"
+oczekiwany = "komisyjny"
+
+[[testy_regresyjne]]
+pytanie = "co grozi za nieobecnosci"
+oczekiwany = "Realizacja"
+
+[[testy_regresyjne]]
+pytanie = "co grozi za niezapisanie sie na zajecia"
+oczekiwany = "Skreśl"
+
+
+# ------------------------------------------------------------------------------
+# P4 ROZBUDOWANE – szersze pokrycie, literówki złożone
+# ------------------------------------------------------------------------------
+
+[[testy_p4_rozbudowane]]
+pytanie = "ile trzeba miec ects zeby zdac"
+oczekiwany = "Deficyt"
+
+[[testy_p4_rozbudowane]]
+pytanie = "jaki jest dopuszczalny deficyt punktowy"
+oczekiwany = "Deficyt"
+
+[[testy_p4_rozbudowane]]
+pytanie = "co jak zabraknie mi punktow ects"
+oczekiwany = "Deficyt"
+
+[[testy_p4_rozbudowane]]
+pytanie = "czy moge przejsc na kolejny semestr z dlugiem ects"
+oczekiwany = "Deficyt"
+
+[[testy_p4_rozbudowane]]
+pytanie = "kiedy jest wpis na semestr"
+oczekiwany = "Warunki i tryb zali"
+
+[[testy_p4_rozbudowane]]
+pytanie = "kiedy dziekan moze mnie skreslic"
+oczekiwany = "Skreślenie"
+
+[[testy_p4_rozbudowane]]
+pytanie = "nie zaplacilem za warunek co teraz"
+oczekiwany = "Skreślenie"
+
+[[testy_p4_rozbudowane]]
+pytanie = "za co uiszcza sie oplaty"
+oczekiwany = "Opłaty"
+
+[[testy_p4_rozbudowane]]
+pytanie = "czy powtarzanie semestru jest platne"
+oczekiwany = "Opłaty"
+
+[[testy_p4_rozbudowane]]
+pytanie = "czy odwolanie od skreslenia jest darmowe"
+oczekiwany = "Skreślenie"
+
+[[testy_p4_rozbudowane]]
+pytanie = "jak zmienic promotora pracy"
+oczekiwany = "Dyplom"
+
+[[testy_p4_rozbudowane]]
+pytanie = "kto recenzuje prace dyplomowa"
+oczekiwany = "Dyplom"
+
+[[testy_p4_rozbudowane]]
+pytanie = "kiedy wolno zdawac egzamin dyplomowy"
+oczekiwany = "Dyplom"
+
+[[testy_p4_rozbudowane]]
+pytanie = "co jesli recenzent wystawi ocene niedostateczna z dyplomu"
+oczekiwany = "Dyplom"
+
+[[testy_p4_rozbudowane]]
+pytanie = "kiedy mozna przedluzyc termin zlozenia dyplomu"
+oczekiwany = "Dyplom"
+
+[[testy_p4_rozbudowane]]
+pytanie = "ile czasu trwa egzamin inzynierski"
+oczekiwany = "Egzamin dypl"
+
+[[testy_p4_rozbudowane]]
+pytanie = "skreslili mnie rok temu czy moge wrocic"
+oczekiwany = "Wznowienia"
+
+[[testy_p4_rozbudowane]]
+pytanie = "na ile mozna wziac urlop bez podania przyczyny"
+oczekiwany = "Urlop"
+
+[[testy_p4_rozbudowane]]
+pytanie = "jak napisac podanie o urlop dziekanski"
+oczekiwany = "Urlop"
+
+[[testy_p4_rozbudowane]]
+pytanie = "czy moge zrezygnowac ze studiow na pierwszym semestrze i wrocic za rok"
+oczekiwany = "Wznow"
+
+[[testy_p4_rozbudowane]]
+pytanie = "ectsys"
+oczekiwany = "Deficyt"
+
+[[testy_p4_rozbudowane]]
+pytanie = "srednia stypedndiowa"
+oczekiwany = "Skala ocen"
+
+[[testy_p4_rozbudowane]]
+pytanie = "wznwienie studjuf"
+oczekiwany = "Wznow"
+
+[[testy_p4_rozbudowane]]
+pytanie = "dzikanka z powodu choroby"
+oczekiwany = "Urlop"
+
+[[testy_p4_rozbudowane]]
+pytanie = "czy prowadzacy musi dac sylabus"
+oczekiwany = "Realizacja"
+
+[[testy_p4_rozbudowane]]
+pytanie = "kto ustanawia kryteria zaliczenia"
+oczekiwany = "Realizacja"
+
+[[testy_p4_rozbudowane]]
+pytanie = "ile lat ma sie na ukonczenie studiow inzynierskich"
+oczekiwany = "Okres nauki"
+
+[[testy_p4_rozbudowane]]
+pytanie = "jak usprawiedliwic nieobecnosc w 24 godziny"
+oczekiwany = "Realizacja"
+
+[[testy_p4_rozbudowane]]
+pytanie = "kto w ustala harmonogram sesji"
+oczekiwany = "Organizacja"
+
+[[testy_p4_rozbudowane]]
+pytanie = "kto moze byc obecny na warunku"
+oczekiwany = "komisyjny"
+
+[[testy_p4_rozbudowane]]
+pytanie = "kiedy nastepuje zamkniecie indeksu"
+oczekiwany = "Oceny"
+
+
+# ------------------------------------------------------------------------------
+# P5 UZUPEŁNIAJĄCE – szersze pokrycie paragrafów
+# ------------------------------------------------------------------------------
+
+[[testy_p5_uzupelniajace]]
+pytanie = "jak zostac studentem pwr"
+oczekiwany = "Przyjęcie na studia"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "jak sie zapisac na studia"
+oczekiwany = "Przyjęcie na studia"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "jakie sa prawa studenta"
+oczekiwany = "Prawa studenta"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "co student moze robic na uczelni"
+oczekiwany = "Prawa studenta"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "jakie sa obowiazki studenta"
+oczekiwany = "Obowiązki studenta"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "co grozi za niewywiazywanie sie z obowiazkow"
+oczekiwany = "Obowiązki studenta"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "czym jest etap studiow"
+oczekiwany = "etapy studiów"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "ile etapow ma studia inzynierskie"
+oczekiwany = "Program studiów"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "czym jest plan studiow"
+oczekiwany = "Program studiów"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "ile punktow ects ma rok studiow"
+oczekiwany = "Punkty ECTS"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "co to jest punkt ects"
+oczekiwany = "Punkty ECTS"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "ile ects mam zrobic zeby zdac rok"
+oczekiwany = "Punkty ECTS"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "kiedy zaczyna sie rok akademicki"
+oczekiwany = "Organizacja roku"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "ile trwa rok akademicki"
+oczekiwany = "Organizacja roku"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "ile tygodni trwa semestr zimowy"
+oczekiwany = "Organizacja roku"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "czy studia stacjonarne sa platne"
+oczekiwany = "Odpłatność"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "jak uiszcza sie oplaty za studia"
+oczekiwany = "Odpłatność"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "jak sie zapisac na przedmiot"
+oczekiwany = "Zapisy"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "co to jest rejestracja na zajecia"
+oczekiwany = "Zapisy"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "czy mozna zaliczyc przedmiot z innej uczelni"
+oczekiwany = "Przenoszenie"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "jak przeniesc zaliczenie z innego wydzialu"
+oczekiwany = "Przenoszenie"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "co to jest zaliczenie bez oceny"
+oczekiwany = "Zaliczanie przedmiotu"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "ile razy mozna poprawiac zaliczenie"
+oczekiwany = "Zaliczanie przedmiotu"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "ile razy moge powtarzac ten sam przedmiot"
+oczekiwany = "Powtarzanie przedmiotu"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "ile tygodni trwaja praktyki zawodowe"
+oczekiwany = "Praktyki zawodowe"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "kto moze zwolnic z praktyk"
+oczekiwany = "Praktyki zawodowe"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "czy praca zawodowa zalicza sie jako praktyka"
+oczekiwany = "Praktyki zawodowe"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "jak sie rozlicza semestr"
+oczekiwany = "Rozliczanie etapu"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "co to jest ios na studiach"
+oczekiwany = "Indywidualna organizacja"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "kto moze wnioskowac o indywidualny plan"
+oczekiwany = "Indywidualna organizacja"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "czy mozna przeniesc sie z innej uczelni"
+oczekiwany = "Przeniesienia z innej"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "jak zmienic uczelnie w trakcie studiow"
+oczekiwany = "Przeniesienia z innej"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "jak sie oblicza ostateczny wynik studiow"
+oczekiwany = "Oceny za studia"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "jak liczona jest srednia na dyplomie"
+oczekiwany = "Oceny za studia"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "kiedy dostaje dyplom ukonczenia"
+oczekiwany = "Ukończenie studiów"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "co zawiera dyplom ukonczenia studiow"
+oczekiwany = "Ukończenie studiów"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "kiedy mozna odebrac dyplom"
+oczekiwany = "Ukończenie studiów"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "ile trwa wydanie dyplomu"
+oczekiwany = "Ukończenie studiów"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "co to jest tok studiow"
+oczekiwany = "Słownik"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "co oznacza pojecie student w regulaminie"
+oczekiwany = "Słownik"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "czym jest absolwent w rozumieniu regulaminu"
+oczekiwany = "Słownik"
+
+[[testy_p5_uzupelniajace]]
+pytanie = "co to jest edukacja cl na pwr"
+oczekiwany = "Systemy komunikacji"
+
+
+# ------------------------------------------------------------------------------
+# KONWERSACYJNE – złożone, wielozdaniowe pytania (§ 3.5)
+# ------------------------------------------------------------------------------
+
+[[testy_conversational]]
+pytanie = "Czy kolokwium z przedmiotu, który kończy się zaliczeniem z oceną (a nie egzaminem) musi być przed sesją czy to jest dobra wola prowadzącego, który zrobi je, np. w ostatnim tygodniu zajęć?"
+oczekiwany = "Zaliczanie przedmiotu"
+
+[[testy_conversational]]
+pytanie = "Czy obecność na pierwszym terminie egzaminu w sesji jest obowiązkowa? I czy nie będąc na pierwszym terminie można przystąpić do egzaminu poprawkowego?"
+oczekiwany = "Egzaminy"
+
+[[testy_conversational]]
+pytanie = "Prowadzący nie chce pokazać mi mojej pracy. Czy czasem nie jest tak, że student powinien mieć wgląd do swoich prac/kolokwiów, egzaminów?"
+oczekiwany = "Wystawianie ocen"
+
+[[testy_conversational]]
+pytanie = "Co to jest grupa kursów?"
+oczekiwany = "Przedmioty i zajęcia"
+
+[[testy_conversational]]
+pytanie = 'Co można rozumieć pod hasłem: "zdalny tryb nauczania"?'
+oczekiwany = "Przedmioty i zajęcia"
+
+[[testy_conversational]]
+pytanie = "Mam zbyt duży deficyt punktów ECTS co mam zrobić?"
+oczekiwany = "Zaliczenie etapu"
+
+[[testy_conversational]]
+pytanie = "Czy mogę realizować swój projekt inżynierski na innej uczelni?"
+oczekiwany = "Praca dyplomowa"
+
+[[testy_conversational]]
+pytanie = "Prowadzący odmówił mi wpisania oceny z laboratorium, ponieważ nie przyniosłam tzw. Rewersu podpisanego przez panią laborantkę. Co mam zrobić?"
+oczekiwany = "Wystawianie ocen"
+
+[[testy_conversational]]
+pytanie = "Prowadzący pod koniec jednego z kursów zmienił warunki jego zaliczenia, czy tak w ogóle można?"
+oczekiwany = "Realizacja zajęć"
+
+[[testy_conversational]]
+pytanie = "Uważam, że ocena z mojego egzaminu została wystawiona niesprawiedliwie. Prowadzący odnosił się do mnie bardzo stronniczo podczas odpowiedzi ustnej. Czy mogę wnioskować o ponowne sprawdzenie mojej wiedzy przed jakąś komisją?"
+oczekiwany = "Egzamin komisyjny"
+
+[[testy_conversational]]
+pytanie = "Znalazłem się w bardzo trudnej sytuacji życiowej i muszę na jakiś czas przerwać naukę. Słyszałem, że dziekan może wyrazić zgodę na przerwę w studiowaniu. Gdzie i kiedy powinienem złożyć odpowiedni wniosek w tej sprawie?"
+oczekiwany = "Urlopy"
+
+[[testy_conversational]]
+pytanie = "Chciałbym zapisać się na zajęcia w nadchodzącym semestrze. Niestety system USOS ciągle mi się zawiesza i nie mogę dokonać rejestracji. Do kogo mam się zgłosić, jeśli minie oficjalny termin zapisów?"
+oczekiwany = "Zapisy (rejestracja)"
+
+[[testy_conversational]]
+pytanie = "Zostałem skreślony z listy studentów na trzecim semestrze z powodu niezaliczenia etapu. Minął już rok i bardzo chciałbym wrócić na uczelnię, aby dokończyć studia. Na jakich warunkach mogę ubiegać się o ponowne przyjęcie?"
+oczekiwany = "Wznowienia"
+
+[[testy_conversational]]
+pytanie = "Niestety nie udało mi się zaliczyć kursu z analizy matematycznej w tym semestrze. Wiem, że muszę go powtórzyć przy kolejnej okazji. Czy będę musiał za to zapłacić i kiedy mogę ponownie zapisać się na ten przedmiot?"
+oczekiwany = "Powtarzanie przedmiotu"

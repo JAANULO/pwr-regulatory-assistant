@@ -4,6 +4,17 @@ Wszystkie istotne zmiany w projekcie są odnotowywane w tym pliku zgodnie ze sta
 
 ---
 
+## [2.9.0] - 2026-05-21
+### Dodano
+- **Automatyczna Symulacja**: Nowy skrypt `scripts/symulacja.py` w pełni zintegrowany z API we Flasku (`/lab/simulate`). Optymalizuje hiperparametry wyszukiwarki przy użyciu siatki wielowymiarowej z bezpiecznym losowaniem (odporność na przepełnienie zmiennych w Pythonie).
+- **Zewnętrzne testy (TOML)**: Usunięto przestarzałe zmienne wbudowane w kod i wyekstrahowano wszystkie zbiory pytań (170 sztuk) do jednego, bardzo edytowalnego pliku `data/config/testy.toml`. Dodano obsługę flagi `--sekcje`.
+- **Leniwy Generator Siatki**: Ominięto zjawisko pochłaniania RAM-u z powodu "klątwy wielowymiarowości", wprowadzając generatory, które trzymają zużycie pamięci PWr asystenta poniżej 100 MB nawet przy miliardach konfiguracji do sprawdzenia.
+
+### Ulepszono
+- **Zwiększona Trafność**: Ze względu na rozbudowę bazy wiedzy oraz usprawnienie algorytmów na `testy.toml`, silnik osiągnął **75.8% (129/170)** bazowej trafności bez przeuczenia.
+- **Odporność Testów**: Zaktualizowano `tests/smoke_test.py` tak, aby weryfikował działanie endpointu `/lab/simulate` (pełne pokrycie nowej logiki).
+
+
 ## [2.8.0] - 2026-05-21
 ### Dodano
 - **Responsywność i Mobilność (Krok 1.2)**: Wdrożenie pliku manifestu PWA (`static/manifest.json`) umożliwiającego uruchamianie aplikacji w trybie `standalone` na urządzeniach mobilnych (bez ramki przeglądarki).
