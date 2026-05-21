@@ -324,7 +324,7 @@ def run_grid_search(
         random.seed(42)
         chosen_indices = set()
         while len(chosen_indices) < max_combinations:
-            chosen_indices.add(random.randint(0, total_combos - 1))
+            chosen_indices.add(random.randint(0, total_combos - 1))  # nosec B311
 
         combos = [
             combo
