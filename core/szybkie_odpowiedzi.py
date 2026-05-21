@@ -6,6 +6,7 @@ szybkie_odpowiedzi.py - Obsługa szybkich definicji ze słownika pojęć (§ 2 r
 import os
 import re
 import sys
+from typing import Any
 from core.wyszukiwarka import usun_polskie_znaki
 
 # W Pythonie 3.11+ tomllib jest częścią biblioteki standardowej
@@ -57,7 +58,7 @@ _cfg_szybkie_cache: dict[str, list[str]] | None = None
 _cfg_szybkie_mtime: float = 0.0
 
 
-def pobierz_konfiguracje_szybkich_odpowiedzi() -> dict[str, list[str]]:
+def pobierz_konfiguracje_szybkich_odpowiedzi() -> dict[str, Any]:
     global _cfg_szybkie_cache, _cfg_szybkie_mtime
     sciezka = os.path.join(
         os.path.dirname(__file__), "..", "data", "config", "szybkie_odpowiedzi.toml"

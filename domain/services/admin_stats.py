@@ -6,10 +6,7 @@ def execute_admin_eksport_csv(token, admin_token):
     import io
     from flask import Response
 
-    try:
-        from core.bd import polacz, TRYB
-    except ImportError:
-        from ...core.bd import polacz, TRYB
+    from core.bd import polacz, TRYB
 
     buf = io.StringIO()
     writer = csv.writer(buf)

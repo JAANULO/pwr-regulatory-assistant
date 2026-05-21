@@ -8,3 +8,8 @@ ignore = [
     "F811", # Zezwolenie na redefinicje
     "F841"  # Nieuzywane zmienne warunkowe
 ]
+
+[tool.mypy]
+exclude = [
+    '^logs/',
+]
