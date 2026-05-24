@@ -14,15 +14,14 @@ Poniżej znajdziesz wszystko, czego potrzebujesz, żeby uruchomić projekt lokal
 ### Instalacja
 
 ```bash
-git clone https://github.com/JAANULO/model.git
-cd model/v2
+git clone https://github.com/JAANULO/pwr-regulatory-assistant.git
+cd pwr-regulatory-assistant
 pip install -r requirements.txt
 ```
 
 ### Uruchomienie serwera deweloperskiego
 
 ```bash
-cd v2
 python app.py
 # Aplikacja dostępna pod: http://localhost:5000
 ```
@@ -32,7 +31,7 @@ python app.py
 ## Struktura projektu
 
 ```
-model/
+pwr-regulatory-assistant/
 ├──
 │   ├── app.py              # Serwer Flask – główny punkt wejścia
 │   ├── core/
@@ -53,7 +52,6 @@ model/
 ## Uruchamianie testów
 
 ```bash
-cd v2
 python tests/test.py
 ```
 

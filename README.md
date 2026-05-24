@@ -65,8 +65,8 @@ The original generative experiments (Version 1.0) have been moved to a separate 
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/JAANULO/model.git
-cd model
+git clone https://github.com/JAANULO/pwr-regulatory-assistant.git
+cd pwr-regulatory-assistant
 
 # 2. Install dependencies (Production optimized)
 pip install -r requirements.txt
