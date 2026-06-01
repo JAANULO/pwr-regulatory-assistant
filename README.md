@@ -49,10 +49,6 @@ Instead of generating answers from memory, it uses a **RAG (Retrieval-Augmented 
 - **Configuration & Hyperparameters** — **46 parameters** fully decoupled into [**`data/config/config.toml`**](data/config/config.toml) for easy tuning (BM25 constants, custom term boosts, static & dynamic chapter weights).
 - **Release History** — track changes in [docs/CHANGELOG.md](docs/CHANGELOG.md).
 
-### Mini-GPT Research (Archived/Moved)
-
-The original generative experiments (Version 1.0) have been moved to a separate repository: [mini-gpt](https://github.com/JAANULO/mini-gpt). This was done to keep the Regulatory Assistant focused on reliability and factual accuracy.
-
 ---
 
 ## Quick Start
@@ -136,8 +132,6 @@ Główny cel projektu to dostarczanie precyzyjnych informacji prawnych.
 - **Indeks na poziomie zdań** — system znajduje konkretne zdanie z odpowiedzią.
 - **Klasyfikator intencji** — wyciąga liczby i terminy bezpośrednio z tekstu.
 
-### Mini-GPT (Zarchiwizowane/Przeniesione)
-Eksperymenty z własną architekturą Transformer (v1.0) zostały przeniesione do osobnego repozytorium: [mini-gpt](https://github.com/JAANULO/mini-gpt).
 
 ---
 
@@ -152,7 +146,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-### Wyniki testów (v2)
+### Wyniki testów 
 | Metryka | Wartość |
 |---|---|
 | Rozmiar zestawu testowego | 170 pytań |
@@ -199,8 +193,3 @@ Symulacja testuje dziesiątki parametrów na zestawie z `data/config/testy.toml`
 ```
 
 ---
-
-## Sprzęt deweloperski
-- **CPU**: Intel Core i3-1215U
-- **RAM**: 16 GB
-- **OS**: Windows 11 / Linux (Ubuntu)
