@@ -1,0 +1,65 @@
+# Obsługa bardzo długich pytań
+
+## Cel
+Implementacja mechanizmu, który pozwoli na efektywne przetwarzanie pytań znacznie przekraczających limit tokenów modelu (np. > 2048 tokenów). System podzieli pytanie na fragmenty, wyciągnie istotne informacje z bazy wiedzy i scali wyniki.
+
+## Wymagania użytkownika
+- Obsługa pytań dłuższych niż limit modelu.
+- Zachowanie wysokiej trafności wyników.
+- Minimalny wpływ na istniejącą wydajność.
+
+## Proponowane zmiany
+---
+### 1. Dodanie konfiguracji
+- **Plik:** `infrastructure/config/config.toml`
+- **Nowe klucze:**
+  - `max_query_length = 2000` (maksymalna liczba znaków przed podziałem)
+  - `chunk_overlap = 200` (liczba znaków nakładających się między fragmentami)
+  - `chunk_size = 1500` (rozmiar jednego fragmentu)
+  - `answer_max_length = 1000` (maksymalna liczba znaków w odpowiedzi)
+  - `top_k = 5` (liczba wyników po agregacji)
+---
+### 2. Rozszerzenie `knowledge_loader.py`
+- **Nowe funkcje:**
+  - `podziel_pytanie(pytanie: str, size: int, overlap: int) -> List[str]`
+    - Dzieli długie pytanie na nakładające się fragmenty.
+  - `przetworz_fragment(fragment: str) -> List[Match]`
+    - Używa istniejącego wektora TF‑IDF do wyszukiwania najtrafniejszych fragmentów bazy.
+  - `obsluz_dluga_pytanie(pytanie: str) -> List[Match]`
+    - Koordynuje podział, przetwarzanie i agregację wyników.
+- **Modyfikacje istniejących funkcji:**
+  - `wyszukaj(pytanie: str)` będzie delegować do `obsluz_dluga_pytanie` jeśli długość > `max_query_length`.
+---
+### 3. Agregacja wyników
+- Po przetworzeniu każdego fragmentu, wyniki zostaną posortowane wg. sumarycznej wagi TF‑IDF.
+- Usuń duplikaty (identyczne rekordy z różnych fragmentów).
+- Zwróć top‑k wyników (k konfigurowalne, np. 5).
+---
+### 4. Testy jednostkowe
+- **Plik:** `tests/test_knowledge_loader_long_query.py`
+  - Test podziału pytania na fragmenty.
+  - Test poprawnego delegowania do istniejącego indeksu.
+  - Test agregacji i usuwania duplikatów.
+---
+### 5. Dokumentacja
+- Aktualizacja `README.md` – opis nowej funkcji oraz przykłady użycia.
+- Dodanie sekcji w `docs/usage.md` (jeśli istnieje) o limitach zapytań.
+---
+## Plan wdrożenia
+1. Dodaj konfigurację do `config.toml`.
+2. Implementuj funkcje podziału i przetwarzania w `knowledge_loader.py`.
+3. Zmodyfikuj istniejącą funkcję wyszukiwania, aby obsługiwała długie pytania.
+4. Dodaj testy i uruchom je.
+5. Zaktualizuj dokumentację.
+6. Przeprowadź ręczną weryfikację na przykładowych pytaniach (> 3000 znaków).
+
+## Weryfikacja
+- **Automatyczna:** `pytest -q`
+- **Ręczna:** Uruchomienie skryptu z bardzo długim pytaniem i sprawdzenie, czy zwrócone wyniki są sensowne oraz czy czas odpowiedzi nie przekracza kilku sekund.
+
+## Ryzyka
+- Zwiększony czas przetwarzania przy dużej liczbie fragmentów – można dostroić `chunk_size` i `chunk_overlap`.
+- Potencjalne duplikaty w wynikach – zabezpieczone filtracją.
+
+# [!NOTE]
+> Użytkownik wymaga konfigurowalnej liczby wyników (`top_k = 5`) oraz agregacji poprzez średnią wagę TF‑IDF.
