@@ -30,13 +30,17 @@ def require_admin_token():
 
 @api_keys_bp.route("", methods=["POST"])
 def create_key():
-    dane = request.get_json(force=True) if request.is_json else {}
-    scopes = dane.get("scopes", ["all"])
-    quota = dane.get("quota", {})
-    rate_limit = dane.get("rate_limit", {"per_min": 60})
-    created_by = dane.get("created_by", "admin")
-    expires_at = dane.get("expires_at")
-    meta = dane.get("meta", {})
+    from typing import Any, Dict, List, Optional
+
+    dane: Dict[str, Any] = request.get_json(force=True) if request.is_json else {}
+    scopes: List[str] = dane.get("scopes", ["all"])
+    quota: Dict[str, Any] = dane.get("quota", {})
+    rate_limit: Dict[str, Any] = dane.get("rate_limit", {"per_min": 60})
+    created_by: str = str(dane.get("created_by", "admin"))
+
+    exp = dane.get("expires_at")
+    expires_at: Optional[str] = str(exp) if exp else None
+    meta: Dict[str, Any] = dane.get("meta", {})
 
     key_id, raw_key = api_key_service.create_api_key(
         created_by=created_by,
@@ -80,17 +84,30 @@ def rotate_key(key_id):
 
     import json
 
+    from typing import Dict, Any, List, Optional
+
+    scopes_val: List[str] = (
+        json.loads(record.get("scopes", "[]")) if record.get("scopes") else ["all"]
+    )
+    quota_val: Dict[str, Any] = (
+        json.loads(record.get("quota", "{}")) if record.get("quota") else {}
+    )
+    rl_val: Dict[str, Any] = (
+        json.loads(record.get("rate_limit", "{}")) if record.get("rate_limit") else {}
+    )
+    exp_val = record.get("expires_at")
+    exp_val_typed: Optional[str] = str(exp_val) if exp_val else None
+    meta_val: Dict[str, Any] = (
+        json.loads(record.get("meta", "{}")) if record.get("meta") else {}
+    )
+
     new_key_id, new_raw_key = api_key_service.create_api_key(
-        created_by=record.get("created_by"),
-        scopes=json.loads(record.get("scopes", "[]"))
-        if record.get("scopes")
-        else ["all"],
-        quota=json.loads(record.get("quota", "{}")) if record.get("quota") else {},
-        rate_limit=json.loads(record.get("rate_limit", "{}"))
-        if record.get("rate_limit")
-        else {},
-        expires_at=record.get("expires_at"),
-        meta=json.loads(record.get("meta", "{}")) if record.get("meta") else {},
+        created_by=str(record.get("created_by") or "admin"),
+        scopes=scopes_val,
+        quota=quota_val,
+        rate_limit=rl_val,
+        expires_at=exp_val_typed,
+        meta=meta_val,
     )
 
     return jsonify(

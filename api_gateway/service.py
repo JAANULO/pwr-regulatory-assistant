@@ -2,7 +2,7 @@ import hashlib
 import secrets
 import string
 import time
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, Optional
 import json
 import logging
 from core.settings import REDIS_URL
@@ -40,8 +40,8 @@ class ApiKeyService:
         scopes: list,
         quota: dict,
         rate_limit: dict,
-        expires_at=None,
-        meta: dict = None,
+        expires_at: Optional[str] = None,
+        meta: Optional[dict] = None,
     ) -> Tuple[str, str]:
         """Tworzy nowy klucz API i zwraca (key_id, raw_api_key). Zapisuje tylko hash."""
         key_id = self._generate_raw_secret(10)
