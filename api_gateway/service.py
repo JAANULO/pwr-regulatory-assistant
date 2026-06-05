@@ -20,7 +20,7 @@ if REDIS_URL:
         _LOG.error(f"Nie udalo sie zinicjowac Redis: {e}")
 
 # Fallback: in-memory Rate Limiter
-_RATE_LIMITS = {}
+_RATE_LIMITS: Dict[str, Any] = {}
 
 
 class ApiKeyService:

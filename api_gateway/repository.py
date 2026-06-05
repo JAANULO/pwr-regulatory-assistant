@@ -1,5 +1,6 @@
 import json
 import uuid
+from typing import Optional
 
 
 class ApiKeysRepository:
@@ -16,7 +17,7 @@ class ApiKeysRepository:
         quota: dict,
         rate_limit: dict,
         expires_at=None,
-        meta: dict = None,
+        meta: Optional[dict] = None,
     ) -> str:
         new_id = str(uuid.uuid4())
         scopes_str = json.dumps(scopes) if scopes else "[]"
@@ -67,7 +68,7 @@ class ApiKeysRepository:
             conn.commit()
             return new_id
 
-    def get_by_key_id(self, key_id: str) -> dict:
+    def get_by_key_id(self, key_id: str) -> Optional[dict]:
         with self.polacz() as conn:
             cur = conn.cursor()
             if self.tryb == "postgres":
