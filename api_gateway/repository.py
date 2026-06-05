@@ -1,6 +1,6 @@
 import json
 import uuid
-from typing import Optional
+from typing import Optional, Dict, Any
 
 
 class ApiKeysRepository:
@@ -16,8 +16,8 @@ class ApiKeysRepository:
         scopes: list,
         quota: dict,
         rate_limit: dict,
-        expires_at=None,
-        meta: Optional[dict] = None,
+        expires_at: Optional[str] = None,
+        meta: Optional[Dict[str, Any]] = None,
     ) -> str:
         new_id = str(uuid.uuid4())
         scopes_str = json.dumps(scopes) if scopes else "[]"
@@ -68,7 +68,7 @@ class ApiKeysRepository:
             conn.commit()
             return new_id
 
-    def get_by_key_id(self, key_id: str) -> Optional[dict]:
+    def get_by_key_id(self, key_id: str) -> Optional[Dict[str, Any]]:
         with self.polacz() as conn:
             cur = conn.cursor()
             if self.tryb == "postgres":
@@ -80,7 +80,7 @@ class ApiKeysRepository:
                 return None
             return dict(row)
 
-    def list_all(self):
+    def list_all(self) -> list:
         with self.polacz() as conn:
             cur = conn.cursor()
             cur.execute(
@@ -89,7 +89,7 @@ class ApiKeysRepository:
             rows = cur.fetchall()
             return [dict(r) for r in rows]
 
-    def revoke(self, key_id: str):
+    def revoke(self, key_id: str) -> None:
         with self.polacz() as conn:
             cur = conn.cursor()
             if self.tryb == "postgres":
@@ -102,7 +102,7 @@ class ApiKeysRepository:
                 )
             conn.commit()
 
-    def update_usage(self, key_id: str):
+    def update_usage(self, key_id: str) -> None:
         with self.polacz() as conn:
             cur = conn.cursor()
             if self.tryb == "postgres":

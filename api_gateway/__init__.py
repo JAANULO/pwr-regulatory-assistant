@@ -4,6 +4,7 @@ from core.bd import polacz, TRYB
 from .repository import ApiKeysRepository
 from .service import ApiKeyService
 from .middleware import init_api_key_middleware
+from typing import Any
 
 __all__ = [
     "api_keys_bp",
@@ -19,7 +20,7 @@ api_keys_bp = Blueprint("api_keys", __name__, url_prefix="/admin/api-keys")
 
 
 @api_keys_bp.before_request
-def require_admin_token():
+def require_admin_token() -> Any:
     # Zabezpieczenie endpointów administracyjnych
     token = request.args.get("token") or (request.get_json(silent=True) or {}).get(
         "token"
@@ -29,7 +30,7 @@ def require_admin_token():
 
 
 @api_keys_bp.route("", methods=["POST"])
-def create_key():
+def create_key() -> Any:
     from typing import Any, Dict, List, Optional
 
     dane: Dict[str, Any] = request.get_json(force=True) if request.is_json else {}
@@ -62,19 +63,19 @@ def create_key():
 
 
 @api_keys_bp.route("", methods=["GET"])
-def list_keys():
+def list_keys() -> Any:
     keys = api_keys_repo.list_all()
     return jsonify(keys), 200
 
 
 @api_keys_bp.route("/<key_id>/revoke", methods=["POST"])
-def revoke_key(key_id):
+def revoke_key(key_id: str) -> Any:
     api_keys_repo.revoke(key_id)
     return jsonify({"status": "revoked", "key_id": key_id}), 200
 
 
 @api_keys_bp.route("/<key_id>/rotate", methods=["POST"])
-def rotate_key(key_id):
+def rotate_key(key_id: str) -> Any:
     # Prosta rotacja: uniewaznij stary, utworz nowy o tych samych parametrach
     record = api_keys_repo.get_by_key_id(key_id)
     if not record:
