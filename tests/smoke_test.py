@@ -8,6 +8,7 @@ import time
 import requests
 import sys
 import os
+import tempfile
 
 
 def run_test():
@@ -62,13 +63,23 @@ def run_test():
                                 flush=True,
                             )
                             # Test endpointu /lab/simulate
-                            print("Sprawdzanie endpointu /lab/simulate...", flush=True)
+                            # Tworzymy tymczasowy plik z jednym pytaniem dla przyspieszenia testu
+                            with tempfile.NamedTemporaryFile(
+                                mode="w", suffix=".txt", delete=False
+                            ) as f:
+                                f.write("ile wynosi urlop?\n")
+                                test_q_path = f.name
+
                             try:
                                 lab_resp = requests.post(
                                     "http://localhost:5005/lab/simulate",
-                                    json={"max_combinations": 1},
+                                    json={
+                                        "max_combinations": 1,
+                                        "questions_path": test_q_path,
+                                    },
                                     timeout=30,
                                 )
+
                                 if lab_resp.status_code == 200:
                                     print(
                                         "[OK] Endpoint /lab/simulate dziala poprawnie!",
@@ -86,6 +97,10 @@ def run_test():
                                     f"[BLAD] /lab/simulate wyrzucil wyjatek: {e}",
                                     flush=True,
                                 )
+                            finally:
+                                if os.path.exists(test_q_path):
+                                    os.remove(test_q_path)
+
                         else:
                             print(
                                 f"[BLAD] Manifest PWA ma niepoprawna strukture: {m_data}",
