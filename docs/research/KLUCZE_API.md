@@ -28,7 +28,7 @@ System ma zapewnić: generowanie, rotację i unieważnianie kluczy; autoryzację
 ## 4. Wymagania niefunkcjonalne / bezpieczeństwo
 
 - Protokół: wymuszenie HTTPS na poziomie reverse-proxy / serwera.
-- Hashowanie: użyć bezpiecznego algorytmu (bcrypt/argon2/PBKDF2) z unikalnym soltem.
+- Hashowanie: użyć szybkiego algorytmu kryptograficznego (np. SHA-256 lub HMAC-SHA256 z globalnym sekretem). Algorytmy typu bcrypt są zbyt wolne dla kluczy API.
 - Przechowywać w DB tylko hash; raw key generowany losowo (min. 32 bajty), wyświetlany tylko raz.
 - Ograniczyć wycieki w logach (nie logować raw key). Logować jedynie id klucza/hash lub truncated.
 - Wysokowydajne limitowanie: użyć Redis dla liczników i sliding window / fixed window.
@@ -36,18 +36,19 @@ System ma zapewnić: generowanie, rotację i unieważnianie kluczy; autoryzację
 
 ## 5. Architektura komponentów
 
-- API Key Service (nowy moduł) — generowanie, walidacja, rotacja, revokacja.
-- Middleware: `api_key_auth` — odpala na początku requestu i ustawia `request.api_key_meta`.
+**Decyzja architektoniczna:** Obsługa kluczy API zostanie zaimplementowana jako **osobny podfolder/moduł w obecnym repozytorium** (monolit modularny, np. `api_gateway/`). Zapobiega to mieszaniu się logiki uwierzytelniania z główną aplikacją (`core/`, `domain/`), zachowując jednocześnie jedno wspólne wdrożenie (bez potrzeby stawiania nowych serwerów). Plik `app.py` zaimportuje ten moduł jedynie jako zgrabny middleware.
+
+- API Key Service (wydzielony podfolder, np. `api_gateway/`) — generowanie, walidacja, rotacja, revokacja.
+- Middleware: `api_key_auth` — odpala na początku requestu, weryfikuje klucz i ustawia `request.api_key_meta` przed wpuszczeniem do głównej logiki.
 - Storage: tabele w głównej bazie (np. `api_keys`) + Redis dla liczników.
-- Admin endpoints: zabezpieczone (np. admin token lub wymagane konto admina w systemie).
+- Admin endpoints: zabezpieczone (np. admin token).
 - Embed script (statyczny JS) — minimalny klient wysyłający żądania do twojego API z kluczem.
 
 ## 6. Model danych (propozycja tabeli `api_keys`)
 
 - `id` : UUID
 - `key_id` : skrócony identyfikator (np. 8-12 znaków) publiczny do referencji
-- `key_hash` : tekst (hash klucza)
-- `salt` : tekst (jeśli wymagane przez algorytm)
+- `key_hash` : tekst (hash klucza SHA-256)
 - `created_by` : userid lub string
 - `created_at` : timestamp
 - `expires_at` : timestamp nullable
@@ -67,8 +68,8 @@ Prefix: `/admin/api-keys` (secured endpoints dla admina)
 
 1. `POST /admin/api-keys` — utwórz klucz
    - Body: `{ "scopes": ["ask","search"], "expires_at": "2026-12-01T00:00:00Z", "quota": {"daily":1000}, "allowed_origins": ["https://example.com"] }`
-   - Response: `{ "key_id": "abc123", "api_key": "RAW-SECRET-ONLY-ONCE" , "meta": {...} }`
-   - Raw klucz pokazany tylko w odpowiedzi tworzenia.
+   - Response: `{ "key_id": "abc123", "api_key": "abc123.RAW-SECRET-ONLY-ONCE" , "meta": {...} }`
+   - Raw klucz (prefiksowany `key_id`) pokazany tylko w odpowiedzi tworzenia.
 
 2. `GET /admin/api-keys` — listuj klucze (bez raw key)
 
@@ -93,7 +94,9 @@ Przykładowa odpowiedź walidacji:
 
 1. Odczyt headeru `X-Api-Key` lub `Authorization`.
 2. Jeśli brak -> 401.
-3. Hash otrzymanego raw key i porównanie z `key_hash` w DB (użyj czasowo-odpornego porównania).
+3. Rozdzielenie klucza na `key_id` i `raw_secret` (np. po kropce).
+4. Szybkie pobranie rekordu z bazy danych przy użyciu `key_id` po zoptymalizowanym indeksie. Jeśli brak -> 401.
+5. Zahashowanie `raw_secret` (SHA-256) i porównanie z zapisanym w DB `key_hash` przy pomocy funkcji stałoczasowej (np. `hmac.compare_digest`).
 4. Sprawdź `revoked` i `expires_at`.
 5. Sprawdź `scopes` czy żądany endpoint jest dozwolony.
 6. Wykonaj rate-limit / quota check (Redis) -> jeśli przekroczone -> 429.
@@ -133,7 +136,7 @@ async function askQuestion(apiKey, prompt) {
 }
 ```
 
-Uwaga: zaleca się proxy po stronie integratora lub ograniczenie allowed_origins oraz quota, aby zminimalizować ryzyko wycieku klucza z frontendu.
+Uwaga: Zdecydowanie zaleca się użycie proxy po stronie integratora. Ograniczenie `allowed_origins` (CORS) chroni klucz tylko w przeglądarce i nie zapobiega jego skopiowaniu oraz użyciu poza nią (np. przez curl). Dla kluczy używanych w publicznym JS należy bezwzględnie stosować minimalne `quota` i restrykcyjny `rate_limit`.
 
 ## 12. Logging i monitoring
 

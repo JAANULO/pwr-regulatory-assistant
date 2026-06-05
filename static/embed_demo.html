@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo API Keys</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        #response { background: #f4f4f4; padding: 15px; margin-top: 20px; white-space: pre-wrap; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h2>Test integracji API (Symulacja strony zewnętrznej)</h2>
+    <p>Tak wyglądałby prosty interfejs na stronie integratora zewnętrznego.</p>
+    
+    <label>Klucz API:</label>
+    <input type="text" id="apiKey" placeholder="Wklej tutaj klucz wygenerowany przez admina" />
+    
+    <label>Pytanie do asystenta:</label>
+    <input type="text" id="pytanie" placeholder="np. co to jest usos?" />
+    
+    <button onclick="zapytajAPI()">Wyślij zapytanie</button>
+    
+    <div id="response">Odpowiedź pojawi się tutaj...</div>
+
+    <script>
+    async function zapytajAPI() {
+        const apiKey = document.getElementById('apiKey').value;
+        const prompt = document.getElementById('pytanie').value;
+        const resBox = document.getElementById('response');
+        
+        if (!apiKey || !prompt) {
+            resBox.innerText = "Podaj klucz API oraz pytanie!";
+            return;
+        }
+
+        resBox.innerText = "Ładowanie...";
+
+        try {
+            const res = await fetch('http://localhost:5000/api/zapytaj', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Api-Key': apiKey
+                },
+                body: JSON.stringify({ pytanie: prompt })
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok) {
+                resBox.innerText = "SUKCES! Odpowiedź z serwera:\n\n" + (data.odpowiedz || JSON.stringify(data, null, 2));
+            } else {
+                resBox.innerText = "BŁĄD " + res.status + ":\n" + data.error;
+            }
+        } catch(e) {
+            resBox.innerText = "BŁĄD SIECI:\n Upewnij się, że serwer Flask (app.py) działa oraz włączono CORS jeśli uruchamiasz to w przeglądarce bezpośrednio z pliku.\nSzczegóły: " + e;
+        }
+    }
+    </script>
+</body>
+</html>

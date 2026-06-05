@@ -17,7 +17,7 @@ def execute_ask_question(
     cache_get_fn: Callable[[str], Any],
     cache_set_fn: Callable[[str, Any], None],
     znajdz_rozszerzenie_fn: Callable[[str], str],
-    MAPA_ZNAKOW: dict[int, int | None],
+    MAPA_ZNAKOW: dict[int, Any],
     SYNONIMY: dict[str, str],
 ) -> dict:
     """

@@ -84,6 +84,23 @@ def inicjalizuj():
                     czas        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS api_keys (
+                    id             VARCHAR(36) PRIMARY KEY,
+                    key_id         VARCHAR(12) UNIQUE NOT NULL,
+                    key_hash       TEXT NOT NULL,
+                    created_by     TEXT,
+                    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    expires_at     TIMESTAMP,
+                    scopes         TEXT,
+                    quota          TEXT,
+                    rate_limit     TEXT,
+                    revoked        BOOLEAN DEFAULT FALSE,
+                    meta           TEXT,
+                    last_used_at   TIMESTAMP,
+                    usage_count    INTEGER DEFAULT 0
+                );
+            """)
             conn.commit()
             _LOG.info("Baza PostgreSQL zainicjalizowana pomyślnie")
     else:
@@ -104,6 +121,21 @@ def inicjalizuj():
                     ocena       INTEGER NOT NULL,
                     komentarz   TEXT,
                     czas        TEXT DEFAULT (datetime('now','localtime'))
+                );
+                CREATE TABLE IF NOT EXISTS api_keys (
+                    id             TEXT PRIMARY KEY,
+                    key_id         TEXT UNIQUE NOT NULL,
+                    key_hash       TEXT NOT NULL,
+                    created_by     TEXT,
+                    created_at     TEXT DEFAULT (datetime('now','localtime')),
+                    expires_at     TEXT,
+                    scopes         TEXT,
+                    quota          TEXT,
+                    rate_limit     TEXT,
+                    revoked        INTEGER DEFAULT 0,
+                    meta           TEXT,
+                    last_used_at   TEXT,
+                    usage_count    INTEGER DEFAULT 0
                 );
             """)
 

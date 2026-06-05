@@ -22,6 +22,7 @@ from core.settings import (
     FLASK_HOST,
     FLASK_PORT,
 )
+from api_gateway import api_keys_bp, init_api_key_middleware, api_key_service
 from core.bd import (
     inicjalizuj,
     pobierz_ostatnie_pytania,
@@ -91,6 +92,22 @@ def zaladuj_wyszukiwarke() -> None:
     container.initialize_components()
 
 
+# ── API Gateway Middleware & Routing ──────────────────────────────────────────
+app.register_blueprint(api_keys_bp)
+init_api_key_middleware(app, api_key_service, protected_routes=["/api/zapytaj"])
+
+
+@app.after_request
+def add_cors_headers(response):
+    if request.path.startswith("/api/"):
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type, X-Api-Key, Authorization"
+        )
+        response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+    return response
+
+
 # ── trasy ─────────────────────────────────────────────────────────────────────
 
 
@@ -113,7 +130,8 @@ def lab_simulate():
 
     dane = request.get_json(force=True) if request.is_json else {}
     max_combos = int(dane.get("max_combinations", 100))
-    questions_path = dane.get("questions_path", None)
+    qp = dane.get("questions_path", None)
+    questions_path = str(qp) if qp is not None else None
 
     try:
         result = run_grid_search(
@@ -179,13 +197,17 @@ def zapytaj():
 
     try:
         from domain.services.ask_question import execute_ask_question
+        from typing import cast
+        from core.wyszukiwarka import Wyszukiwarka
+
+        wyszukiwarka_obj = cast(Wyszukiwarka, container.wyszukiwarka)
 
         payload = execute_ask_question(
             pytanie=pytanie,
             filtr_zrodlo=filtr_zrodlo,
             kontekst_tytul=kontekst_tytul,
             kontekst_pytanie=kontekst_pytanie,
-            wyszukiwarka=container.wyszukiwarka,
+            wyszukiwarka=wyszukiwarka_obj,
             indeks_zdan=container.indeks_zdan,
             logger=logger,
             cache_get_fn=_cache_get,
@@ -205,6 +227,15 @@ def zapytaj():
         ), 500
 
     return jsonify(payload)
+
+
+@app.route("/api/zapytaj", methods=["POST", "OPTIONS"])
+def api_zapytaj():
+    """Wystawiony dla zewnętrznych integratorów poprzez API Gateway. Wymaga klucza."""
+    if request.method == "OPTIONS":
+        return "", 200
+    # Oddelegowanie do podstawowej logiki, uwierzytelnianie zapewnia middleware.
+    return zapytaj()
 
 
 @app.route("/admin/debug", methods=["GET"])

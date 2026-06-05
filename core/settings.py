@@ -20,11 +20,21 @@ if not APP_ENV:
 # AUTO: postgres gdy jest DATABASE_URL, inaczej sqlite.
 DB_BACKEND = os.getenv("DB_BACKEND", "auto").strip().lower()
 DATABASE_URL = os.getenv("DATABASE_URL")
+REDIS_URL = os.getenv("REDIS_URL")
 
 if DB_BACKEND == "auto":
     DB_BACKEND = "postgres" if DATABASE_URL else "sqlite"
 elif DB_BACKEND not in {"postgres", "sqlite"}:
     DB_BACKEND = "sqlite"
+
+if APP_ENV != "local" and DB_BACKEND == "sqlite":
+    import logging
+
+    logging.getLogger("asystent").warning(
+        "URUCHOMIONO BAZĘ SQLITE W ŚRODOWISKU PRODUKCYJNYM! "
+        "UWAGA: Może to prowadzić do utraty wygenerowanych kluczy po restarcie usługi. "
+        "Zaleca się dodanie DATABASE_URL (Supabase/Render Postgres)."
+    )
 
 DB_CONNECT_TIMEOUT = int(os.getenv("DB_CONNECT_TIMEOUT", "5"))
 DB_SSLMODE = os.getenv("DB_SSLMODE", "require")
