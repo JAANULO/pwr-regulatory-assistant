@@ -35,7 +35,7 @@ def pobierz_prompty() -> dict:
             with open(sciezka, "rb") as f:
                 _prompts_cache = tomllib.load(f)
         except Exception:
-            pass
+            pass  # nosec B110
 
     if _prompts_cache is None:
         _prompts_cache = {

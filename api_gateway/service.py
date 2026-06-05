@@ -95,16 +95,16 @@ class ApiKeyService:
                 scopes = json.loads(record["scopes"])
                 if endpoint_scope not in scopes and "all" not in scopes:
                     return False, "Scope not allowed", {}
-            except Exception:
-                pass
+            except Exception as e:
+                _LOG.warning(f"Blad parsowania scopes: {e}")
 
         # 5. Rate Limit
         rl = {}
         if record["rate_limit"]:
             try:
                 rl = json.loads(record["rate_limit"])
-            except Exception:
-                pass
+            except Exception as e:
+                _LOG.warning(f"Blad parsowania rate_limit: {e}")
 
         if "per_min" in rl:
             limit = int(rl["per_min"])

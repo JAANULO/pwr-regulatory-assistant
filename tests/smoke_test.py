@@ -3,7 +3,7 @@ smoke_test.py – prosty test integracyjny (Smoke Test).
 Sprawdza, czy aplikacja Flask uruchamia się poprawnie i czy endpoint /zapytaj odpowiada.
 """
 
-import subprocess
+import subprocess  # nosec B404
 import time
 import requests
 import sys
@@ -17,7 +17,7 @@ def run_test():
     print(f"--- Uruchamianie Smoke Testu dla: {app_path} ---", flush=True)
 
     # Uruchomienie aplikacji w tle
-    process = subprocess.Popen(
+    process = subprocess.Popen(  # nosec B603
         [sys.executable, "app.py"],
         cwd=base_dir,
         env={**os.environ, "FLASK_DEBUG": "0", "PORT": "5005"},
