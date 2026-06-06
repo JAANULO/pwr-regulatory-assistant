@@ -329,6 +329,18 @@ def admin():
     return render_template("admin.html", stats=pobierz_statystyki(), token=token)
 
 
+@app.route("/admin/keys")
+def admin_keys():
+    token = request.args.get("token", "")
+
+    if token != ADMIN_TOKEN:
+        return (
+            "Brak dostępu! Podaj prawidłowy token.",
+            403,
+        )
+    return render_template("admin_keys.html", token=token)
+
+
 @app.route("/admin/dodaj_synonim", methods=["POST"])
 def admin_dodaj_synonim():
     from domain.services.admin_stats import execute_admin_dodaj_synonim

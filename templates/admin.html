@@ -106,9 +106,14 @@
 
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <h1>Panel Administracyjny</h1>
-        <a href="/admin/eksport_csv?token={{ token }}"
-            style="padding: 10px 20px; background: var(--accent2); color: #000; font-weight: bold; text-decoration: none; border-radius: 6px; font-size: 14px;">▼
-            Pobierz pełen raport CSV</a>
+        <div>
+            <a href="/admin/keys?token={{ token }}"
+                style="padding: 10px 20px; background: var(--surface); color: var(--accent); font-weight: bold; text-decoration: none; border-radius: 6px; font-size: 14px; margin-right: 12px; border: 1px solid var(--accent);">
+                🔑 Zarządzaj Kluczami API</a>
+            <a href="/admin/eksport_csv?token={{ token }}"
+                style="padding: 10px 20px; background: var(--accent2); color: #000; font-weight: bold; text-decoration: none; border-radius: 6px; font-size: 14px;">▼
+                Pobierz pełen raport CSV</a>
+        </div>
     </div>
 
     <div class="grid">
@@ -226,9 +231,12 @@
         </table>
     </div>
 
+    <script id="stats-data" type="application/json">
+        {{ stats | tojson | safe }}
+    </script>
     <script>
-        // Dane pobrane prosto z bazy Flask-a (zserializowane do JSON)
-        const stats = {{ stats | tojson }};
+        // Dane pobrane z bezpiecznego bloku JSON
+        const stats = JSON.parse(document.getElementById('stats-data').textContent);
 
         Chart.defaults.color = '#606070';
         Chart.defaults.font.family = "'JetBrains Mono', monospace";

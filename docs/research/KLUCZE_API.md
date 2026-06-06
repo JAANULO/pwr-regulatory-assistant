@@ -159,19 +159,19 @@ Uwaga: Zdecydowanie zaleca się użycie proxy po stronie integratora. Ograniczen
 - Env vars wymagane: `API_KEYS_SECRET` (opcjonalny pepper), `REDIS_URL`, `DATABASE_URL`, `RATE_LIMIT_CONFIG`.
 - Docker: dodać usługi Redis do `docker-compose` / konfigurację produkcyjną.
 
-## 16. Harmonogram i checklist (przykładowy, 2 tygodnie)
+## 16. Harmonogram i checklist 
 
 Tydzień 1:
-- Dzień 1: Przegląd kodu (`app.py`), zaprojektowanie modelu danych i migracji.
-- Dzień 2-3: Implementacja CRUD admin + generowanie klucza (bez rate-limit).
-- Dzień 4: Implementacja middleware walidacji i testy manualne.
-- Dzień 5: Dodanie Redis rate-limiter i quota.
+- `DONE` : Przegląd kodu (`app.py`), zaprojektowanie modelu danych i migracji.
+- `DONE` : Implementacja CRUD admin + generowanie klucza (bez rate-limit).
+- `DONE` : Implementacja middleware walidacji i testy manualne.
+- `TODO` : Dodanie Redis rate-limiter i quota.
 
 Tydzień 2:
-- Dzień 6-7: UI administracyjne + dokumentacja i przykładowe embedy.
-- Dzień 8: Testy integracyjne i obciążeniowe.
-- Dzień 9: Monitoring, logi, konfiguracja env.
-- Dzień 10: Review i merge, przygotowanie instrukcji wdrożenia.
+- `TODO` : UI administracyjne + dokumentacja i przykładowe embedy.
+- `TODO` : Testy integracyjne i obciążeniowe.
+- `TODO` : Monitoring, logi, konfiguracja env.
+- `TODO` : Review i merge, przygotowanie instrukcji wdrożenia.
 
 ## 17. Ryzyka i mitigacje
 
@@ -181,11 +181,11 @@ Tydzień 2:
 
 ## 18. Kolejne kroki (konkretne zadania do implementacji)
 
-1. Przejrzeć `app.py` i punkty wejścia API, zaproponować miejsca integracji middleware.
-2. Dodać migrację DB dla tabeli `api_keys`.
-3. Implementować admin endpoints i generowanie kluczy.
-4. Dodać middleware walidacji i prosty rate-limiter Redis.
-5. Napisać dokumentację i przykładowy embed.
+1. `DONE` Przejrzeć `app.py` i punkty wejścia API, zaproponować miejsca integracji middleware.
+2. `DONE` Dodać migrację DB dla tabeli `api_keys`.
+3. `DONE` Implementować admin endpoints i generowanie kluczy.
+4. `TODO` Dodać middleware walidacji i prosty rate-limiter Redis. (Walidacja gotowa, brak Redis).
+5. `TODO` Napisać dokumentację i przykładowy embed.
 
 ---
 

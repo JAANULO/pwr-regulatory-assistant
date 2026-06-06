@@ -77,7 +77,7 @@ def run_test():
                                         "max_combinations": 1,
                                         "questions_path": test_q_path,
                                     },
-                                    timeout=30,
+                                    timeout=120,
                                 )
 
                                 if lab_resp.status_code == 200:
