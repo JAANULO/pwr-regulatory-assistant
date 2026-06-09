@@ -26,7 +26,7 @@ def init_api_key_middleware(app, api_key_service, protected_routes=None):
             api_key = api_key.split("ApiKey ")[1].strip()
 
         # Uzywamy nazwy endpointu z protected_routes jako scope
-        scope = "ask" if request.path == "/zapytaj" else "all"
+        scope = "ask" if request.path == "/api/zapytaj" else "all"
         is_valid, msg, meta = api_key_service.validate_key(api_key, scope)
 
         if not is_valid:
