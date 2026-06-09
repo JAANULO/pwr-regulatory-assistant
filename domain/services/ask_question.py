@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Any, Callable
 
 if TYPE_CHECKING:
     from core.wyszukiwarka import Wyszukiwarka
-    from core.indeks_zdan import IndeksZdan
 
 
 def execute_ask_question(
@@ -12,7 +11,6 @@ def execute_ask_question(
     kontekst_tytul: str | None,
     kontekst_pytanie: str | None,
     wyszukiwarka: "Wyszukiwarka",
-    indeks_zdan: "IndeksZdan | None",
     logger: logging.Logger,
     cache_get_fn: Callable[[str], Any],
     cache_set_fn: Callable[[str, Any], None],
@@ -30,9 +28,6 @@ def execute_ask_question(
     from core.wyszukiwarka import tokenizuj
     from core.intencje import (
         wykryj_intencje,
-        generuj_skrot,
-        wyciagnij_liczbe,
-        wyciagnij_termin,
     )
 
     cache_dozwolony = kontekst_tytul is None
@@ -219,50 +214,9 @@ def execute_ask_question(
             cache_set_fn(pytanie, payload)
         return payload
 
-    # 5. Ekstrakcja intencji i najlepszego zdania z Indeksu Zdaniowego
     intencja = wykryj_intencje(pytanie)
-    zdania_wyniki = (
-        indeks_zdan.szukaj(pytanie, n_wynikow=5) if indeks_zdan is not None else []
-    )
-
     najlepsze_zdanie = None
-    for zw in zdania_wyniki:
-        if zw["tytul"] != wynik.tytul or zw["podobienstwo"] < 0.1:
-            continue
-        if intencja == "LICZBA":
-            p_lower = pytanie.lower()
-            if "ile dni" in p_lower or "miedzy terminami" in p_lower:
-                if any(
-                    s in zw["zdanie"].lower()
-                    for s in ["odstęp", "odstep", "pięciodniowym", "pieciodniowym"]
-                ):
-                    najlepsze_zdanie = zw["zdanie"]
-                    break
-            else:
-                l = wyciagnij_liczbe(zw["zdanie"])
-                logger.debug(f"zdanie: {zw['zdanie'][:80]} → L:{l}")
-                if l:
-                    najlepsze_zdanie = zw["zdanie"]
-                    break
-        elif intencja == "TERMIN":
-            if wyciagnij_termin(zw["zdanie"]):
-                najlepsze_zdanie = zw["zdanie"]
-                break
-            p_lower = pytanie.lower()
-            if any(s in p_lower for s in ["ile dni", "miedzy terminami"]):
-                if any(
-                    s in zw["zdanie"].lower()
-                    for s in ["odstęp", "odstep", "pięciodniowym", "pieciodniowym"]
-                ):
-                    najlepsze_zdanie = zw["zdanie"]
-                    break
-        else:
-            najlepsze_zdanie = zw["zdanie"]
-            break
-
     skrot = None
-    if najlepsze_zdanie:
-        skrot = generuj_skrot(intencja, pytanie, najlepsze_zdanie)
 
     if intencja in ("SKUTEK", "TAK_NIE") and najlepsze_zdanie:
         odp = formatuj_odpowiedz(

@@ -5,7 +5,6 @@ from core.settings import LOG_LEVEL
 
 if TYPE_CHECKING:
     from core.wyszukiwarka import Wyszukiwarka
-    from core.indeks_zdan import IndeksZdan
 
 
 class Container:
@@ -17,7 +16,6 @@ class Container:
         self.log_file = log_file
 
         self.wyszukiwarka: "Wyszukiwarka | None" = None
-        self.indeks_zdan: "IndeksZdan | None" = None
         self.logger: logging.Logger = self._setup_logger()
 
     def _setup_logger(self) -> logging.Logger:
@@ -38,17 +36,10 @@ class Container:
         logging.getLogger("werkzeug").setLevel(logging.WARNING)
         return logger
 
-    def initialize_components(self) -> None:
-        """Inicjalizuje wyszukiwarkę i indeks zdań."""
-        from infrastructure.knowledge_loader import (
-            utworz_wyszukiwarke,
-            utworz_indeks_zdan,
-        )
+    def get_wyszukiwarka(self) -> "Wyszukiwarka":
+        from infrastructure.knowledge_loader import utworz_wyszukiwarke
 
         if not self.wyszukiwarka:
             self.wyszukiwarka = utworz_wyszukiwarke(self.data_dir)
             self.logger.info("Wyszukiwarka zainicjalizowana (DI)")
-
-        if not self.indeks_zdan:
-            self.indeks_zdan = utworz_indeks_zdan(self.data_dir)
-            self.logger.info("Indeks zdań zainicjalizowany (DI)")
+        return self.wyszukiwarka

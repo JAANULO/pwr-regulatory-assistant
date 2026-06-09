@@ -2,37 +2,44 @@
     "ile razy mozna podejsc do egzaminu": {
         "oczekiwany": "Egzamin",
         "otrzymany": "§ 18. Egzaminy",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "4."
     },
     "co zrobic jak nie zdam egzaminu": {
         "oczekiwany": "Egzamin",
         "otrzymany": "§ 18. Egzaminy",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "4."
     },
     "czy moge zdawac egzamin przed sesja": {
         "oczekiwany": "Egzamin",
         "otrzymany": "§ 18. Egzaminy",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "6."
     },
     "ile dni miedzy pierwszym a drugim terminem": {
         "oczekiwany": "Egzamin",
         "otrzymany": "§ 18. Egzaminy",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "3."
     },
     "kto moze uniewaznic egzamin": {
         "oczekiwany": "Egzamin",
         "otrzymany": "§ 18. Egzaminy",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "11."
     },
     "czy moge poprawic egzamin": {
         "oczekiwany": "Egzamin",
         "otrzymany": "§ 18. Egzaminy",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "4."
     },
     "kiedy jest poprawka egzaminu": {
         "oczekiwany": "Egzamin",
         "otrzymany": "§ 18. Egzaminy",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "3."
     },
     "egzamni": {
         "oczekiwany": "Egzamin",
@@ -42,102 +49,122 @@
     "co to jest egzamin komisyjny": {
         "oczekiwany": "komisyjny",
         "otrzymany": "§ 21. Egzamin komisyjny",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "ile mam czasu na wniosek komisyjny": {
         "oczekiwany": "komisyjny",
         "otrzymany": "§ 21. Egzamin komisyjny",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "kto jest w komisji egzaminacyjnej": {
         "oczekiwany": "komisyjny",
         "otrzymany": "§ 21. Egzamin komisyjny",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "3."
     },
     "czy moge miec obserwatora na egzaminie": {
         "oczekiwany": "komisyjny",
         "otrzymany": "§ 21. Egzamin komisyjny",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "3."
     },
     "co grozi za nieobecnosci": {
         "oczekiwany": "Realizacja",
         "otrzymany": "§ 16. Realizacja zajęć",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "8."
     },
     "co grozi jak nie chodze na zajecia": {
         "oczekiwany": "Realizacja",
         "otrzymany": "§ 16. Realizacja zajęć",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "8."
     },
     "ile nieobecnosci mozna miec": {
         "oczekiwany": "Realizacja",
         "otrzymany": "§ 16. Realizacja zajęć",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "4."
     },
     "mam 3 nieobecnosci czy to duzo": {
         "oczekiwany": "Realizacja",
         "otrzymany": "§ 16. Realizacja zajęć",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "4."
     },
     "jak usprawiedliwic nieobecnosc": {
         "oczekiwany": "Realizacja",
         "otrzymany": "§ 16. Realizacja zajęć",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "9."
     },
     "kto ustala limit nieobecnosci": {
         "oczekiwany": "Realizacja",
         "otrzymany": "§ 16. Realizacja zajęć",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "4."
     },
     "jakie sa oceny w regulaminie": {
         "oczekiwany": "Skala",
         "otrzymany": "§ 19. Skala ocen",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "ile procent na piatke": {
         "oczekiwany": "Skala",
         "otrzymany": "§ 19. Skala ocen",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "ile procent na czworke": {
         "oczekiwany": "Skala",
         "otrzymany": "§ 19. Skala ocen",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "ile procent na trojke": {
         "oczekiwany": "Skala",
         "otrzymany": "§ 19. Skala ocen",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "ile procent na cztery i pol": {
         "oczekiwany": "Skala",
         "otrzymany": "§ 19. Skala ocen",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "jaka jest najnizsza ocena zaliczajaca": {
         "oczekiwany": "Skala",
         "otrzymany": "§ 19. Skala ocen",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "kiedy mozna wziac urlop dziekanski": {
         "oczekiwany": "Urlop",
         "otrzymany": "§ 27. Urlopy",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "7."
     },
     "urlop zdrowotny jak dostac": {
         "oczekiwany": "Urlop",
         "otrzymany": "§ 27. Urlopy",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "2."
     },
     "czy moge wziac urlop bo jestem w ciazy": {
         "oczekiwany": "Urlop",
         "otrzymany": "§ 27. Urlopy",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "3."
     },
     "ile urlopow dziekanskich moge wziac": {
         "oczekiwany": "Urlop",
         "otrzymany": "§ 27. Urlopy",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "10."
     },
     "czy podczas urlopu mam prawa studenta": {
         "oczekiwany": "Urlop",
@@ -152,142 +179,170 @@
     "kiedy mozna zostac skreslanym": {
         "oczekiwany": "Skreśl",
         "otrzymany": "§ 33. Skreślenia z listy studentów",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "2."
     },
     "jak zlozyc rezygnacje ze studiow": {
         "oczekiwany": "Skreśl",
         "otrzymany": "§ 33. Skreślenia z listy studentów",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "co grozi za niezapisanie sie na zajecia": {
         "oczekiwany": "Skreśl",
         "otrzymany": "§ 33. Skreślenia z listy studentów",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "jak wznowic studia po skreslanym": {
         "oczekiwany": "Wznow",
         "otrzymany": "§ 34. Wznowienia studiów, przywrócenie praw studenta",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "ile razy mozna wznowic studia": {
         "oczekiwany": "Wznow",
         "otrzymany": "§ 34. Wznowienia studiów, przywrócenie praw studenta",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "3."
     },
     "ile mam czasu na wznowienie studiow": {
         "oczekiwany": "Wznow",
         "otrzymany": "§ 34. Wznowienia studiów, przywrócenie praw studenta",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "2."
     },
     "jak wznowic studia": {
         "oczekiwany": "Wznow",
         "otrzymany": "§ 34. Wznowienia studiów, przywrócenie praw studenta",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "co to jest powtarzanie przedmiotu": {
         "oczekiwany": "Powtarz",
         "otrzymany": "§ 22. Powtarzanie przedmiotu",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "2."
     },
     "ile razy mozna powtarzac przedmiot": {
         "oczekiwany": "Powtarz",
         "otrzymany": "§ 22. Powtarzanie przedmiotu",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "5."
     },
     "czy powtarzanie jest platne": {
         "oczekiwany": "Powtarz",
         "otrzymany": "§ 12. Odpłatność za usługi edukacyjne",
-        "sukces": false
+        "sukces": false,
+        "oczekiwany_punkt": "1."
     },
     "kiedy mozna powtarzac semestr": {
         "oczekiwany": "Powtarz",
         "otrzymany": "§ 22. Powtarzanie przedmiotu",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "jak wyglada praca dyplomowa": {
         "oczekiwany": "Dyplom",
         "otrzymany": "§ 35. Praca dyplomowa",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "ile osob moze pisac wspolna prace": {
         "oczekiwany": "Dyplom",
         "otrzymany": "§ 35. Praca dyplomowa",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "6."
     },
     "czy praca jest sprawdzana antyplagiatem": {
         "oczekiwany": "Dyplom",
         "otrzymany": "§ 35. Praca dyplomowa",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "11."
     },
     "w jakim jezyku pisze sie prace dyplomowa": {
         "oczekiwany": "Dyplom",
         "otrzymany": "§ 35. Praca dyplomowa",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "7."
     },
     "kto to jest promotor": {
         "oczekiwany": "Dyplom",
         "otrzymany": "§ 35. Praca dyplomowa",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "14."
     },
     "jak dlugo trwa semestr": {
         "oczekiwany": "Organ",
         "otrzymany": "§ 11. Organizacja roku akademickiego",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "ile tygodni ma semestr": {
         "oczekiwany": "Organ",
         "otrzymany": "§ 11. Organizacja roku akademickiego",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "4."
     },
     "kiedy konczy sie sesja letnia": {
         "oczekiwany": "Organ",
         "otrzymany": "§ 11. Organizacja roku akademickiego",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "7."
     },
     "ile dni trwa sesja egzaminacyjna": {
         "oczekiwany": "Organ",
         "otrzymany": "§ 11. Organizacja roku akademickiego",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "6."
     },
     "jak oblicza sie srednia ocen": {
         "oczekiwany": "Skala ocen",
         "otrzymany": "§ 19. Skala ocen",
-        "sukces": true
+        "sukces": false,
+        "oczekiwany_punkt": "5."
     },
     "kiedy dostane wyróznienie": {
         "oczekiwany": "Oceny za",
         "otrzymany": "§ 38. Oceny za studia, ostateczny wynik studiów",
-        "sukces": true
+        "sukces": false,
+        "oczekiwany_punkt": "6."
     },
     "jak liczona jest ocena koncowa studiow": {
         "oczekiwany": "Oceny za",
         "otrzymany": "§ 38. Oceny za studia, ostateczny wynik studiów",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "ile wazy ocena z pracy dyplomowej": {
         "oczekiwany": "Oceny za",
         "otrzymany": "§ 38. Oceny za studia, ostateczny wynik studiów",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "jak policzyc koncowy wynik studiow": {
         "oczekiwany": "Oceny za",
         "otrzymany": "§ 38. Oceny za studia, ostateczny wynik studiów",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "czy ocena pracy dyplomowej liczy sie do wyniku": {
         "oczekiwany": "Oceny za",
         "otrzymany": "§ 38. Oceny za studia, ostateczny wynik studiów",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "jak wyglada praktyka zawodowa": {
         "oczekiwany": "Praktyk",
         "otrzymany": "§ 23. Praktyki zawodowe",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "czy moge zaliczyc praktyke bez odbywania": {
         "oczekiwany": "Praktyk",
         "otrzymany": "§ 23. Praktyki zawodowe",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "6."
     },
     "ak liczona jest ocena koncowa studiow": {
         "oczekiwany": "Oceny za",
@@ -327,17 +382,20 @@
     "kto to jest absolwent?": {
         "oczekiwany": "Słownik",
         "otrzymany": "§ 2. Słownik pojęć",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1)"
     },
     "co oznacza roznice programowe?": {
         "oczekiwany": "Słownik",
         "otrzymany": "§ 2. Słownik pojęć",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "19)"
     },
     "co to sa punkty ects?": {
         "oczekiwany": "Słownik",
         "otrzymany": "§ 2. Słownik pojęć",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "17)"
     },
     "jaka jest skala ocen": {
         "oczekiwany": "Skala",
@@ -366,7 +424,7 @@
     },
     "czy moge przejsc na kolejny semestr z dlugiem ects": {
         "oczekiwany": "Deficyt",
-        "otrzymany": "§ 11. Organizacja roku akademickiego",
+        "otrzymany": "§ 26. Zaliczenie etapu studiów",
         "sukces": false
     },
     "kiedy jest wpis na semestr": {
@@ -517,7 +575,8 @@
     "jakie sa prawa studenta": {
         "oczekiwany": "Prawa studenta",
         "otrzymany": "§ 6. Prawa studenta",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "co student moze robic na uczelni": {
         "oczekiwany": "Prawa studenta",
@@ -527,7 +586,8 @@
     "jakie sa obowiazki studenta": {
         "oczekiwany": "Obowiązki studenta",
         "otrzymany": "§ 7. Obowiązki studenta",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "co grozi za niewywiazywanie sie z obowiazkow": {
         "oczekiwany": "Obowiązki studenta",
@@ -542,7 +602,8 @@
     "ile etapow ma studia inzynierskie": {
         "oczekiwany": "Program studiów",
         "otrzymany": "§ 3. Kierunki, poziomy, profile i formy studiów",
-        "sukces": false
+        "sukces": false,
+        "oczekiwany_punkt": "6)"
     },
     "czym jest plan studiow": {
         "oczekiwany": "Program studiów",
@@ -557,7 +618,8 @@
     "co to jest punkt ects": {
         "oczekiwany": "Punkty ECTS",
         "otrzymany": "§ 10. Punkty ECTS",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1."
     },
     "ile ects mam zrobic zeby zdac rok": {
         "oczekiwany": "Punkty ECTS",
@@ -697,17 +759,20 @@
     "co to jest tok studiow": {
         "oczekiwany": "Słownik",
         "otrzymany": "§ 2. Słownik pojęć",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "24)"
     },
     "co oznacza pojecie student w regulaminie": {
         "oczekiwany": "Słownik",
         "otrzymany": "§ 2. Słownik pojęć",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "21)"
     },
     "czym jest absolwent w rozumieniu regulaminu": {
         "oczekiwany": "Słownik",
         "otrzymany": "§ 2. Słownik pojęć",
-        "sukces": true
+        "sukces": true,
+        "oczekiwany_punkt": "1)"
     },
     "co to jest edukacja cl na pwr": {
         "oczekiwany": "Systemy komunikacji",

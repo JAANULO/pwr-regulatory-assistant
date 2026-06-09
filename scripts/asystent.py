@@ -20,7 +20,7 @@ from infrastructure.knowledge_loader import utworz_wyszukiwarke
 
 
 # Ścieżki zależne od v2_root
-PLIK_BAZY = os.path.join(v2_root, "data", "baza_wiedzy.json")
+PLIK_BAZY = os.path.join(v2_root, "data", "kb", "baza_wiedzy.json")
 PLIK_LOG = os.path.join(v2_root, "logs", "log.txt")
 PROG_PEWNOSCI = 0.15
 

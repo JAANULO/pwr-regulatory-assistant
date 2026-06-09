@@ -32,14 +32,24 @@ BASELINE_FILE = os.path.join(os.path.dirname(__file__), "baseline.json")
 def ran_tests(w):
     """Uruchamia testy i zbiera wyniki w formacie słownika"""
     results = {}
-    for pytanie, oczekiwany in TESTY:
+    for pytanie, oczekiwany, ocz_punkt in TESTY:
         wyniki = w.szukaj(pytanie, n_wynikow=1)
         tytul = wyniki[0].tytul if wyniki else "BRAK"
-        results[pytanie] = {
+        tresc = wyniki[0].tresc if wyniki else ""
+
+        sukces = (oczekiwany.lower() in tytul.lower()) if wyniki else False
+        if sukces and ocz_punkt:
+            sukces = ocz_punkt.lower() in tresc.lower()
+
+        res_dict = {
             "oczekiwany": oczekiwany,
             "otrzymany": tytul,
-            "sukces": (oczekiwany.lower() in tytul.lower()) if wyniki else False,
+            "sukces": sukces,
         }
+        if ocz_punkt:
+            res_dict["oczekiwany_punkt"] = ocz_punkt
+
+        results[pytanie] = res_dict
     return results
 
 

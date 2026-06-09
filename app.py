@@ -89,7 +89,7 @@ logger = container.logger
 
 
 def zaladuj_wyszukiwarke() -> None:
-    container.initialize_components()
+    container.get_wyszukiwarka()
 
 
 # ── API Gateway Middleware & Routing ──────────────────────────────────────────
@@ -208,7 +208,6 @@ def zapytaj():
             kontekst_tytul=kontekst_tytul,
             kontekst_pytanie=kontekst_pytanie,
             wyszukiwarka=wyszukiwarka_obj,
-            indeks_zdan=container.indeks_zdan,
             logger=logger,
             cache_get_fn=_cache_get,
             cache_set_fn=_cache_set,

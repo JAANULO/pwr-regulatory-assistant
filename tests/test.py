@@ -36,9 +36,9 @@ _SEKCJE = [
 def wczytaj_testy(
     sciezka: pathlib.Path = TESTY_TOML,
     sekcje: list[str] | None = None,
-) -> list[tuple[str, str]]:
+) -> list[tuple[str, str, str | None]]:
     """
-    Wczytuje pary (pytanie, oczekiwany) z testy.toml.
+    Wczytuje pary (pytanie, oczekiwany, oczekiwany_punkt) z testy.toml.
     Parametr `sekcje` pozwala wybrać konkretne grupy testów.
     Domyślnie wczytuje wszystkie sekcje z _SEKCJE.
     """
@@ -46,10 +46,12 @@ def wczytaj_testy(
         dane = tomllib.load(f)
 
     wybrane = sekcje if sekcje is not None else _SEKCJE
-    testy: list[tuple[str, str]] = []
+    testy: list[tuple[str, str, str | None]] = []
     for sekcja in wybrane:
         for wpis in dane.get(sekcja, []):
-            testy.append((wpis["pytanie"], wpis["oczekiwany"]))
+            testy.append(
+                (wpis["pytanie"], wpis["oczekiwany"], wpis.get("oczekiwany_punkt"))
+            )
     return testy
 
 
@@ -112,7 +114,7 @@ def main():
 
     print(f"Rozpoczynam testy ({len(testy)} przypadkow)...")
 
-    for pytanie, oczekiwany_fragment in testy:
+    for pytanie, oczekiwany_fragment, _ in testy:
         wyniki = w.szukaj(pytanie, n_wynikow=1, virtual_params=virtual_params)
         if not wyniki:
             bledy.append((pytanie, oczekiwany_fragment, "BRAK WYNIKOW"))

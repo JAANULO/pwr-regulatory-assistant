@@ -11,7 +11,7 @@ import re
 import pdfplumber
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(BASE_DIR, "..", "data")
+DATA_DIR = os.path.join(BASE_DIR, "..", "data", "kb")
 PLIK_PDF = os.path.join(DATA_DIR, "regulamin.pdf")
 PLIK_WYJSCIOWY = os.path.join(DATA_DIR, "baza_wiedzy.json")
 
@@ -61,7 +61,50 @@ def podziel_na_fragmenty(tekst):
             continue
 
         tresc = re.sub(r"\s+", " ", " ".join(linie).strip())
+
+        # Zapisz pełny paragraf
         fragmenty.append({"tytul": tytul, "tresc": tresc})
+
+        # Próba podziału wewnętrznego na ustępy i punkty
+        # Wzorzec szuka 1. (z dużą literą po spacji) lub 1) (z dowolną literą)
+        # Unika dopasowania samego paragrafu np. "§ 2."
+        wzorzec_wewnetrzny = (
+            r"(?<=\s)(?<!§\s)(?=\d+\.\s+[A-ZĄĆĘŁŃÓŚŹŻ])|(?<=\s)(?=\d+\)\s+)"
+        )
+        podczesci = re.split(wzorzec_wewnetrzny, tresc)
+
+        if len(podczesci) > 1:
+            tekst_wstepny = podczesci[0].strip()
+
+            # Czasem wstęp to tylko powtórzenie tytułu, jeśli jest bardzo krótki, pomijamy go jako wstęp
+            if len(tekst_wstepny) < len(tytul) + 5:
+                tekst_wstepny = ""
+            elif tekst_wstepny.startswith(tytul):
+                # Usunięcie tytułu z tekstu wstępnego, żeby nie duplikować w podpunktach
+                tekst_wstepny = tekst_wstepny[len(tytul) :].strip()
+
+            for p_czesc in podczesci[1:]:
+                p_czesc = p_czesc.strip()
+                if not p_czesc:
+                    continue
+
+                # Wyciągamy identyfikator (np. "1." lub "1)")
+                match = re.match(r"^(\d+\.)|(\d+\))", p_czesc)
+                if match:
+                    id_czesci = match.group(0)
+                    oznaczenie = "ust." if id_czesci.endswith(".") else "pkt"
+                    nr = id_czesci.strip(".)")
+                    nowy_tytul = f"{tytul} - {oznaczenie} {nr}"
+                else:
+                    nowy_tytul = f"{tytul} - fragment"
+
+                # Budujemy nową treść z doklejonym wstępem
+                nowa_tresc = f"{tekst_wstepny} {p_czesc}".strip()
+                # Zabezpieczenie przed dublowaniem tytułu na początku nowej treści (częsty przypadek)
+                if not nowa_tresc.startswith(tytul):
+                    nowa_tresc = f"{tytul} {nowa_tresc}".strip()
+
+                fragmenty.append({"tytul": nowy_tytul, "tresc": nowa_tresc})
 
     return fragmenty
 
