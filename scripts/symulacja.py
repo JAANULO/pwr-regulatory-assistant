@@ -352,18 +352,22 @@ def run_grid_search(
 
     # Lazy sampling: jeśli za dużo – losujemy indeksy, nie ładujemy wszystkiego
     if total_combos > max_combinations:
-        random.seed(42)  # nosec B311
+        random.seed(42)
 
         # 1. Zbieramy możliwe opcje dla każdego parametru
-        param_options = {}
+        param_options: dict[str, list[Any]] = {}
         for key, val in flat_cfg.items():
             if isinstance(val, int):
-                step = max(1, abs(val) // 5)
-                param_options[key] = sorted({val - step, val, val + step})
+                step_int = max(1, abs(val) // 5)
+                param_options[key] = sorted({val - step_int, val, val + step_int})
             elif isinstance(val, float):
-                step = max(0.05, abs(val) * 0.2)
+                step_float = max(0.05, abs(val) * 0.2)
                 param_options[key] = sorted(
-                    {round(val - step, 3), round(val, 3), round(val + step, 3)}
+                    {
+                        round(val - step_float, 3),
+                        round(val, 3),
+                        round(val + step_float, 3),
+                    }
                 )
 
         # 2. Losujemy kombinacje bezpośrednio (O(N) względem max_combinations, a nie total_combos)
