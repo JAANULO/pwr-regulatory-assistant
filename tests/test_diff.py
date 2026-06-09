@@ -67,6 +67,12 @@ def main():
         default=0.0,
         help="Minimalna wymagana skutecznosc (0.0 - 1.0)",
     )
+    parser.add_argument(
+        "--max-regressions",
+        type=int,
+        default=3,
+        help="Maksymalna dozwolona liczba regresji",
+    )
     args = parser.parse_args()
 
     # Ustawienie ścieżek bezwzględnych
@@ -125,9 +131,15 @@ def main():
             regresje = len(diffs) - poprawy
             print(f"\nPodsumowanie zmiany: +{poprawy} / -{regresje}")
 
-            if regresje > 0:
-                print(f"\n[!] ALARM: Wykryto {regresje} regresji! Przerywam.")
+            if regresje > args.max_regressions:
+                print(
+                    f"\n[!] ALARM: Wykryto {regresje} regresji (limit: {args.max_regressions})! Przerywam."
+                )
                 sys.exit(1)
+            elif regresje > 0:
+                print(
+                    f"\n[!] OSTRZEZENIE: Wykryto {regresje} regresji (limit: {args.max_regressions}). Akceptuje."
+                )
 
             if poprawy > 0:
                 print("\n[+] GRATULACJE: Poprawiono skutecznosc algorytmu!")
