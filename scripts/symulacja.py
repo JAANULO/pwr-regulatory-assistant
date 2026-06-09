@@ -49,9 +49,9 @@ _SEKCJE = [
 def load_questions(
     path: str | None = None,
     sekcje: list[str] | None = None,
-) -> list[tuple[str, str]]:
+) -> list[tuple[str, str, str]]:
     """
-    Wczytuje pary (pytanie, oczekiwany) z testy.toml.
+    Wczytuje trójki (pytanie, oczekiwany, oczekiwany_punkt) z testy.toml.
 
     Jeśli path podano → wczytuje z zewnętrznego pliku TOML lub TXT.
       - TOML: obsługuje ten sam format co testy.toml (sekcje z [[...]])
@@ -68,10 +68,16 @@ def load_questions(
             with p.open("rb") as f:
                 dane = tomllib.load(f)
             wybrane = sekcje if sekcje is not None else _SEKCJE
-            pary: list[tuple[str, str]] = []
+            pary: list[tuple[str, str, str]] = []
             for sekcja in wybrane:
                 for wpis in dane.get(sekcja, []):
-                    pary.append((wpis["pytanie"], wpis.get("oczekiwany", "")))
+                    pary.append(
+                        (
+                            wpis["pytanie"],
+                            wpis.get("oczekiwany", ""),
+                            wpis.get("oczekiwany_punkt", ""),
+                        )
+                    )
             return pary
         else:
             # Tryb TXT (wsteczna kompatybilność): brak info o oczekiwanym paragrafie
@@ -80,7 +86,7 @@ def load_questions(
                 for l in p.read_text(encoding="utf-8").splitlines()
                 if l.strip()
             ]
-            return [(q, "") for q in linie]
+            return [(q, "", "") for q in linie]
 
     # Domyślnie: wczytaj z testy.toml
     with TESTY_TOML.open("rb") as f:
@@ -89,7 +95,13 @@ def load_questions(
     pary = []
     for sekcja in wybrane:
         for wpis in dane.get(sekcja, []):
-            pary.append((wpis["pytanie"], wpis.get("oczekiwany", "")))
+            pary.append(
+                (
+                    wpis["pytanie"],
+                    wpis.get("oczekiwany", ""),
+                    wpis.get("oczekiwany_punkt", ""),
+                )
+            )
     return pary
 
 
@@ -237,7 +249,7 @@ def _build_virtual_params(flat_combo: dict[str, Any]) -> dict[str, Any]:
 
 def _evaluate_config(
     wyszukiwarka: Any,
-    questions: list[tuple[str, str]],
+    questions: list[tuple[str, str, str]],
     flat_combo: dict[str, Any],
 ) -> dict[str, Any]:
     """
@@ -253,9 +265,9 @@ def _evaluate_config(
     hits_confidence = 0  # wyniki z conf > 0
     hits_accuracy = 0  # trafienia w właściwy paragraf
 
-    has_expected = any(oczekiwany for _, oczekiwany in questions)
+    has_expected = any(oczekiwany for _, oczekiwany, _ in questions)
 
-    for pytanie, oczekiwany in questions:
+    for pytanie, oczekiwany, ocz_punkt in questions:
         wyniki = wyszukiwarka.szukaj(
             pytanie, n_wynikow=1, virtual_params=vp if vp else None
         )
@@ -265,14 +277,25 @@ def _evaluate_config(
             min_conf = min(min_conf, conf)
             if conf > 0:
                 hits_confidence += 1
-            if oczekiwany and oczekiwany.lower() in wyniki[0].tytul.lower():
+
+            tytul = wyniki[0].tytul
+            tresc = wyniki[0].tresc
+
+            sukces = False
+            if oczekiwany and oczekiwany.lower() in tytul.lower():
+                sukces = True
+
+            if sukces and ocz_punkt:
+                sukces = ocz_punkt.lower() in tresc.lower()
+
+            if sukces:
                 hits_accuracy += 1
         else:
             # Brak wyników → conf = 0, min_conf nie rośnie
             min_conf = min(min_conf, 0.0)
 
     n = max(len(questions), 1)
-    n_with_expected = max(sum(1 for _, o in questions if o), 1)
+    n_with_expected = max(sum(1 for _, o, _ in questions if o), 1)
 
     return {
         "accuracy": round(hits_accuracy / n_with_expected, 4) if has_expected else None,
@@ -304,7 +327,7 @@ def run_grid_search(
 
     # --- pytania ---
     questions = load_questions(questions_path, sekcje=sekcje)
-    has_expected = any(oczekiwany for _, oczekiwany in questions)
+    has_expected = any(oczekiwany for _, oczekiwany, _ in questions)
     print(f"Pytań do testowania: {len(questions)}")
     print(
         f"Metryka główna: {'accuracy (trafność paragrafu)' if has_expected else 'avg_confidence'}"
@@ -330,16 +353,26 @@ def run_grid_search(
     # Lazy sampling: jeśli za dużo – losujemy indeksy, nie ładujemy wszystkiego
     if total_combos > max_combinations:
         random.seed(42)
-        chosen_indices: set[int] = set()
-        while len(chosen_indices) < max_combinations:
-            chosen_indices.add(random.randint(0, total_combos - 1))  # nosec B311
 
-        combos = [
-            combo
-            for idx, combo in enumerate(_generate_param_grid(flat_cfg))
-            if idx in chosen_indices
-        ]
-        print(f"Losowo wybrano {max_combinations} kombinacji")
+        # 1. Zbieramy możliwe opcje dla każdego parametru
+        param_options = {}
+        for key, val in flat_cfg.items():
+            if isinstance(val, int):
+                step = max(1, abs(val) // 5)
+                param_options[key] = sorted({val - step, val, val + step})
+            elif isinstance(val, float):
+                step = max(0.05, abs(val) * 0.2)
+                param_options[key] = sorted(
+                    {round(val - step, 3), round(val, 3), round(val + step, 3)}
+                )
+
+        # 2. Losujemy kombinacje bezpośrednio (O(N) względem max_combinations, a nie total_combos)
+        combos = []
+        for _ in range(max_combinations):
+            combo = {k: random.choice(opts) for k, opts in param_options.items()}
+            combos.append(combo)
+
+        print(f"Losowo wygenerowano {max_combinations} kombinacji")
     else:
         combos = list(_generate_param_grid(flat_cfg))
 
@@ -378,7 +411,8 @@ def run_grid_search(
             print(f"  [{idx + 1}/{len(combos)}] best_{metric_label}={best_score:.4f}")
 
     # --- zapis optymalnej konfiguracji ---
-    optimal_path = base_dir / "data" / "config" / "optimal_config.json"
+    optimal_path = base_dir / "data" / "config" / "optimal" / "optimal_config.json"
+    optimal_path.parent.mkdir(parents=True, exist_ok=True)
     output = {
         "best_config": best_combo,
         "metrics": best_metrics,

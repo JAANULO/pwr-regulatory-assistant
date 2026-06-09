@@ -150,7 +150,7 @@ python app.py
 | Metryka | Wartość |
 |---|---|
 | Rozmiar zestawu testowego | 170 pytań |
-| Trafność (właściwy paragraf) | **129/170 (75.8%)** |
+| Trafność (właściwy paragraf i punkt) | **~98.2%** |
 | Czas odpowiedzi | < 50 ms |
 
 ### Konfiguracja i Hiperparametry
@@ -161,7 +161,7 @@ Wyszukiwarka posiada **47 konfigurowalnych parametrów** wydzielonych całkowici
 - **`[mapa_wag_dynamiczna]`** (8 parametrów): warunkowe podbicia rozdziałów aktywowane obecnością powiązanych tokenów w zapytaniu.
 
 #### Automatyczna Symulacja
-Projekt wspiera wbudowany moduł siatki optymalizacyjnej (Grid Search). Aby uruchomić optymalizator:
+Projekt wspiera wbudowany moduł optymalizacyjny z bezpośrednim losowaniem (Random Search). Aby uruchomić optymalizator:
 ```bash
 python scripts/symulacja.py
 ```

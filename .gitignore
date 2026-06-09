@@ -33,3 +33,4 @@ Thumbs.db
 # --- Pliki Tymczasowe i Szkice ---
 tests/debug_*.py
 scratch/
+data/config/optimal/

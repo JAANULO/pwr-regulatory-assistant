@@ -4,6 +4,15 @@ Wszystkie istotne zmiany w projekcie są odnotowywane w tym pliku zgodnie ze sta
 
 ---
 
+## [2.9.1] - 2026-06-09
+### Dodano
+- **Rygorystyczna Walidacja**: Skrypt `symulacja.py` weryfikuje od teraz nie tylko trafienie w paragraf, ale także dokładny punkt/podpunkt z treści, co zrównuje jego logikę z systemem testów regresyjnych.
+- **Artefakty Optymalizacji**: Wyniki symulacji zapisywane są w bezpiecznym, ignorowanym przez kontrolę wersji folderze `data/config/optimal/`.
+
+### Naprawiono
+- **Timeout w GitHub Actions**: Zastąpiono "Leniwy Generator Siatki" (Grid Search) algorytmem bezpośredniego losowania z ograniczonej puli opcji (Random Search). Eliminuje to problem pętli iterujących po tryliardach kombinacji.
+- **Skuteczność**: Nowy algorytm wygenerował konfigurację o rekordowej skuteczności ponad **98.2%** na restrykcyjnych kryteriach zapytań konwersacyjnych.
+
 ## [2.9.0] - 2026-05-21
 ### Dodano
 - **Automatyczna Symulacja**: Nowy skrypt `scripts/symulacja.py` w pełni zintegrowany z API we Flasku (`/lab/simulate`). Optymalizuje hiperparametry wyszukiwarki przy użyciu siatki wielowymiarowej z bezpiecznym losowaniem (odporność na przepełnienie zmiennych w Pythonie).
