@@ -352,7 +352,7 @@ def run_grid_search(
 
     # Lazy sampling: jeśli za dużo – losujemy indeksy, nie ładujemy wszystkiego
     if total_combos > max_combinations:
-        random.seed(42)
+        random.seed(42)  # nosec B311
 
         # 1. Zbieramy możliwe opcje dla każdego parametru
         param_options = {}
@@ -369,7 +369,7 @@ def run_grid_search(
         # 2. Losujemy kombinacje bezpośrednio (O(N) względem max_combinations, a nie total_combos)
         combos = []
         for _ in range(max_combinations):
-            combo = {k: random.choice(opts) for k, opts in param_options.items()}
+            combo = {k: random.choice(opts) for k, opts in param_options.items()}  # nosec B311
             combos.append(combo)
 
         print(f"Losowo wygenerowano {max_combinations} kombinacji")
