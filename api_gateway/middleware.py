@@ -24,6 +24,8 @@ def init_api_key_middleware(app, api_key_service, protected_routes=None):
 
         if api_key.startswith("ApiKey "):
             api_key = api_key.split("ApiKey ")[1].strip()
+        elif api_key.startswith("Bearer "):
+            api_key = api_key.split("Bearer ")[1].strip()
 
         # Uzywamy nazwy endpointu z protected_routes jako scope
         scope = "ask" if request.path == "/api/zapytaj" else "all"

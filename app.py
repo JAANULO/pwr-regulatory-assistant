@@ -15,6 +15,7 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
 from flask import Flask, jsonify, render_template, request
+from flask_cors import CORS
 
 from core.settings import (
     ADMIN_TOKEN,
@@ -35,6 +36,9 @@ from domain.services.debug_service import execute_debug_info, get_error_details
 
 
 app = Flask(__name__)
+CORS(
+    app
+)  # Docelowo ustaw tutaj origins=["https://twoja-domena.github.io", "http://127.0.0.1:5000"]
 
 
 def _znajdz_rozszerzenie(pytanie_lower: str) -> str:
@@ -97,15 +101,7 @@ app.register_blueprint(api_keys_bp)
 init_api_key_middleware(app, api_key_service, protected_routes=["/api/zapytaj"])
 
 
-@app.after_request
-def add_cors_headers(response):
-    if request.path.startswith("/api/"):
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = (
-            "Content-Type, X-Api-Key, Authorization"
-        )
-        response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-    return response
+# CORS jest teraz obsługiwany przez rozszerzenie flask_cors
 
 
 # ── trasy ─────────────────────────────────────────────────────────────────────
@@ -113,13 +109,7 @@ def add_cors_headers(response):
 
 @app.route("/")
 def index():
-    return render_template("index.html")
-
-
-# --- Tryb Laboratorium (Symulacja BM25) ---
-@app.route("/lab")
-def lab_view():
-    return render_template("lab.html")
+    return jsonify({"status": "API is running", "version": "1.0"})
 
 
 @app.route("/lab/simulate", methods=["POST"])
@@ -265,11 +255,7 @@ def feedback():
     return jsonify({"ok": True})
 
 
-@app.route("/graf_widok", methods=["GET"])
-def graf_widok():
-    """Otwiera kompletnie czysty plik nowego interfejsu (żeby nie pożerać wydajności asystenta)"""
-    pytanie = request.args.get("pytanie", "")
-    return render_template("graf.html", pytanie=pytanie)
+# Widok grafu przeniesiony do frontendu
 
 
 @app.route("/graf_wektorowy", methods=["GET"])
