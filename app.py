@@ -109,7 +109,7 @@ init_api_key_middleware(app, api_key_service, protected_routes=["/api/zapytaj"])
 
 @app.route("/")
 def index():
-    return redirect("https://jaanulo.github.io/pwr-regulatory-assistant-frontend/")
+    return redirect("https://janulo.me")
 
 
 @app.route("/lab/simulate", methods=["POST"])
