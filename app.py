@@ -14,7 +14,7 @@ ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, redirect
 from flask_cors import CORS
 
 from core.settings import (
@@ -109,7 +109,7 @@ init_api_key_middleware(app, api_key_service, protected_routes=["/api/zapytaj"])
 
 @app.route("/")
 def index():
-    return jsonify({"status": "API is running", "version": "1.0"})
+    return redirect("https://jaanulo.github.io/pwr-regulatory-assistant-frontend/")
 
 
 @app.route("/lab/simulate", methods=["POST"])
