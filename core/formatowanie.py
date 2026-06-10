@@ -90,7 +90,12 @@ def wyciagnij_zdania(
     szukaj: list[str] | None = None,
     pytanie_tokeny: list[str] | None = None,
 ) -> list[str]:
-    tresc = re.sub(r"^§\s*\d+\.\s*\S[^\n\.]{0,60}\.?\s*", "", tresc).strip()
+    # Usprawnione usuwanie tytułu paragrafu zapobiegające ucinaniu w połowie słowa
+    tresc = re.sub(
+        r"^§\s*\d+[a-z]?\.\s*[^\d\n]{5,200}?(?=\s+\d+\)|\s+\d+\.)", "", tresc
+    ).strip()
+    if tresc.startswith("§"):
+        tresc = re.sub(r"^§\s*\d+[a-z]?\.[^\.\n]{5,150}\.", "", tresc).strip()
     tresc_split = re.sub(
         r"(?<!\bust)(?<!\bpkt)(?<!\bart)(?<!\bpoz)(?<!\bm\.in)\.\s+(?=[A-ZŁŚŻŹ\d])",
         "|||",
