@@ -98,7 +98,11 @@ def zaladuj_wyszukiwarke() -> None:
 
 # ── API Gateway Middleware & Routing ──────────────────────────────────────────
 app.register_blueprint(api_keys_bp)
-init_api_key_middleware(app, api_key_service, protected_routes=["/api/zapytaj"])
+init_api_key_middleware(
+    app,
+    api_key_service,
+    protected_routes=["/zapytaj", "/api/zapytaj", "/feedback", "/historia"],
+)
 
 
 # CORS jest teraz obsługiwany przez rozszerzenie flask_cors
