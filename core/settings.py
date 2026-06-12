@@ -36,7 +36,7 @@ if APP_ENV != "local" and DB_BACKEND == "sqlite":
         "Zaleca się dodanie DATABASE_URL (Supabase/Render Postgres)."
     )
 
-DB_CONNECT_TIMEOUT = int(os.getenv("DB_CONNECT_TIMEOUT", "5"))
+DB_CONNECT_TIMEOUT = int(os.getenv("DB_CONNECT_TIMEOUT", "15"))
 DB_SSLMODE = os.getenv("DB_SSLMODE", "require")
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()

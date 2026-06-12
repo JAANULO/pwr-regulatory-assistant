@@ -61,6 +61,21 @@ def execute_debug_info(data_dir, db_path, admin_token, request_token):
     except Exception as e:
         info["database"]["error"] = str(e)
 
+    # Test połączenia z PostgreSQL, aby ułatwić debugowanie w Render
+    db_url = os.getenv("DATABASE_URL")
+    if db_url:
+        info["postgres_test"] = {"url_set": True}
+        try:
+            import psycopg2
+
+            conn = psycopg2.connect(db_url, connect_timeout=15, sslmode="require")
+            conn.close()
+            info["postgres_test"]["status"] = "OK"
+        except Exception as e:
+            info["postgres_test"]["status"] = "ERROR"
+            info["postgres_test"]["error"] = str(e)
+            info["postgres_test"]["error_type"] = type(e).__name__
+
     return info, 200
 
 
