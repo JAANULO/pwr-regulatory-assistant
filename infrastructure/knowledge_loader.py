@@ -85,6 +85,11 @@ def utworz_wyszukiwarke(plik_bazy: str) -> "Wyszukiwarka":
         try:
             with open(cache, "rb") as f_pkl:
                 idf, wektory, wszystkie_tokeny = pickle.load(f_pkl)  # nosec B301
+            if len(wektory) != len(fragmenty):
+                print(
+                    "   Ostrzeżenie: Cache nie pasuje do rozmiaru wczytanej bazy. Buduję od nowa..."
+                )
+                idf = None
         except Exception as e:
             print(f"   Ostrzeżenie: Cache uszkodzony ({e}). Buduję indeks na nowo...")
             idf = None

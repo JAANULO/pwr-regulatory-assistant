@@ -4,6 +4,25 @@ Wszystkie istotne zmiany w projekcie są odnotowywane w tym pliku zgodnie ze sta
 
 ---
 
+## [2.10.1] - 2026-06-17
+### Dodano
+- **Grafy w Głównym Menu**: Wyciągnięcie podglądu powiązań grafowych bezpośrednio pod wybór baz wiedzy.
+- **Przełącznik Parametrów**: Nowy element interfejsu (toggle) pozwalający na szybką zmianę parametrów dopasowania odpowiedzi z poziomu przeglądarki.
+
+### Naprawiono
+- **Bezpieczeństwo (Prywatność)**: Tymczasowe wyłączenie współdzielonej historii czatu, aby zapobiec krzyżowym wyciekom danych między użytkownikami.
+- **Generator Konfiguracji**: Naprawiono błąd w `scripts/symulacja.py`, przez który plik `optimal_config.json` był generowany ze spłaszczonymi kluczami. Przywrócono poprawną zagnieżdżoną strukturę TOML-podobną.
+
+## [2.10.0] - 2026-06-17
+### Dodano
+- **Wsparcie dla zdań twierdzących**: Zaimplementowano płynne filtrowanie fraz oceniających (np. "Oceń czy to zdanie jest prawdziwe:"). Dzięki temu algorytm wyszukiwarki skutecznie przetwarza podane mu stwierdzenia (znajdując regulacje potrzebne do weryfikacji).
+- **Izolacja Konfiguracji**: Dodano plik bazowy `data/config/config.example.toml` oraz dodano właściwy `config.toml` do ignorowanych w kontroli wersji.
+
+### Ulepszono
+- **Architektura Kodu**: Przeniesienie zmiennej wbudowanej `STOPWORDS` z pliku Pythona wprost do deklaratywnego środowiska TOML.
+
+---
+
 ## [2.9.1] - 2026-06-09
 ### Dodano
 - **Rygorystyczna Walidacja**: Skrypt `symulacja.py` weryfikuje od teraz nie tylko trafienie w paragraf, ale także dokładny punkt/podpunkt z treści, co zrównuje jego logikę z systemem testów regresyjnych.

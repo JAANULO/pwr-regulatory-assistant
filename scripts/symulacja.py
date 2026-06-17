@@ -16,6 +16,7 @@ import json
 import pathlib
 import random
 import sys
+import time
 import tomllib
 from typing import Any, Iterator
 
@@ -157,6 +158,10 @@ def _unflatten(flat: dict[str, Any]) -> dict[str, Any]:
 
 
 def load_base_config() -> dict[str, Any]:
+    if not CONFIG_PATH.exists():
+        fallback_path = CONFIG_PATH.with_name("config.example.toml")
+        with fallback_path.open("rb") as f:
+            return tomllib.load(f)
     with CONFIG_PATH.open("rb") as f:
         return tomllib.load(f)
 
@@ -386,6 +391,8 @@ def run_grid_search(
     best_metrics: dict[str, Any] = {}
     results_log: list[dict[str, Any]] = []
 
+    start_time = time.time()
+
     for idx, combo in enumerate(combos):
         metrics = _evaluate_config(wyszukiwarka, questions, combo)
 
@@ -412,13 +419,21 @@ def run_grid_search(
         # Progres co 10 kombinacji
         if (idx + 1) % 10 == 0 or idx == len(combos) - 1:
             metric_label = "accuracy" if has_expected else "avg_conf"
-            print(f"  [{idx + 1}/{len(combos)}] best_{metric_label}={best_score:.4f}")
+            elapsed = time.time() - start_time
+            avg_time_per_iter = elapsed / (idx + 1)
+            remaining_iters = len(combos) - (idx + 1)
+            eta_seconds = int(remaining_iters * avg_time_per_iter)
+            eta_mins, eta_secs = divmod(eta_seconds, 60)
+
+            print(
+                f"  [{idx + 1}/{len(combos)}] best_{metric_label}={best_score:.4f} | ETA: {eta_mins}m {eta_secs}s"
+            )
 
     # --- zapis optymalnej konfiguracji ---
     optimal_path = base_dir / "data" / "config" / "optimal" / "optimal_config.json"
     optimal_path.parent.mkdir(parents=True, exist_ok=True)
     output = {
-        "best_config": best_combo,
+        "best_config": _unflatten(best_combo),
         "metrics": best_metrics,
         "questions_used": len(questions),
         "combinations_tested": len(combos),

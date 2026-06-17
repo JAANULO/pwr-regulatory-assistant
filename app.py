@@ -26,7 +26,6 @@ from core.settings import (
 from api_gateway import api_keys_bp, init_api_key_middleware, api_key_service
 from core.bd import (
     inicjalizuj,
-    pobierz_ostatnie_pytania,
     pobierz_statystyki,
     PLIK_DB,
 )
@@ -289,14 +288,15 @@ def zrodla():
     return jsonify(pliki)
 
 
-@app.route("/historia", methods=["GET"])
-def historia():
-    try:
-        inicjalizuj()
-        return jsonify(pobierz_ostatnie_pytania(10))
-    except Exception as e:
-        logger.error(f"Błąd pobierania historii: {e}")
-        return jsonify({"error": str(e)}), 500
+# Tymczasowo zablokowane - wszyscy użytkownicy mieli tę samą historię
+# @app.route("/historia", methods=["GET"])
+# def historia():
+#     try:
+#         inicjalizuj()
+#         return jsonify(pobierz_ostatnie_pytania(10))
+#     except Exception as e:
+#         logger.error(f"Błąd pobierania historii: {e}")
+#         return jsonify({"error": str(e)}), 500
 
 
 @app.route("/admin/eksport_csv", methods=["GET"])

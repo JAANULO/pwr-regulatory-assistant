@@ -198,59 +198,73 @@ def normalizuj(slowo: str) -> str:
     return SYNONIMY.get(slowo, slowo)
 
 
-STOPWORDS = {
-    "i",
-    "w",
-    "z",
-    "do",
-    "na",
-    "ze",
-    "nie",
-    "sie",
-    "jest",
-    "to",
-    "a",
-    "o",
-    "lub",
-    "oraz",
-    "po",
-    "przez",
-    "przy",
-    "ten",
-    "ta",
-    "te",
-    "tego",
-    "tej",
-    "tym",
-    "tych",
-    "od",
-    "za",
-    "jak",
-    "czy",
-    "co",
-    "kt",
-    "kto",
-    "ale",
-    "bo",
-    "by",
-    "go",
-    "mu",
-    "jej",
-    "ich",
-    "im",
-    "je",
-    "dla",
-    "gdy",
-    "az",
-    "tez",
-    "juz",
-    "jesli",
-    "ze",
-    "tego",
-    "tej",
-    "jego",
-    "jako",
-}
+_STOPWORDS_CACHE: set[str] | None = None
+
+
+def pobierz_stopwords() -> set[str]:
+    global _STOPWORDS_CACHE
+    if _STOPWORDS_CACHE is None:
+        cfg = pobierz_konfiguracje()
+        stopwords_list = cfg.get("szumy_i_wykluczenia", {}).get(
+            "stopwords",
+            [
+                "i",
+                "w",
+                "z",
+                "do",
+                "na",
+                "ze",
+                "nie",
+                "sie",
+                "jest",
+                "to",
+                "a",
+                "o",
+                "lub",
+                "oraz",
+                "po",
+                "przez",
+                "przy",
+                "ten",
+                "ta",
+                "te",
+                "tego",
+                "tej",
+                "tym",
+                "tych",
+                "od",
+                "za",
+                "jak",
+                "czy",
+                "co",
+                "kt",
+                "kto",
+                "ale",
+                "bo",
+                "by",
+                "go",
+                "mu",
+                "jej",
+                "ich",
+                "im",
+                "je",
+                "dla",
+                "gdy",
+                "az",
+                "tez",
+                "juz",
+                "jesli",
+                "jego",
+                "jako",
+                "ocen",
+                "prawdziwe",
+                "zdanie",
+                "prawda",
+                "falsz",
+            ],
+        )
+        _STOPWORDS_CACHE = set(stopwords_list)
+    return _STOPWORDS_CACHE
 
 
 def tokenizuj(tekst: str, slownik_korekcji: set[str] | None = None) -> list[str]:
@@ -266,7 +280,7 @@ def tokenizuj(tekst: str, slownik_korekcji: set[str] | None = None) -> list[str]
     slowa = tekst.split()
     # 1. Filtrujemy stopwords i krótkie tokeny najpierw
     filtrowane = [
-        s for s in slowa if s not in STOPWORDS and (len(s) > 1 or s.isdigit())
+        s for s in slowa if s not in pobierz_stopwords() and (len(s) > 1 or s.isdigit())
     ]
 
     wyniki = []
@@ -811,7 +825,7 @@ class Wyszukiwarka:
 
 
 def main():
-    w = Wyszukiwarka(None, {}, [], [])  # pusta wyszukiwarka do testów importu
+    w = Wyszukiwarka([], {}, [], [])  # pusta wyszukiwarka do testów importu
 
     pytania_testowe = [
         "ile razy mozna powtarzac egzamin",

@@ -17,20 +17,21 @@ An academic project built entirely from scratch — no external NLP libraries (n
 
 ## How It Works
 
+```mermaid
+graph TD
+    A["User Question / Statement"] --> B["Tokenization & Cleaning (Stopwords)"]
+    B --> C["Phonetic Correction (Levenshtein)"]
+    C --> D["BM25 Vectorization"]
+    D --> E["Cosine Similarity with Knowledge Base"]
+    E --> F["Intent Extraction & Formatting"]
+    F --> G["Answer + Source (e.g. § 18. Exams)"]
 ```
-user question: "how many times can I take an exam?"
-         ↓
-  tokenization + normalization
-  (stemming, typo correction, diacritic removal)
-         ↓
-  BM25 — each word of the query compared against every paragraph
-  (Best Match 25 — improves TF-IDF with document length normalization)
-         ↓
-  cosine similarity → paragraph ranking
-  (threshold: 0.12 - 0.15)
-         ↓
-  answer + source: "§ 18. Exams"
-```
+
+### Mathematical Foundations (BM25)
+Instead of relying on black-box NLP libraries, the system implements the classic BM25 (Best Match 25) formula from scratch. Hyperparameters control term frequency saturation (`k1`) and document length penalty (`b`), avoiding cosine dilution in long regulatory documents and drastically improving accuracy.
+
+### Affirmative Statements Evaluation
+The system supports verifying statements directly. You can prompt: *"Evaluate if this sentence is true: A student has the right to a dean's leave"*. The algorithm filters out the command noise and matches the underlying fact against the exact regulation!
 
 ---
 
@@ -46,7 +47,9 @@ Instead of generating answers from memory, it uses a **RAG (Retrieval-Augmented 
 - **Levenshtein Distance** — custom implementation for typo correction.
 - **Intent Classifier** — extracts numbers, dates, and consequences from paragraphs.
 - **Diagnostics API** — built-in tools for production monitoring and error tracing.
-- **Configuration & Hyperparameters** — **46 parameters** fully decoupled into [**`data/config/config.toml`**](data/config/config.toml) for easy tuning (BM25 constants, custom term boosts, static & dynamic chapter weights).
+- **Configuration & Hyperparameters** — **47 parameters** fully decoupled into [**`data/config/config.toml`**](data/config/config.toml) for easy tuning (BM25 constants, custom term boosts, static & dynamic chapter weights).
+- **Graph Visualization** — view connections between paragraphs directly from the UI.
+- **UI Toggles** — flexible control over matching parameters without modifying code.
 - **Release History** — track changes in [docs/CHANGELOG.md](docs/CHANGELOG.md).
 
 ---
@@ -75,6 +78,20 @@ python app.py
 # → open http://localhost:5000
 ```
 
+### Test Results
+| Metric | Value |
+|---|---|
+| Test suite size | 170 questions |
+| Accuracy (correct paragraph & point) | **~98.2%** |
+| Response time | < 50 ms |
+
+### Automatic Simulation
+The project supports a built-in optimization module with Random Search. To run the optimizer:
+```bash
+python scripts/symulacja.py
+```
+The simulation tests dozens of parameters on the dataset from `data/config/testy.toml` to find the best configuration.
+
 ---
 
 ## Diagnostics & Admin Tools
@@ -97,6 +114,31 @@ The project includes advanced diagnostics for the production environment (e.g., 
 
 ---
 
+## Project Architecture
+
+```
+├── docs/                       ← Technical documentation and changelog
+│   ├── assets/                 ← Images and graphics
+│   └── research/               ← Notes and ideas
+├── deployment/                 ← Deployment files (Docker, Gunicorn)
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   └── gunicorn.conf.py
+├── app.py                      ← Flask API server
+├── core/                       ← Algorithms and settings
+├── domain/                     ← Business logic and repositories
+├── infrastructure/             ← Loaders and infrastructure
+├── static/                     ← Frontend (JS, CSS)
+├── templates/                  ← Frontend (HTML)
+├── data/                       ← Configs, DBs, Knowledge Bases (SoC)
+│   ├── config/                 ← TOML configuration files
+│   ├── database/               ← SQLite DB and cache .pkl files (ignored)
+│   └── kb/                     ← Knowledge base files (.json, .pdf)
+└── tests/                      ← Tests and verification
+```
+
+---
+
 # 🇵🇱 Asystent Regulaminowy PWr
 
 > System wyszukiwania informacji z regulaminu studiów Politechniki Wrocławskiej.
@@ -108,18 +150,21 @@ Projekt akademicki zbudowany od zera — bez gotowych bibliotek NLP (bez sklearn
 
 ## Jak to działa
 
+```mermaid
+graph TD
+    A["Pytanie / Stwierdzenie Użytkownika"] --> B["Tokenizacja i Oczyszczanie (Stopwords)"]
+    B --> C["Korekcja Fonetyczna (Levenshtein)"]
+    C --> D["Wektoryzacja BM25"]
+    D --> E["Podobieństwo Cosinusowe z Bazą Wiedzy"]
+    E --> F["Ekstrakcja Intencji i Formatowanie"]
+    F --> G["Odpowiedź + Źródło (np. § 18. Egzaminy)"]
 ```
-pytanie użytkownika: "ile razy można podejść do egzaminu?"
-         ↓
-  tokenizacja + normalizacja
-  (usuwanie odmiany, literówek, polskich znaków)
-         ↓
-  BM25 — każde słowo pytania porównywane z każdym paragrafem
-         ↓
-  podobieństwo cosinusowe → ranking paragrafów
-         ↓
-  odpowiedź + źródło: "§ 18. Egzaminy"
-```
+
+### Podstawy Matematyczne (BM25)
+Zamiast korzystać z gotowych bibliotek, system implementuje wzór BM25 (Best Match 25), w którym hiperparametry kontrolują nasycenie częstości słowa (`k1`) oraz karę za długość paragrafu (`b`). Dzięki temu unikamy zjawiska tzw. dilucji cosinusowej przy długich dokumentach, co drastycznie podnosi trafność.
+
+### Ocenianie Zdań Twierdzących
+System obsługuje weryfikację twierdzeń. Wpisanie komendy takiej jak *"Oceń czy to zdanie jest prawdziwe: Student ma prawo do urlopu dziekańskiego"* spowoduje odfiltrowanie szumu i precyzyjne dopasowanie samego zdania (faktu) do właściwego paragrafu regulaminu!
 
 ---
 
@@ -131,6 +176,8 @@ Główny cel projektu to dostarczanie precyzyjnych informacji prawnych.
 - **Korekcja literówek Levenshteina** (od zera).
 - **Indeks na poziomie zdań** — system znajduje konkretne zdanie z odpowiedzią.
 - **Klasyfikator intencji** — wyciąga liczby i terminy bezpośrednio z tekstu.
+- **Wizualizacja Grafów** — możliwość podglądu powiązań między paragrafami wprost z interfejsu.
+- **Przełączniki UI** — elastyczne sterowanie parametrami dopasowania bez modyfikacji kodu.
 
 
 ---

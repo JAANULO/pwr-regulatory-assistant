@@ -128,13 +128,24 @@ max_dystans_levenshteina = 1
 
 
 [szumy_i_wykluczenia]
+# Lista krótkich słów i spójników ignorowanych przy wyszukiwaniu BM25
+stopwords = [
+    "i", "w", "z", "do", "na", "ze", "nie", "sie", "jest", "to", "a", "o", "lub", 
+    "oraz", "po", "przez", "przy", "ten", "ta", "te", "tego", "tej", "tym", "tych", 
+    "od", "za", "jak", "czy", "co", "kt", "kto", "ale", "bo", "by", "go", "mu", 
+    "jej", "ich", "im", "je", "dla", "gdy", "az", "tez", "juz", "jesli", "jego", 
+    "jako", "ocen", "prawdziwe", "zdanie", "prawda", "falsz"
+]
+
 # Szumy i frazy potoczne do ignorowania w NLP
 szumy = [
     "co mam zrobic", "co robic", "pomocy", "pomoc", "mam pytanie", "witam", 
     "dzien dobry", "czesc", "hej", "siema", "chcialbym zapytac", 
     "chcialbym sie dowiedziec", "czy ktos wie", "pozdrawiam", 
     "z gory dziekuje", "z góry dziękuję", "co teraz", "i co teraz", 
-    "co z tym zrobic", "czy tak mozna", "czy tak w ogole mozna", "czy to prawda"
+    "co z tym zrobic", "czy tak mozna", "czy tak w ogole mozna", "czy to prawda",
+    "oceń czy to zdanie jest prawdziwe", "oceń czy", "ocen czy", "czy to prawda że",
+    "czy to zdanie jest prawdziwe", "czy prawda jest", "oceń", "ocen"
 ]
 
 # Wykluczenia z szybkiej ścieżki
