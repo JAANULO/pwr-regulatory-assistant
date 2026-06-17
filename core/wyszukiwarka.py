@@ -24,6 +24,17 @@ def pobierz_konfiguracje() -> dict[str, Any]:
     if not os.path.exists(sciezka):
         sciezka = os.path.join("data", "config", "config.toml")
 
+    if not os.path.exists(sciezka):
+        sciezka_example = os.path.join(
+            os.path.dirname(__file__), "..", "data", "config", "config.example.toml"
+        )
+        if os.path.exists(sciezka_example):
+            sciezka = sciezka_example
+        else:
+            sciezka_example_alt = os.path.join("data", "config", "config.example.toml")
+            if os.path.exists(sciezka_example_alt):
+                sciezka = sciezka_example_alt
+
     if os.path.exists(sciezka):
         try:
             mtime = os.path.getmtime(sciezka)
