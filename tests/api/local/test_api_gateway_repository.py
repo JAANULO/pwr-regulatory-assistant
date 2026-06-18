@@ -19,6 +19,7 @@ def repo():
                 id TEXT PRIMARY KEY,
                 key_id TEXT UNIQUE NOT NULL,
                 key_hash TEXT NOT NULL,
+                name TEXT UNIQUE,
                 created_by TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 expires_at TIMESTAMP,
@@ -45,6 +46,7 @@ def test_create_and_get_key(repo):
     repo.create(
         key_id=key_id,
         key_hash=key_hash,
+        name="test_name",
         created_by=created_by,
         scopes=["all"],
         quota={"max": 100},
@@ -64,18 +66,31 @@ def test_create_and_get_key(repo):
 def test_revoke_key(repo):
     key_id = "test_revoke"
     repo.create(
-        key_id=key_id, key_hash="h", created_by="a", scopes=[], quota={}, rate_limit={}
+        key_id=key_id,
+        key_hash="h",
+        name="revoke_name",
+        created_by="a",
+        scopes=[],
+        quota={},
+        rate_limit={},
     )
 
     repo.revoke(key_id)
     record = repo.get_by_key_id(key_id)
     assert record["revoked"] == 1
+    assert "revoke_name_revoked_test_revoke" in record["name"]
 
 
 def test_update_usage(repo):
     key_id = "test_usage"
     repo.create(
-        key_id=key_id, key_hash="h", created_by="a", scopes=[], quota={}, rate_limit={}
+        key_id=key_id,
+        key_hash="h",
+        name="usage_name",
+        created_by="a",
+        scopes=[],
+        quota={},
+        rate_limit={},
     )
 
     repo.update_usage(key_id)

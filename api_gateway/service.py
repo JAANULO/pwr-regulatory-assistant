@@ -37,6 +37,7 @@ class ApiKeyService:
     def create_api_key(
         self,
         created_by: str,
+        name: str,
         scopes: list,
         quota: dict,
         rate_limit: dict,
@@ -53,6 +54,7 @@ class ApiKeyService:
         self.repo.create(
             key_id=key_id,
             key_hash=key_hash,
+            name=name,
             created_by=created_by,
             scopes=scopes,
             quota=quota,

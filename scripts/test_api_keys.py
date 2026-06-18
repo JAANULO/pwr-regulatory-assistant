@@ -1,5 +1,6 @@
 import requests
 import os
+import uuid
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,6 +11,7 @@ BASE_URL = "http://localhost:5000"
 def test_api_keys():
     print("--- 1. Tworzenie klucza ---")
     create_payload = {
+        "name": f"test_script_key_{uuid.uuid4()}",
         "scopes": ["all"],
         "quota": {"daily": 1000},
         "rate_limit": {"per_min": 3},

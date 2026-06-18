@@ -12,6 +12,7 @@ class MockRepo:
         self,
         key_id,
         key_hash,
+        name,
         created_by,
         scopes,
         quota,
@@ -22,6 +23,7 @@ class MockRepo:
         self.records[key_id] = {
             "key_id": key_id,
             "key_hash": key_hash,
+            "name": name,
             "created_by": created_by,
             "scopes": json.dumps(scopes) if scopes else "[]",
             "quota": json.dumps(quota) if quota else "{}",
@@ -46,7 +48,11 @@ def service():
 
 def test_create_and_validate_key(service):
     key_id, raw_key = service.create_api_key(
-        created_by="admin", scopes=["ask"], quota={}, rate_limit={"per_min": 5}
+        created_by="admin",
+        name="test1",
+        scopes=["ask"],
+        quota={},
+        rate_limit={"per_min": 5},
     )
 
     assert key_id in raw_key
@@ -61,7 +67,7 @@ def test_create_and_validate_key(service):
 
 def test_validate_key_invalid_hash(service):
     key_id, raw_key = service.create_api_key(
-        created_by="admin", scopes=["ask"], quota={}, rate_limit={}
+        created_by="admin", name="test2", scopes=["ask"], quota={}, rate_limit={}
     )
     invalid_key = f"{key_id}.badsecret123"
 
@@ -72,7 +78,7 @@ def test_validate_key_invalid_hash(service):
 
 def test_validate_key_scope(service):
     _, raw_key = service.create_api_key(
-        created_by="admin", scopes=["other"], quota={}, rate_limit={}
+        created_by="admin", name="test3", scopes=["other"], quota={}, rate_limit={}
     )
 
     is_valid, msg, _ = service.validate_key(raw_key, "ask")
@@ -82,7 +88,11 @@ def test_validate_key_scope(service):
 
 def test_rate_limit(service):
     key_id, raw_key = service.create_api_key(
-        created_by="a", scopes=["all"], quota={}, rate_limit={"per_min": 2}
+        created_by="a",
+        name="test4",
+        scopes=["all"],
+        quota={},
+        rate_limit={"per_min": 2},
     )
 
     # 1 użycie

@@ -43,7 +43,7 @@ else:
 
 @contextmanager
 def polacz():
-    if TRYB == "postgres":
+    if TRYB == "postgres" and pg_pool is not None:
         conn = pg_pool.getconn()
         conn.cursor_factory = RealDictCursor
         try:
@@ -89,6 +89,7 @@ def inicjalizuj():
                     id             VARCHAR(36) PRIMARY KEY,
                     key_id         VARCHAR(12) UNIQUE NOT NULL,
                     key_hash       TEXT NOT NULL,
+                    name           TEXT UNIQUE,
                     created_by     TEXT,
                     created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     expires_at     TIMESTAMP,
@@ -101,6 +102,19 @@ def inicjalizuj():
                     usage_count    INTEGER DEFAULT 0
                 );
             """)
+
+            # Automatyczna migracja PostgreSQL dla name
+            try:
+                cur.execute("ALTER TABLE api_keys ADD COLUMN name TEXT UNIQUE;")
+                _LOG.info(
+                    "Migracja: Dodano kolumnę 'name' do tabeli 'api_keys' (PostgreSQL)"
+                )
+            except Exception as e:
+                # Oczekiwany wyjątek jeśli kolumna już istnieje (kod 42701)
+                conn.rollback()
+            else:
+                conn.commit()
+
             conn.commit()
             _LOG.info("Baza PostgreSQL zainicjalizowana pomyślnie")
     else:
@@ -126,6 +140,7 @@ def inicjalizuj():
                     id             TEXT PRIMARY KEY,
                     key_id         TEXT UNIQUE NOT NULL,
                     key_hash       TEXT NOT NULL,
+                    name           TEXT UNIQUE,
                     created_by     TEXT,
                     created_at     TEXT DEFAULT (datetime('now','localtime')),
                     expires_at     TEXT,
@@ -151,6 +166,42 @@ def inicjalizuj():
                     )
             except Exception as e:
                 _LOG.warning("Błąd migracji kolumny 'odpowiedz': %s", e)
+
+            # Automatyczna migracja dla api_keys: dodaj 'name'
+            try:
+                cursor.execute("PRAGMA table_info(api_keys)")
+                columns_api = [row[1] for row in cursor.fetchall()]
+                if "name" not in columns_api:
+                    conn.execute("ALTER TABLE api_keys RENAME TO api_keys_old")
+                    conn.execute("""
+                        CREATE TABLE api_keys (
+                            id             TEXT PRIMARY KEY,
+                            key_id         TEXT UNIQUE NOT NULL,
+                            key_hash       TEXT NOT NULL,
+                            name           TEXT UNIQUE,
+                            created_by     TEXT,
+                            created_at     TEXT DEFAULT (datetime('now','localtime')),
+                            expires_at     TEXT,
+                            scopes         TEXT,
+                            quota          TEXT,
+                            rate_limit     TEXT,
+                            revoked        INTEGER DEFAULT 0,
+                            meta           TEXT,
+                            last_used_at   TEXT,
+                            usage_count    INTEGER DEFAULT 0
+                        );
+                    """)
+                    conn.execute("""
+                        INSERT INTO api_keys (id, key_id, key_hash, created_by, created_at, expires_at, scopes, quota, rate_limit, revoked, meta, last_used_at, usage_count, name)
+                        SELECT id, key_id, key_hash, created_by, created_at, expires_at, scopes, quota, rate_limit, revoked, meta, last_used_at, usage_count, 'Stary klucz ' || key_id
+                        FROM api_keys_old;
+                    """)
+                    conn.execute("DROP TABLE api_keys_old")
+                    _LOG.info(
+                        "Migracja: Przebudowano tabelę 'api_keys' i dodano 'name' (SQLite)"
+                    )
+            except Exception as e:
+                _LOG.warning("Błąd migracji kolumny 'name' w api_keys: %s", e)
 
 
 # ── Repozytoria (inicjalizowane raz przy imporcie modułu) ─────────────────────

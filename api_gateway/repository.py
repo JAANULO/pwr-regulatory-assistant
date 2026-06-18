@@ -12,6 +12,7 @@ class ApiKeysRepository:
         self,
         key_id: str,
         key_hash: str,
+        name: str,
         created_by: str,
         scopes: list,
         quota: dict,
@@ -31,13 +32,14 @@ class ApiKeysRepository:
                 cur.execute(
                     """
                     INSERT INTO api_keys 
-                    (id, key_id, key_hash, created_by, scopes, quota, rate_limit, expires_at, meta)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    (id, key_id, key_hash, name, created_by, scopes, quota, rate_limit, expires_at, meta)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                     (
                         new_id,
                         key_id,
                         key_hash,
+                        name,
                         created_by,
                         scopes_str,
                         quota_str,
@@ -50,13 +52,14 @@ class ApiKeysRepository:
                 cur.execute(
                     """
                     INSERT INTO api_keys 
-                    (id, key_id, key_hash, created_by, scopes, quota, rate_limit, expires_at, meta)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    (id, key_id, key_hash, name, created_by, scopes, quota, rate_limit, expires_at, meta)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                     (
                         new_id,
                         key_id,
                         key_hash,
+                        name,
                         created_by,
                         scopes_str,
                         quota_str,
@@ -84,21 +87,37 @@ class ApiKeysRepository:
         with self.polacz() as conn:
             cur = conn.cursor()
             cur.execute(
-                "SELECT id, key_id, created_by, created_at, expires_at, scopes, quota, rate_limit, revoked, meta, last_used_at, usage_count FROM api_keys ORDER BY created_at DESC"
+                "SELECT id, key_id, name, created_by, created_at, expires_at, scopes, quota, rate_limit, revoked, meta, last_used_at, usage_count FROM api_keys ORDER BY created_at DESC"
             )
             rows = cur.fetchall()
             return [dict(r) for r in rows]
+
+    def rename_key(self, key_id: str, new_name: str) -> None:
+        with self.polacz() as conn:
+            cur = conn.cursor()
+            if self.tryb == "postgres":
+                cur.execute(
+                    "UPDATE api_keys SET name = %s WHERE key_id = %s",
+                    (new_name, key_id),
+                )
+            else:
+                cur.execute(
+                    "UPDATE api_keys SET name = ? WHERE key_id = ?", (new_name, key_id)
+                )
+            conn.commit()
 
     def revoke(self, key_id: str) -> None:
         with self.polacz() as conn:
             cur = conn.cursor()
             if self.tryb == "postgres":
                 cur.execute(
-                    "UPDATE api_keys SET revoked = TRUE WHERE key_id = %s", (key_id,)
+                    "UPDATE api_keys SET revoked = TRUE, name = name || '_revoked_' || %s WHERE key_id = %s",
+                    (key_id, key_id),
                 )
             else:
                 cur.execute(
-                    "UPDATE api_keys SET revoked = 1 WHERE key_id = ?", (key_id,)
+                    "UPDATE api_keys SET revoked = 1, name = name || '_revoked_' || ? WHERE key_id = ?",
+                    (key_id, key_id),
                 )
             conn.commit()
 

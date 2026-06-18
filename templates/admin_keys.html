@@ -114,6 +114,7 @@
         <h1>Zarządzanie Kluczami API</h1>
         <div>
             <a href="/admin?token={{ token }}" style="color: var(--muted); text-decoration: none; margin-right: 16px;">Wróć do statystyk</a>
+            <input type="text" id="newKeyName" placeholder="Nazwa klucza..." required style="padding: 8px; background: #0d0d0f; border: 1px solid #2a2a32; color: #fff; border-radius: 4px; margin-right: 8px;">
             <button class="btn" onclick="createKey()">+ Generuj Nowy Klucz</button>
         </div>
     </div>
@@ -131,6 +132,7 @@
                 <thead>
                     <tr>
                         <th>Key ID</th>
+                        <th>Nazwa</th>
                         <th>Utworzony</th>
                         <th>Status</th>
                         <th>Użycia</th>
@@ -157,7 +159,7 @@
                 tbody.innerHTML = '';
 
                 if (keys.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--muted); padding: 20px;">Brak kluczy w bazie.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--muted); padding: 20px;">Brak kluczy w bazie.</td></tr>';
                     return;
                 }
 
@@ -168,12 +170,14 @@
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td style="color: var(--text);"><strong>${k.key_id}</strong></td>
+                        <td style="color: var(--text);">${k.name || '-'}</td>
                         <td>${k.created_at}</td>
                         <td class="${statusClass}">${statusText}</td>
                         <td>${k.usage_count}</td>
                         <td>${k.last_used_at || '-'}</td>
                         <td>
-                            ${!k.revoked ? `<button class="btn btn-danger" onclick="revokeKey('${k.key_id}')" style="padding: 4px 8px; font-size: 12px;">Unieważnij</button>` : ''}
+                            ${!k.revoked ? `<button class="btn btn-danger" onclick="revokeKey('${k.key_id}')" style="padding: 4px 8px; font-size: 12px; margin-right: 4px;">Unieważnij</button>` : ''}
+                            ${!k.revoked ? `<button class="btn" onclick="renameKey('${k.key_id}', '${k.name || ''}')" style="padding: 4px 8px; font-size: 12px; background: #00d4ff;">✏️ Zmień nazwę</button>` : ''}
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -184,22 +188,29 @@
         }
 
         async function createKey() {
-            if(!confirm("Czy na pewno chcesz wygenerować nowy klucz API?")) return;
+            const nameInput = document.getElementById('newKeyName');
+            const name = nameInput.value.trim();
+            if(!name) {
+                alert("Proszę wpisać nazwę klucza przed wygenerowaniem.");
+                return;
+            }
+            if(!confirm(`Czy na pewno chcesz wygenerować nowy klucz API o nazwie "${name}"?`)) return;
             
             try {
                 const res = await fetch(`/admin/api-keys?token=${TOKEN}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ scopes: ["all"] })
+                    body: JSON.stringify({ name: name, scopes: ["all"] })
                 });
                 const data = await res.json();
                 
-                if (data.api_key) {
+                if (res.ok && data.api_key) {
                     document.getElementById('rawKeyValue').innerText = data.api_key;
                     document.getElementById('newKeyResult').style.display = 'block';
+                    nameInput.value = '';
                     fetchKeys();
                 } else {
-                    alert("Błąd podczas generowania klucza.");
+                    alert(data.error || "Błąd podczas generowania klucza.");
                 }
             } catch (e) {
                 console.error(e);
@@ -208,7 +219,7 @@
         }
 
         async function revokeKey(keyId) {
-            if(!confirm("Czy na pewno chcesz unieważnić ten klucz? Ta operacja jest nieodwracalna!")) return;
+            if(!confirm("Czy na pewno chcesz unieważnić ten klucz? Ta operacja zwolni jego nazwę i jest nieodwracalna!")) return;
 
             try {
                 const res = await fetch(`/admin/api-keys/${keyId}/revoke?token=${TOKEN}`, {
@@ -218,6 +229,29 @@
                     fetchKeys();
                 } else {
                     alert("Błąd podczas unieważniania klucza.");
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Wystąpił błąd.");
+            }
+        }
+
+        async function renameKey(keyId, currentName) {
+            const newName = prompt("Podaj nową, unikalną nazwę dla tego klucza:", currentName);
+            if(newName === null || newName.trim() === "" || newName.trim() === currentName) return;
+
+            try {
+                const res = await fetch(`/admin/api-keys/${keyId}/name?token=${TOKEN}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: newName.trim() })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    fetchKeys();
+                } else {
+                    alert(data.error || "Błąd podczas zmiany nazwy klucza.");
                 }
             } catch (e) {
                 console.error(e);

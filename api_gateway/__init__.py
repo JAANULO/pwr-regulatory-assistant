@@ -4,7 +4,7 @@ from core.bd import polacz, TRYB
 from .repository import ApiKeysRepository
 from .service import ApiKeyService
 from .middleware import init_api_key_middleware
-from typing import Any
+from typing import Any, Dict
 
 __all__ = [
     "api_keys_bp",
@@ -34,6 +34,10 @@ def create_key() -> Any:
     from typing import Any, Dict, List, Optional
 
     dane: Dict[str, Any] = request.get_json(force=True) if request.is_json else {}
+    name: str = dane.get("name", "").strip()
+    if not name:
+        return jsonify({"error": "Pole 'name' jest wymagane"}), 400
+
     scopes: List[str] = dane.get("scopes", ["all"])
     quota: Dict[str, Any] = dane.get("quota", {})
     rate_limit: Dict[str, Any] = dane.get("rate_limit", {"per_min": 60})
@@ -43,14 +47,22 @@ def create_key() -> Any:
     expires_at: Optional[str] = str(exp) if exp else None
     meta: Dict[str, Any] = dane.get("meta", {})
 
-    key_id, raw_key = api_key_service.create_api_key(
-        created_by=created_by,
-        scopes=scopes,
-        quota=quota,
-        rate_limit=rate_limit,
-        expires_at=expires_at,
-        meta=meta,
-    )
+    try:
+        key_id, raw_key = api_key_service.create_api_key(
+            created_by=created_by,
+            name=name,
+            scopes=scopes,
+            quota=quota,
+            rate_limit=rate_limit,
+            expires_at=expires_at,
+            meta=meta,
+        )
+    except Exception as e:
+        return jsonify(
+            {
+                "error": f"Błąd tworzenia klucza. Upewnij się, że nazwa '{name}' jest unikalna. Szegóły błędu: {e}"
+            }
+        ), 409
 
     return jsonify(
         {
@@ -101,15 +113,24 @@ def rotate_key(key_id: str) -> Any:
     meta_val: Dict[str, Any] = (
         json.loads(record.get("meta", "{}")) if record.get("meta") else {}
     )
+    name_val: str = str(record.get("name") or "Rotowany klucz")
 
-    new_key_id, new_raw_key = api_key_service.create_api_key(
-        created_by=str(record.get("created_by") or "admin"),
-        scopes=scopes_val,
-        quota=quota_val,
-        rate_limit=rl_val,
-        expires_at=exp_val_typed,
-        meta=meta_val,
-    )
+    try:
+        new_key_id, new_raw_key = api_key_service.create_api_key(
+            created_by=str(record.get("created_by") or "admin"),
+            name=name_val,
+            scopes=scopes_val,
+            quota=quota_val,
+            rate_limit=rl_val,
+            expires_at=exp_val_typed,
+            meta=meta_val,
+        )
+    except Exception as e:
+        return jsonify(
+            {
+                "error": f"Błąd rotacji. Upewnij się, że zwalniana nazwa nie ma konfliktów: {e}"
+            }
+        ), 409
 
     return jsonify(
         {
@@ -119,3 +140,24 @@ def rotate_key(key_id: str) -> Any:
             "message": "Key rotated successfully.",
         }
     ), 200
+
+
+@api_keys_bp.route("/<key_id>/name", methods=["PUT"])
+def change_key_name(key_id: str) -> Any:
+    dane: Dict[str, Any] = request.get_json(force=True) if request.is_json else {}
+    new_name: str = dane.get("name", "").strip()
+
+    if not new_name:
+        return jsonify({"error": "Pole 'name' jest wymagane"}), 400
+
+    try:
+        api_keys_repo.rename_key(key_id, new_name)
+        return jsonify(
+            {"status": "renamed", "key_id": key_id, "new_name": new_name}
+        ), 200
+    except Exception as e:
+        return jsonify(
+            {
+                "error": f"Nie udało się zmienić nazwy. Nowa nazwa '{new_name}' może już istnieć. ({str(e)})"
+            }
+        ), 409
