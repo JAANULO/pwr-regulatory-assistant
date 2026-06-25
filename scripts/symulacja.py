@@ -27,7 +27,7 @@ if ROOT_DIR not in sys.path:
 
 # GŁÓWNY PARAMETR SYMULACJI - Ilość sprawdzanych kombinacji
 # Im większa wartość, tym dłużej trwa symulacja, ale szansa na lepszy wynik rośnie.
-DOMYSLNA_LICZBA_KOMBINACJI = 100
+DOMYSLNA_LICZBA_KOMBINACJI = 1000
 
 
 # ── 1. Wyciąganie pytań z testy.toml ────────────────────────────────────────
@@ -259,7 +259,7 @@ def _evaluate_config(
 ) -> dict[str, Any]:
     """
     Ocenia jedną konfigurację:
-    - wywołuje wyszukiwarka.szukaj dla każdej pary (pytanie, oczekiwany)
+    - wywołuje wyszukiwarka.szukaj_wiele dla wszystkich pytań
     - liczy accuracy  = odsetek trafień w właściwy paragraf  ← główna metryka
     - liczy avg_confidence = średnie podobieństwo top-1       ← pomocnicza
     - liczy min_confidence = minimum podobieństwa (0 gdy brak wyników)
@@ -272,10 +272,13 @@ def _evaluate_config(
 
     has_expected = any(oczekiwany for _, oczekiwany, _ in questions)
 
-    for pytanie, oczekiwany, ocz_punkt in questions:
-        wyniki = wyszukiwarka.szukaj(
-            pytanie, n_wynikow=1, virtual_params=vp if vp else None
-        )
+    pytania = [q for q, _, _ in questions]
+    wyniki_wiele = wyszukiwarka.szukaj_wiele(
+        pytania, n_wynikow=1, virtual_params=vp if vp else None
+    )
+
+    for idx, (pytanie, oczekiwany, ocz_punkt) in enumerate(questions):
+        wyniki = wyniki_wiele[idx]
         if wyniki:
             conf = wyniki[0].podobienstwo
             total_conf += conf
@@ -310,6 +313,34 @@ def _evaluate_config(
     }
 
 
+# Zmienna globalna w procesie roboczym przechowująca instancję wyszukiwarki
+_wyszukiwarka_globalna = None
+
+
+def _init_worker(data_dir: str):
+    """Inicjalizuje obiekt wyszukiwarki raz na proces roboczy."""
+    global _wyszukiwarka_globalna
+    from infrastructure.knowledge_loader import utworz_wyszukiwarke
+
+    _wyszukiwarka_globalna = utworz_wyszukiwarke(data_dir)
+
+
+def _worker_task(
+    combo: dict[str, Any], questions: list[tuple[str, str, str]]
+) -> tuple[dict[str, Any], dict[str, Any] | None]:
+    """Wykonuje ewaluację pojedynczej konfiguracji w procesie roboczym."""
+    global _wyszukiwarka_globalna
+    try:
+        metrics = _evaluate_config(_wyszukiwarka_globalna, questions, combo)
+        return combo, metrics
+    except Exception as e:
+        print(
+            f"\n[BŁĄD] Wystąpił błąd podczas ewaluacji konfiguracji {combo}: {e}",
+            file=sys.stderr,
+        )
+        return combo, None
+
+
 # ── 5. Główna funkcja grid-search ────────────────────────────────────────────
 
 
@@ -320,14 +351,14 @@ def run_grid_search(
 ) -> dict[str, Any]:
     """
     1. Wczytuje pytania z data/config/testy.toml (lub podanego pliku).
-    2. Buduje wyszukiwarkę (jednorazowo).
-    3. Generuje siatkę parametrów liczbowych z config.toml.
-    4. Losowo ogranicza do max_combinations (lazy – bez ładowania całości do RAM).
-    5. Ocenia każdą kombinację → wybiera najlepszą wg accuracy (gdy dostępna)
-       lub avg_confidence (gdy brak info o oczekiwanych paragrafach).
-    6. Zapisuje wynik do data/config/optimal_config.json.
-    7. Zwraca słownik z wynikami.
+    2. Generuje siatkę parametrów liczbowych z config.toml.
+    3. Losowo ogranicza do max_combinations bez duplikatów.
+    4. Ocenia każdą kombinację równolegle przy użyciu ProcessPoolExecutor.
+    5. Zapisuje najlepszą konfigurację do optimal_config.json.
     """
+    import os
+    from concurrent.futures import ProcessPoolExecutor, as_completed
+
     print("=== Lab Simulation – Grid Search ===")
 
     # --- pytania ---
@@ -338,12 +369,8 @@ def run_grid_search(
         f"Metryka główna: {'accuracy (trafność paragrafu)' if has_expected else 'avg_confidence'}"
     )
 
-    # --- wyszukiwarka (raz) ---
-    from infrastructure.knowledge_loader import utworz_wyszukiwarke
-
     base_dir = pathlib.Path(__file__).resolve().parents[1]
-    data_dir = base_dir / "data"
-    wyszukiwarka = utworz_wyszukiwarke(str(data_dir))
+    data_dir = str(base_dir / "data")
 
     # --- parametry ---
     base_cfg = load_base_config()
@@ -355,82 +382,119 @@ def run_grid_search(
     total_combos = _count_combinations(flat_cfg)
     print(f"Wszystkich kombinacji: {total_combos}")
 
-    # Lazy sampling: jeśli za dużo – losujemy indeksy, nie ładujemy wszystkiego
+    # 1. Zbieramy możliwe opcje dla każdego parametru
+    param_options: dict[str, list[Any]] = {}
+    for key, val in flat_cfg.items():
+        if isinstance(val, int):
+            step_int = max(1, abs(val) // 5)
+            param_options[key] = sorted({val - step_int, val, val + step_int})
+        elif isinstance(val, float):
+            step_float = max(0.05, abs(val) * 0.2)
+            param_options[key] = sorted(
+                {
+                    round(val - step_float, 3),
+                    round(val, 3),
+                    round(val + step_float, 3),
+                }
+            )
+
+    # 2. Generowanie combos z deduplikacją
     if total_combos > max_combinations:
         random.seed(42)
-
-        # 1. Zbieramy możliwe opcje dla każdego parametru
-        param_options: dict[str, list[Any]] = {}
-        for key, val in flat_cfg.items():
-            if isinstance(val, int):
-                step_int = max(1, abs(val) // 5)
-                param_options[key] = sorted({val - step_int, val, val + step_int})
-            elif isinstance(val, float):
-                step_float = max(0.05, abs(val) * 0.2)
-                param_options[key] = sorted(
-                    {
-                        round(val - step_float, 3),
-                        round(val, 3),
-                        round(val + step_float, 3),
-                    }
-                )
-
-        # 2. Losujemy kombinacje bezpośrednio (O(N) względem max_combinations, a nie total_combos)
+        combos_set = set()
         combos = []
-        for _ in range(max_combinations):
-            combo = {k: random.choice(opts) for k, opts in param_options.items()}  # nosec B311
-            combos.append(combo)
 
-        print(f"Losowo wygenerowano {max_combinations} kombinacji")
+        while len(combos) < max_combinations:
+            combo = {k: random.choice(opts) for k, opts in param_options.items()}
+            # Stabilna reprezentacja do hashowania
+            combo_tuple = tuple(sorted(combo.items()))
+            if combo_tuple not in combos_set:
+                combos_set.add(combo_tuple)
+                combos.append(combo)
+
+        print(f"Losowo wygenerowano {max_combinations} unikalnych kombinacji")
     else:
         combos = list(_generate_param_grid(flat_cfg))
 
-    # --- przeszukiwanie ---
+    # --- przeszukiwanie równoległe  ---
     best_score = -1.0
     best_combo: dict[str, Any] = {}
     best_metrics: dict[str, Any] = {}
     results_log: list[dict[str, Any]] = []
 
+    # Ustalenie liczby rdzeni (cpu_count - 1)
+    cpu_count = os.cpu_count() or 2
+    max_workers = max(1, cpu_count - 1)
+    print(f"Uruchamianie puli procesów roboczych (liczba rdzeni: {max_workers})...")
+
     start_time = time.time()
 
-    for idx, combo in enumerate(combos):
-        metrics = _evaluate_config(wyszukiwarka, questions, combo)
+    with ProcessPoolExecutor(
+        max_workers=max_workers,
+        initializer=_init_worker,
+        initargs=(data_dir,),
+    ) as executor:
+        # Zgłoszenie wszystkich zadań
+        futures = {
+            executor.submit(_worker_task, combo, questions): combo for combo in combos
+        }
 
-        # Główna metryka: accuracy jeśli dostępna, inaczej avg_confidence
-        score = (
-            metrics["accuracy"]
-            if (has_expected and metrics["accuracy"] is not None)
-            else metrics["avg_confidence"]
-        )
+        completed_count = 0
+        total_tasks = len(combos)
 
-        results_log.append(
-            {
-                "index": idx,
-                "params": combo,
-                "metrics": metrics,
-            }
-        )
+        for future in as_completed(futures):
+            completed_count += 1
+            combo = futures[future]
 
-        if score > best_score:
-            best_score = score
-            best_combo = combo
-            best_metrics = metrics
+            try:
+                result_combo, metrics = future.result()
+            except Exception as e:
+                print(
+                    f"\n[BŁĄD] Zadanie zakończyło się wyjątkiem: {e}",
+                    file=sys.stderr,
+                )
+                continue
 
-        # Progres co 10 kombinacji
-        if (idx + 1) % 10 == 0 or idx == len(combos) - 1:
-            metric_label = "accuracy" if has_expected else "avg_conf"
-            elapsed = time.time() - start_time
-            avg_time_per_iter = elapsed / (idx + 1)
-            remaining_iters = len(combos) - (idx + 1)
-            eta_seconds = int(remaining_iters * avg_time_per_iter)
-            eta_mins, eta_secs = divmod(eta_seconds, 60)
+            if metrics is None:
+                continue
 
-            print(
-                f"  [{idx + 1}/{len(combos)}] best_{metric_label}={best_score:.4f} | ETA: {eta_mins}m {eta_secs}s"
+            score = (
+                metrics["accuracy"]
+                if (has_expected and metrics["accuracy"] is not None)
+                else metrics["avg_confidence"]
             )
 
+            results_log.append(
+                {
+                    "index": completed_count - 1,
+                    "params": combo,
+                    "metrics": metrics,
+                }
+            )
+
+            if score > best_score:
+                best_score = score
+                best_combo = combo
+                best_metrics = metrics
+
+            # Progres co 10 kombinacji lub przy ostatniej
+            if completed_count % 10 == 0 or completed_count == total_tasks:
+                metric_label = "accuracy" if has_expected else "avg_conf"
+                elapsed = time.time() - start_time
+                avg_time_per_iter = elapsed / completed_count
+                remaining_iters = total_tasks - completed_count
+                eta_seconds = int(remaining_iters * avg_time_per_iter)
+                eta_mins, eta_secs = divmod(eta_seconds, 60)
+
+                print(
+                    f"  [{completed_count}/{total_tasks}] best_{metric_label}={best_score:.4f} | ETA: {eta_mins}m {eta_secs}s"
+                )
+
     # --- zapis optymalnej konfiguracji ---
-    optimal_path = base_dir / "data" / "config" / "optimal" / "optimal_config.json"
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    optimal_path = (
+        base_dir / "data" / "config" / "optimal" / f"optimal_config_{timestamp}.json"
+    )
     optimal_path.parent.mkdir(parents=True, exist_ok=True)
     output = {
         "best_config": _unflatten(best_combo),
@@ -438,6 +502,7 @@ def run_grid_search(
         "questions_used": len(questions),
         "combinations_tested": len(combos),
         "metric": "accuracy" if has_expected else "avg_confidence",
+        "saved_at": optimal_path.name,
     }
     with optimal_path.open("w", encoding="utf-8") as f:
         json.dump(output, f, indent=2, ensure_ascii=False)
@@ -450,9 +515,42 @@ def run_grid_search(
 
 
 if __name__ == "__main__":
+    import argparse
     from core.bd import inicjalizuj
 
+    # Inicjalizacja bazy
     inicjalizuj()
-    result = run_grid_search()
+
+    # Konfiguracja parsera argumentów CLI
+    parser = argparse.ArgumentParser(
+        description="Symulacja optymalizacji parametrów BM25 za pomocą grid-search."
+    )
+    parser.add_argument(
+        "--questions",
+        type=str,
+        default=None,
+        help="Ścieżka do zewnętrznego pliku z pytaniami (TOML lub TXT).",
+    )
+    parser.add_argument(
+        "--max-combos",
+        type=int,
+        default=DOMYSLNA_LICZBA_KOMBINACJI,
+        help=f"Maksymalna liczba kombinacji do przetestowania (domyślnie: {DOMYSLNA_LICZBA_KOMBINACJI}).",
+    )
+    parser.add_argument(
+        "--sekcje",
+        type=str,
+        nargs="+",
+        default=None,
+        help="Nazwy sekcji z pliku testy.toml do wczytania (np. testy_latwe testy_trudne).",
+    )
+
+    args = parser.parse_args()
+
+    result = run_grid_search(
+        questions_path=args.questions,
+        max_combinations=args.max_combos,
+        sekcje=args.sekcje,
+    )
     print("\n=== WYNIK ===")
     print(json.dumps(result, indent=2, ensure_ascii=False))

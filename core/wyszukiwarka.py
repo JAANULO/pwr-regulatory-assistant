@@ -602,17 +602,16 @@ class Wyszukiwarka:
         setattr(self, cache_key, wynik)
         return wynik
 
-    def szukaj(
+    def _szukaj_z_gotowymi_wektorami(
         self,
         pytanie: str,
+        wektory_bazy: list[dict[str, float]],
+        synonimy_waga: float,
         n_wynikow: int = 1,
         zrodlo: str | None = None,
         virtual_params: dict | None = None,
+        cfg: dict | None = None,
     ) -> list[WynikWyszukiwania]:
-        """
-        Dla podanego pytania zwraca n najbardziej pasujacych fragmentow.
-        Parametr virtual_params to słownik suwaków z Laboratorium w locie omijający Cache.
-        """
         # Szybka ścieżka: zapytanie o konkretny paragraf bez BM25 (wyłączenie w locie labu z faktu na 1.0)
         numer_paragrafu = self.wykryj_numer_paragrafu(pytanie)
         if numer_paragrafu:
@@ -623,7 +622,8 @@ class Wyszukiwarka:
         # Szybka ścieżka dla definicji ze słownika pojęć (§ 2)
         from core.szybkie_odpowiedzi import dopasuj_szybka_odpowiedz
 
-        cfg = pobierz_konfiguracje()
+        if cfg is None:
+            cfg = pobierz_konfiguracje()
 
         # Wykluczamy pojęcia, które w bazie regresyjnej mają przypisane inne, bardziej szczegółowe paragrafy
         wykluczenia_cfg = cfg.get("szumy_i_wykluczenia", {})
@@ -652,23 +652,6 @@ class Wyszukiwarka:
         # Jeśli brak aktywnych zdań po filtracji, cofamy się do pełnego pytania
         if not aktywne_zdania:
             aktywne_zdania = [pytanie]
-
-        # --- Faza dla Laboratorium (Wczytanie parametrów) ---
-        cfg = pobierz_konfiguracje()
-        bm25_cfg = cfg.get("bm25", {})
-        k1_default = float(bm25_cfg.get("k1", 1.5))
-        b_default = float(bm25_cfg.get("b", 0.75))
-        synonimy_waga = float(bm25_cfg.get("synonimy_waga", 0.85))
-
-        wektory_bazy = self.wektory
-        if virtual_params:
-            synonimy_waga = float(virtual_params.get("synonym_weight", synonimy_waga))
-            k1_lab = float(virtual_params.get("bm25_k1", k1_default))
-            b_lab = float(virtual_params.get("bm25_b", b_default))
-            if k1_lab != k1_default or b_lab != b_default:
-                wektory_bazy = zbuduj_wektory_bm25(
-                    self.wszystkie_tokeny, self.idf, custom_k1=k1_lab, custom_b=b_lab
-                )
 
         slownik_korekcji = set(self.idf.keys()) | set(SYNONIMY.keys())
         wszystkie_tokeny_pytania = []
@@ -830,6 +813,66 @@ class Wyszukiwarka:
             kandydaci = [k for k in kandydaci if k.zrodlo == zrodlo]
 
         return kandydaci[:n_wynikow]
+
+    def szukaj_wiele(
+        self,
+        pytania: list[str],
+        n_wynikow: int = 1,
+        zrodlo: str | None = None,
+        virtual_params: dict | None = None,
+    ) -> list[list[WynikWyszukiwania]]:
+        """
+        Dla listy pytań zwraca listę najbardziej pasujących fragmentów.
+        Parametry BM25 są przeliczane tylko raz na całe wywołanie.
+        """
+        cfg = pobierz_konfiguracje()
+        bm25_cfg = cfg.get("bm25", {})
+        k1_default = float(bm25_cfg.get("k1", 1.5))
+        b_default = float(bm25_cfg.get("b", 0.75))
+        synonimy_waga = float(bm25_cfg.get("synonimy_waga", 0.85))
+
+        wektory_bazy = self.wektory
+        if virtual_params:
+            synonimy_waga = float(virtual_params.get("synonym_weight", synonimy_waga))
+            k1_lab = float(virtual_params.get("bm25_k1", k1_default))
+            b_lab = float(virtual_params.get("bm25_b", b_default))
+            if k1_lab != k1_default or b_lab != b_default:
+                wektory_bazy = zbuduj_wektory_bm25(
+                    self.wszystkie_tokeny, self.idf, custom_k1=k1_lab, custom_b=b_lab
+                )
+
+        wyniki_wiele = []
+        for pytanie in pytania:
+            res = self._szukaj_z_gotowymi_wektorami(
+                pytanie,
+                wektory_bazy=wektory_bazy,
+                synonimy_waga=synonimy_waga,
+                n_wynikow=n_wynikow,
+                zrodlo=zrodlo,
+                virtual_params=virtual_params,
+                cfg=cfg,
+            )
+            wyniki_wiele.append(res)
+        return wyniki_wiele
+
+    def szukaj(
+        self,
+        pytanie: str,
+        n_wynikow: int = 1,
+        zrodlo: str | None = None,
+        virtual_params: dict | None = None,
+    ) -> list[WynikWyszukiwania]:
+        """
+        Dla podanego pytania zwraca n najbardziej pasujacych fragmentow.
+        Metoda zachowuje oryginalną sygnaturę i zachowanie, korzystając z szukaj_wiele.
+        """
+        wyniki = self.szukaj_wiele(
+            [pytanie],
+            n_wynikow=n_wynikow,
+            zrodlo=zrodlo,
+            virtual_params=virtual_params,
+        )
+        return wyniki[0] if wyniki else []
 
 
 # ── Test ──────────────────────────────────────────────────────────────────────

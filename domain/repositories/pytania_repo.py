@@ -28,9 +28,10 @@ def _domyslne_statystyki() -> dict:
 class PytaniaRepository:
     """Repozytorium operacji CRUD na tabeli `pytania`."""
 
-    def __init__(self, polacz_fn, tryb: str) -> None:
+    def __init__(self, polacz_fn, tryb: str, zapytania: dict) -> None:
         self._polacz = polacz_fn
         self._tryb = tryb
+        self._zapytania = zapytania
 
     def zapisz(
         self,
@@ -46,7 +47,7 @@ class PytaniaRepository:
                 with self._polacz() as conn:
                     with conn.cursor() as cur:
                         cur.execute(
-                            "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (%s,%s,%s,%s,%s) RETURNING id",
+                            self._zapytania["zapisz_pytanie"],
                             (pytanie, tytul, podobienstwo, baza, odpowiedz),
                         )
                         conn.commit()
@@ -57,7 +58,7 @@ class PytaniaRepository:
         else:
             with self._polacz() as conn:
                 cur = conn.execute(
-                    "INSERT INTO pytania (pytanie, tytul, podobienstwo, baza, odpowiedz) VALUES (?,?,?,?,?)",
+                    self._zapytania["zapisz_pytanie"],
                     (pytanie, tytul, podobienstwo, baza, odpowiedz),
                 )
                 return cur.lastrowid
@@ -69,7 +70,7 @@ class PytaniaRepository:
                 with self._polacz() as conn:
                     with conn.cursor() as cur:
                         cur.execute(
-                            "SELECT pytanie, tytul, podobienstwo, odpowiedz FROM pytania WHERE id = %s",
+                            self._zapytania["pobierz_pytanie"],
                             (pytanie_id,),
                         )
                         return cur.fetchone()
@@ -79,7 +80,7 @@ class PytaniaRepository:
         else:
             with self._polacz() as conn:
                 return conn.execute(
-                    "SELECT pytanie, tytul, podobienstwo, odpowiedz FROM pytania WHERE id = ?",
+                    self._zapytania["pobierz_pytanie"],
                     (pytanie_id,),
                 ).fetchone()
 
@@ -90,7 +91,7 @@ class PytaniaRepository:
                 with self._polacz() as conn:
                     with conn.cursor() as cur:
                         cur.execute(
-                            "SELECT pytanie FROM pytania WHERE pytanie IS NOT NULL AND pytanie <> '' ORDER BY id DESC LIMIT %s",
+                            self._zapytania["pobierz_ostatnie"],
                             (limit * 3,),
                         )
                         rows = cur.fetchall()
@@ -100,7 +101,7 @@ class PytaniaRepository:
         else:
             with self._polacz() as conn:
                 rows = conn.execute(
-                    "SELECT pytanie FROM pytania WHERE pytanie IS NOT NULL AND pytanie <> '' ORDER BY id DESC LIMIT ?",
+                    self._zapytania["pobierz_ostatnie"],
                     (limit * 3,),
                 ).fetchall()
 
@@ -122,69 +123,37 @@ class PytaniaRepository:
             try:
                 with self._polacz() as conn:
                     with conn.cursor() as cur:
-                        cur.execute("SELECT COUNT(*) as total FROM pytania")
+                        cur.execute(self._zapytania["pobierz_statystyki_total"])
                         total = cur.fetchone()["total"]
-                        cur.execute("SELECT AVG(podobienstwo) as avg FROM pytania")
+                        cur.execute(self._zapytania["pobierz_statystyki_avg"])
                         avg = cur.fetchone()["avg"]
-                        cur.execute("""
-                            SELECT tytul, COUNT(*) as n
-                            FROM pytania WHERE tytul IS NOT NULL
-                            GROUP BY tytul ORDER BY n DESC LIMIT 5
-                        """)
+                        cur.execute(self._zapytania["pobierz_statystyki_top"])
                         top = cur.fetchall()
-                        cur.execute("""
-                            SELECT p.pytanie, p.tytul, p.podobienstwo
-                            FROM feedback f
-                                     JOIN pytania p ON f.pytanie_id = p.id
-                            WHERE f.ocena = -1
-                            ORDER BY f.czas DESC LIMIT 10
-                        """)
+                        cur.execute(self._zapytania["pobierz_statystyki_zle"])
                         zle = cur.fetchall()
-                        cur.execute("""
-                            SELECT TO_CHAR(czas::timestamp, 'YYYY-MM-DD') as dzien, COUNT(*) as liczba
-                            FROM pytania
-                            GROUP BY dzien
-                            ORDER BY dzien LIMIT 30
-                        """)
+                        cur.execute(self._zapytania["pobierz_statystyki_dzienne"])
                         dzienne = cur.fetchall()
-                        cur.execute("""
-                            SELECT czas, pytanie, odpowiedz, podobienstwo
-                            FROM pytania
-                            ORDER BY id DESC LIMIT 50
-                        """)
+                        cur.execute(self._zapytania["pobierz_statystyki_ostatnie"])
                         ostatnie = cur.fetchall()
             except Exception as e:
                 _LOG.warning("Nie udalo sie pobrac statystyk (postgres): %s", e)
                 return _domyslne_statystyki()
         else:
             with self._polacz() as conn:
-                total = conn.execute("SELECT COUNT(*) FROM pytania").fetchone()[0]
-                avg = conn.execute("SELECT AVG(podobienstwo) FROM pytania").fetchone()[
-                    0
-                ]
-                top = conn.execute("""
-                    SELECT tytul, COUNT(*) as n
-                    FROM pytania WHERE tytul IS NOT NULL
-                    GROUP BY tytul ORDER BY n DESC LIMIT 5
-                """).fetchall()
-                zle = conn.execute("""
-                    SELECT p.pytanie, p.tytul, p.podobienstwo
-                    FROM feedback f
-                             JOIN pytania p ON f.pytanie_id = p.id
-                    WHERE f.ocena = -1
-                    ORDER BY f.czas DESC LIMIT 10
-                """).fetchall()
-                dzienne = conn.execute("""
-                    SELECT substr(czas, 1, 10) as dzien, COUNT(*) as liczba
-                    FROM pytania
-                    GROUP BY substr(czas, 1, 10)
-                    ORDER BY dzien LIMIT 30
-                """).fetchall()
-                ostatnie = conn.execute("""
-                    SELECT czas, pytanie, odpowiedz, podobienstwo
-                    FROM pytania
-                    ORDER BY id DESC LIMIT 50
-                """).fetchall()
+                total = conn.execute(
+                    self._zapytania["pobierz_statystyki_total"]
+                ).fetchone()[0]
+                avg = conn.execute(
+                    self._zapytania["pobierz_statystyki_avg"]
+                ).fetchone()[0]
+                top = conn.execute(self._zapytania["pobierz_statystyki_top"]).fetchall()
+                zle = conn.execute(self._zapytania["pobierz_statystyki_zle"]).fetchall()
+                dzienne = conn.execute(
+                    self._zapytania["pobierz_statystyki_dzienne"]
+                ).fetchall()
+                ostatnie = conn.execute(
+                    self._zapytania["pobierz_statystyki_ostatnie"]
+                ).fetchall()
 
         return {
             "pytania": total,

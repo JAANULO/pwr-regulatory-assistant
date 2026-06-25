@@ -17,9 +17,10 @@ _LOG = logging.getLogger("asystent.db")
 class FeedbackRepository:
     """Repozytorium operacji na tabeli `feedback`."""
 
-    def __init__(self, polacz_fn, tryb: str) -> None:
+    def __init__(self, polacz_fn, tryb: str, zapytania: dict) -> None:
         self._polacz = polacz_fn
         self._tryb = tryb
+        self._zapytania = zapytania
 
     def zapisz(
         self,
@@ -33,7 +34,7 @@ class FeedbackRepository:
                 with self._polacz() as conn:
                     with conn.cursor() as cur:
                         cur.execute(
-                            "INSERT INTO feedback (pytanie_id, ocena, komentarz) VALUES (%s,%s,%s)",
+                            self._zapytania["zapisz_feedback"],
                             (pytanie_id, ocena, komentarz),
                         )
                         conn.commit()
@@ -42,7 +43,7 @@ class FeedbackRepository:
         else:
             with self._polacz() as conn:
                 conn.execute(
-                    "INSERT INTO feedback (pytanie_id, ocena, komentarz) VALUES (?,?,?)",
+                    self._zapytania["zapisz_feedback"],
                     (pytanie_id, ocena, komentarz),
                 )
         return True
@@ -53,13 +54,7 @@ class FeedbackRepository:
         Używane przez algorytm BM25 do modyfikacji rankingu wyników.
         Wartość > 1.0 oznacza, że paragraf jest często oceniany pozytywnie.
         """
-        zapytanie = """
-            SELECT p.tytul, SUM(f.ocena) as suma_ocen
-            FROM feedback f
-            JOIN pytania p ON f.pytanie_id = p.id
-            WHERE p.tytul IS NOT NULL
-            GROUP BY p.tytul
-        """
+        zapytanie = self._zapytania["pobierz_wspolczynniki_zbiorczo"]
         if self._tryb == "postgres":
             try:
                 with self._polacz() as conn:

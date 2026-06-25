@@ -86,11 +86,20 @@ python app.py
 | Response time | < 50 ms |
 
 ### Automatic Simulation
-The project supports a built-in optimization module with Random Search. To run the optimizer:
+The project supports a built-in optimization module with parallel Random Search (utilizing multiple CPU cores). To run the optimizer:
 ```bash
 python scripts/symulacja.py
 ```
-The simulation tests dozens of parameters on the dataset from `data/config/testy.toml` to find the best configuration.
+You can customize the simulation using command-line arguments:
+*   `--questions <path>`: Path to a custom test questions file.
+*   `--max-combos <number>`: Maximum number of parameter combinations to check (default: 50).
+*   `--sekcje <names>`: Select specific sections from `testy.toml` (e.g. `testy_latwe testy_trudne`).
+
+Example:
+```bash
+python scripts/symulacja.py --max-combos 100 --sekcje testy_trudne
+```
+The simulation tests parameters on the dataset to find the best configuration and saves it in `data/config/optimal/`.
 
 ---
 
@@ -133,6 +142,7 @@ The project includes advanced diagnostics for the production environment (e.g., 
 ├── data/                       ← Configs, DBs, Knowledge Bases (SoC)
 │   ├── config/                 ← TOML configuration files
 │   ├── database/               ← SQLite DB and cache .pkl files (ignored)
+│   │   └── sql/                ← SQL schemas and queries (SQLite & Postgres)
 │   └── kb/                     ← Knowledge base files (.json, .pdf)
 └── tests/                      ← Tests and verification
 ```
@@ -208,11 +218,20 @@ Wyszukiwarka posiada **47 konfigurowalnych parametrów** wydzielonych całkowici
 - **`[mapa_wag_dynamiczna]`** (8 parametrów): warunkowe podbicia rozdziałów aktywowane obecnością powiązanych tokenów w zapytaniu.
 
 #### Automatyczna Symulacja
-Projekt wspiera wbudowany moduł optymalizacyjny z bezpośrednim losowaniem (Random Search). Aby uruchomić optymalizator:
+Projekt wspiera wbudowany moduł optymalizacyjny z równoległym losowaniem parametrów (Random Search wykorzystujący wiele rdzeni procesora). Aby uruchomić optymalizator:
 ```bash
 python scripts/symulacja.py
 ```
-Symulacja testuje dziesiątki parametrów na zestawie z `data/config/testy.toml` w poszukiwaniu najlepszego wyniku.
+Możesz dostosować przebieg symulacji za pomocą argumentów wiersza poleceń:
+*   `--questions <sciezka>`: Ścieżka do zewnętrznego pliku z pytaniami testowymi.
+*   `--max-combos <liczba>`: Maksymalna liczba kombinacji parametrów do przetestowania (domyślnie: 50).
+*   `--sekcje <nazwy>`: Wybór konkretnych sekcji z pliku `testy.toml` (np. `testy_latwe testy_trudne`).
+
+Przykład:
+```bash
+python scripts/symulacja.py --max-combos 100 --sekcje testy_trudne
+```
+Symulacja testuje parametry na wybranym zestawie pytań, poszukując najlepszej konfiguracji, którą zapisuje w folderze `data/config/optimal/`.
 
 ---
 
@@ -235,6 +254,7 @@ Symulacja testuje dziesiątki parametrów na zestawie z `data/config/testy.toml`
 ├── data/                       ← Konfiguracja, bazy danych, bazy wiedzy (SoC)
 │   ├── config/                 ← Pliki konfiguracyjne TOML
 │   ├── database/               ← Baza SQLite i pliki cache .pkl (ignorowane)
+│   │   └── sql/                ← Schematy i zapytania SQL (SQLite & Postgres)
 │   └── kb/                     ← Pliki bazy wiedzy (.json, .pdf)
 └── tests/                      ← Testy i weryfikacja
 ```

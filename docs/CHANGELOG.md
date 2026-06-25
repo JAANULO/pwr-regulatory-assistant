@@ -4,6 +4,16 @@ Wszystkie istotne zmiany w projekcie są odnotowywane w tym pliku zgodnie ze sta
 
 ---
 
+## [2.11.0] - 2026-06-25
+### Dodano
+- **Wieloprocesowość w Optymalizacji**: Równoległe uruchamianie symulacji dopasowywania parametrów na wielu rdzeniach procesora z użyciem `ProcessPoolExecutor` w `scripts/symulacja.py`.
+- **CLI w Symulacji**: Możliwość konfiguracji optymalizatora bezpośrednio z poziomu terminala za pomocą flag `--questions`, `--max-combos` oraz `--sekcje`.
+- **Batching Wyszukiwania**: Nowa metoda `szukaj_wiele` w klasie `Wyszukiwarka` ([core/wyszukiwarka.py](file:///c:/Users/atona/Documents/GitHub/pwr-regulatory-assistant/core/wyszukiwarka.py)), optymalizująca zapytania seryjne przez jednokrotne budowanie wektorów BM25.
+
+### Zmieniono
+- **Separacja SQL (SoC)**: Przeniesienie schematów bazodanowych oraz zapytań SQL z kodu Pythona ([core/bd.py](file:///c:/Users/atona/Documents/GitHub/pwr-regulatory-assistant/core/bd.py) i repozytoriów) do dedykowanych plików zewnętrznych w folderze `data/database/sql/` (`schema_*.sql`, `queries_*.sql`).
+- **Endpoint główny `/`**: Zmiana zachowania root endpointu we Flasku. Jeśli zmienna środowiskowa `APP_ENV` ma wartość `local`, zwracany jest status serwera w formacie JSON zamiast przekierowania na domenę zewnętrzną.
+
 ## [2.10.1] - 2026-06-17
 ### Dodano
 - **Grafy w Głównym Menu**: Wyciągnięcie podglądu powiązań grafowych bezpośrednio pod wybór baz wiedzy.

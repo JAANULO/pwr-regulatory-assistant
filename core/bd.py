@@ -19,6 +19,57 @@ _LOG = logging.getLogger("asystent.db")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PLIK_DB = os.path.join(BASE_DIR, "..", "data", "database", "asystent.db")
+KATALOG_SQL = os.path.join(BASE_DIR, "..", "data", "database", "sql")
+
+WYMAGANE_KLUCZE = {
+    "zapisz_feedback",
+    "pobierz_wspolczynniki_zbiorczo",
+    "zapisz_pytanie",
+    "pobierz_pytanie",
+    "pobierz_ostatnie",
+    "pobierz_statystyki_total",
+    "pobierz_statystyki_avg",
+    "pobierz_statystyki_top",
+    "pobierz_statystyki_zle",
+    "pobierz_statystyki_dzienne",
+    "pobierz_statystyki_ostatnie",
+}
+
+
+def wczytaj_zapytania(sciezka_pliku: str) -> dict[str, str]:
+    zapytania = {}
+    if not os.path.exists(sciezka_pliku):
+        raise FileNotFoundError(f"Nie znaleziono pliku SQL: {sciezka_pliku}")
+
+    current_name = None
+    lines_accumulator = []
+
+    with open(sciezka_pliku, "r", encoding="utf-8") as f:
+        for line in f:
+            line_stripped = line.strip()
+            if line_stripped.startswith("-- name:"):
+                if current_name:
+                    zapytania[current_name] = "\n".join(lines_accumulator).strip()
+                current_name = line_stripped[len("-- name:") :].strip()
+                lines_accumulator = []
+            elif current_name is not None:
+                lines_accumulator.append(line)
+
+        if current_name:
+            zapytania[current_name] = "\n".join(lines_accumulator).strip()
+
+    brakujace = WYMAGANE_KLUCZE - set(zapytania.keys())
+    if brakujace:
+        raise ValueError(
+            f"Blad wczytywania zapytan z {sciezka_pliku}. Brakujace wymagane zapytania: {', '.join(brakujace)}"
+        )
+    return zapytania
+
+
+PLIK_ZAPYTAN = os.path.join(
+    KATALOG_SQL, "queries_postgres.sql" if TRYB == "postgres" else "queries_sqlite.sql"
+)
+ZAPYTANIA = wczytaj_zapytania(PLIK_ZAPYTAN)
 
 
 if TRYB == "postgres":
@@ -64,44 +115,10 @@ def inicjalizuj():
     if TRYB == "postgres":
         with polacz() as conn:
             cur = conn.cursor()
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS pytania (
-                    id          SERIAL PRIMARY KEY,
-                    pytanie     TEXT NOT NULL,
-                    tytul       TEXT,
-                    podobienstwo REAL,
-                    odpowiedz   TEXT,
-                    baza        TEXT DEFAULT 'studia',
-                    czas        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                );
-            """)
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS feedback (
-                    id          SERIAL PRIMARY KEY,
-                    pytanie_id  INTEGER REFERENCES pytania(id),
-                    ocena       INTEGER NOT NULL,
-                    komentarz   TEXT,
-                    czas        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                );
-            """)
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS api_keys (
-                    id             VARCHAR(36) PRIMARY KEY,
-                    key_id         VARCHAR(12) UNIQUE NOT NULL,
-                    key_hash       TEXT NOT NULL,
-                    name           TEXT UNIQUE,
-                    created_by     TEXT,
-                    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    expires_at     TIMESTAMP,
-                    scopes         TEXT,
-                    quota          TEXT,
-                    rate_limit     TEXT,
-                    revoked        BOOLEAN DEFAULT FALSE,
-                    meta           TEXT,
-                    last_used_at   TIMESTAMP,
-                    usage_count    INTEGER DEFAULT 0
-                );
-            """)
+            sciezka_schematu = os.path.join(KATALOG_SQL, "schema_postgres.sql")
+            with open(sciezka_schematu, "r", encoding="utf-8") as f:
+                schemat = f.read()
+            cur.execute(schemat)
 
             # Automatyczna migracja PostgreSQL dla name
             try:
@@ -119,40 +136,10 @@ def inicjalizuj():
             _LOG.info("Baza PostgreSQL zainicjalizowana pomyślnie")
     else:
         with polacz() as conn:
-            conn.executescript("""
-                CREATE TABLE IF NOT EXISTS pytania (
-                    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                    pytanie     TEXT NOT NULL,
-                    tytul       TEXT,
-                    podobienstwo REAL,
-                    odpowiedz   TEXT,
-                    baza        TEXT DEFAULT 'studia',
-                    czas        TEXT DEFAULT (datetime('now','localtime'))
-                );
-                CREATE TABLE IF NOT EXISTS feedback (
-                    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                    pytanie_id  INTEGER REFERENCES pytania(id),
-                    ocena       INTEGER NOT NULL,
-                    komentarz   TEXT,
-                    czas        TEXT DEFAULT (datetime('now','localtime'))
-                );
-                CREATE TABLE IF NOT EXISTS api_keys (
-                    id             TEXT PRIMARY KEY,
-                    key_id         TEXT UNIQUE NOT NULL,
-                    key_hash       TEXT NOT NULL,
-                    name           TEXT UNIQUE,
-                    created_by     TEXT,
-                    created_at     TEXT DEFAULT (datetime('now','localtime')),
-                    expires_at     TEXT,
-                    scopes         TEXT,
-                    quota          TEXT,
-                    rate_limit     TEXT,
-                    revoked        INTEGER DEFAULT 0,
-                    meta           TEXT,
-                    last_used_at   TEXT,
-                    usage_count    INTEGER DEFAULT 0
-                );
-            """)
+            sciezka_schematu = os.path.join(KATALOG_SQL, "schema_sqlite.sql")
+            with open(sciezka_schematu, "r", encoding="utf-8") as f:
+                schemat = f.read()
+            conn.executescript(schemat)
 
             # Automatyczna migracja: dodaj kolumnę 'odpowiedz' jeśli tabela istniała bez niej
             try:
@@ -209,8 +196,8 @@ def inicjalizuj():
 from domain.repositories.pytania_repo import PytaniaRepository  # type: ignore
 from domain.repositories.feedback_repo import FeedbackRepository  # type: ignore
 
-_pytania = PytaniaRepository(polacz, TRYB)
-_feedback = FeedbackRepository(polacz, TRYB)
+_pytania = PytaniaRepository(polacz, TRYB, ZAPYTANIA)
+_feedback = FeedbackRepository(polacz, TRYB, ZAPYTANIA)
 
 
 # ── Publiczne API — thin wrappers delegujące do repozytoriów ──────────────────

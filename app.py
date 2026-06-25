@@ -22,6 +22,7 @@ from core.settings import (
     FLASK_DEBUG,
     FLASK_HOST,
     FLASK_PORT,
+    APP_ENV,
 )
 from api_gateway import api_keys_bp, init_api_key_middleware, api_key_service
 from core.bd import (
@@ -112,6 +113,10 @@ init_api_key_middleware(
 
 @app.route("/")
 def index():
+    if APP_ENV == "local":
+        return jsonify(
+            {"status": "running", "backend": "PWr Regulatory Assistant API"}
+        ), 200
     return redirect("https://janulo.me")
 
 
@@ -148,9 +153,6 @@ def zapytaj_symulacja():
         request.get_json(force=True), container.wyszukiwarka, logger
     )
     return jsonify(payload), status
-
-
-# ----------------------------------------
 
 
 @app.route("/zapytaj", methods=["POST"])
@@ -208,6 +210,7 @@ def zapytaj():
             MAPA_ZNAKOW=MAPA_ZNAKOW,
             SYNONIMY=SYNONIMY,
         )
+
     except Exception as e:
         logger.exception("Błąd podczas przetwarzania zapytania")
         error_details = get_error_details(e)
@@ -256,9 +259,6 @@ def feedback():
 
     execute_feedback_submission(dane["pytanie_id"], dane["ocena"], BASE_DIR, logger)
     return jsonify({"ok": True})
-
-
-# Widok grafu przeniesiony do frontendu
 
 
 @app.route("/graf_wektorowy", methods=["GET"])
@@ -347,8 +347,6 @@ if __name__ != "__main__":
     except Exception as e:
         logger.warning(f"Start w trybie WSGI bez pelnej inicjalizacji: {e}")
 
-
-# ── start ─────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     print("Inicjalizacja bazy danych...")
