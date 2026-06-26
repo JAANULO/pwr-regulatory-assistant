@@ -402,10 +402,10 @@ def run_grid_search(
     if total_combos > max_combinations:
         random.seed(42)
         combos_set = set()
-        combos = []
+        combos: list[dict[str, Any]] = []
 
         while len(combos) < max_combinations:
-            combo = {k: random.choice(opts) for k, opts in param_options.items()}
+            combo = {k: random.choice(opts) for k, opts in param_options.items()}  # nosec B311
             # Stabilna reprezentacja do hashowania
             combo_tuple = tuple(sorted(combo.items()))
             if combo_tuple not in combos_set:

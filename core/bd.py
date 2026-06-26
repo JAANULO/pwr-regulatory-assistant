@@ -42,7 +42,7 @@ def wczytaj_zapytania(sciezka_pliku: str) -> dict[str, str]:
         raise FileNotFoundError(f"Nie znaleziono pliku SQL: {sciezka_pliku}")
 
     current_name = None
-    lines_accumulator = []
+    lines_accumulator: list[str] = []
 
     with open(sciezka_pliku, "r", encoding="utf-8") as f:
         for line in f:
