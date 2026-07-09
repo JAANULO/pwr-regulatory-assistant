@@ -3,6 +3,7 @@ slowniki.py - centralne miejsce dla synonimów i rozszerzeń zapytań.
 Ładuje słowniki dynamicznie z plików TOML w folderze data/.
 """
 
+import logging
 import os
 import sys
 
@@ -19,6 +20,8 @@ else:
         )
 
 # Ustalenie ścieżek bezwzględnych do plików słowników
+logger = logging.getLogger(__name__)
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
 
@@ -72,8 +75,12 @@ class DynamicDictProxy(dict):
                 self.clear()
                 self.update(dane)
                 self._mtime = current_mtime
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(
+                "Nie udało się przeładować słownika %s: %s",
+                self.sciezka_pliku,
+                e,
+            )
 
     def __getitem__(self, key):
         self._sprawdz_i_przeladuj()
