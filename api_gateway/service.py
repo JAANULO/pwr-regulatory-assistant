@@ -86,10 +86,22 @@ class ApiKeyService:
         if record["revoked"]:
             return False, "Key revoked", {}
 
-        # 3. Sprawdz date waznosci (uproszczone bez strefy czasowej, mozna dodac)
-        # expires_at = record["expires_at"]
-        # if expires_at:
-        #    ...
+        # 3. Sprawdz date waznosci
+        expires_at_val = record.get("expires_at")
+        if expires_at_val:
+            from datetime import datetime
+
+            try:
+                if isinstance(expires_at_val, datetime):
+                    expires_dt = expires_at_val
+                else:
+                    expires_dt = datetime.fromisoformat(str(expires_at_val))
+                if expires_dt.tzinfo is not None:
+                    expires_dt = expires_dt.astimezone().replace(tzinfo=None)
+                if datetime.now() > expires_dt:
+                    return False, "Key expired", {}
+            except Exception as e:
+                _LOG.warning(f"Blad walidacji daty wygasniecia klucza {key_id}: {e}")
 
         # 4. Sprawdz scope
         if record["scopes"]:

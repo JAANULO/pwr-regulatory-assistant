@@ -9,7 +9,7 @@ import sys
 
 # Ustawienie ścieżki dla modułów lokalnych
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.dirname(BASE_DIR)
+ROOT_DIR = os.path.dirname(os.path.dirname(BASE_DIR))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
@@ -22,8 +22,7 @@ print("  WERYFIKACJA PROJEKTU")
 print("=" * 55)
 
 # 1. Baza wiedzy
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PLIK_BAZY = os.path.join(BASE_DIR, "data", "kb", "baza_wiedzy.json")
+PLIK_BAZY = os.path.join(ROOT_DIR, "data", "kb", "baza_wiedzy.json")
 
 baza = json.load(open(PLIK_BAZY, encoding="utf-8"))
 print("\n[1] Baza wiedzy:")

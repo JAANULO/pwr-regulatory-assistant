@@ -12,15 +12,15 @@ import tomllib
 try:
     from infrastructure.knowledge_loader import utworz_wyszukiwarke
 except ImportError:
-    # Fallback dla uruchamiania bezpośredniego z folderu tests/
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+    # Fallback dla uruchamiania bezpośredniego z folderu tests/integration/
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
     from infrastructure.knowledge_loader import utworz_wyszukiwarke
 
 
 # ── Ładowanie pytań z testy.toml ──────────────────────────────────────────────
 
 TESTY_TOML = (
-    pathlib.Path(__file__).resolve().parents[1] / "data" / "config" / "testy.toml"
+    pathlib.Path(__file__).resolve().parents[2] / "data" / "config" / "testy.toml"
 )
 
 _SEKCJE = [
@@ -96,7 +96,7 @@ def main():
 
     # Użycie ścieżek bezwzględnych dla stabilności na Windows
     SKRYPT_DIR = os.path.dirname(os.path.abspath(__file__))
-    BASE_DIR = os.path.dirname(SKRYPT_DIR)
+    BASE_DIR = os.path.dirname(os.path.dirname(SKRYPT_DIR))
     PLIK_BAZY = os.path.join(BASE_DIR, "data", "kb", "baza_wiedzy.json")
 
     if not os.path.exists(PLIK_BAZY):

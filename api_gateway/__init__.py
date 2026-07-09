@@ -44,7 +44,19 @@ def create_key() -> Any:
     created_by: str = str(dane.get("created_by", "admin"))
 
     exp = dane.get("expires_at")
-    expires_at: Optional[str] = str(exp) if exp else None
+    expires_at: Optional[str] = None
+    if exp:
+        from datetime import datetime
+
+        try:
+            datetime.fromisoformat(str(exp))
+            expires_at = str(exp)
+        except ValueError:
+            return jsonify(
+                {
+                    "error": f"Niepoprawny format daty 'expires_at': '{exp}'. Oczekiwany format ISO 8601 (np. YYYY-MM-DD lub YYYY-MM-DDTHH:MM:SS)."
+                }
+            ), 400
     meta: Dict[str, Any] = dane.get("meta", {})
 
     try:

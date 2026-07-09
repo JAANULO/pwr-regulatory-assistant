@@ -127,8 +127,18 @@ def inicjalizuj():
                     "Migracja: Dodano kolumnę 'name' do tabeli 'api_keys' (PostgreSQL)"
                 )
             except Exception as e:
-                # Oczekiwany wyjątek jeśli kolumna już istnieje (kod 42701)
                 conn.rollback()
+                pgcode = getattr(e, "pgcode", None)
+                if pgcode == "42701":
+                    _LOG.debug(
+                        "Migracja PostgreSQL: kolumna 'name' już istnieje (kod 42701)"
+                    )
+                else:
+                    _LOG.warning(
+                        "Błąd automatycznej migracji PostgreSQL (dodawanie kolumny 'name'): %s",
+                        e,
+                        exc_info=True,
+                    )
             else:
                 conn.commit()
 
@@ -152,7 +162,7 @@ def inicjalizuj():
                         "Migracja: Dodano kolumnę 'odpowiedz' do tabeli 'pytania'"
                     )
             except Exception as e:
-                _LOG.warning("Błąd migracji kolumny 'odpowiedz': %s", e)
+                _LOG.warning("Błąd migracji kolumny 'odpowiedz': %s", e, exc_info=True)
 
             # Automatyczna migracja dla api_keys: dodaj 'name'
             try:
@@ -188,7 +198,9 @@ def inicjalizuj():
                         "Migracja: Przebudowano tabelę 'api_keys' i dodano 'name' (SQLite)"
                     )
             except Exception as e:
-                _LOG.warning("Błąd migracji kolumny 'name' w api_keys: %s", e)
+                _LOG.warning(
+                    "Błąd migracji kolumny 'name' w api_keys: %s", e, exc_info=True
+                )
 
 
 # ── Repozytoria (inicjalizowane raz przy imporcie modułu) ─────────────────────

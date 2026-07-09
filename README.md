@@ -145,6 +145,8 @@ The project includes advanced diagnostics for the production environment (e.g., 
 │   │   └── sql/                ← SQL schemas and queries (SQLite & Postgres)
 │   └── kb/                     ← Knowledge base files (.json, .pdf)
 └── tests/                      ← Tests and verification
+    ├── unit/                   ← Unit tests (TOML validity, basic scripts)
+    └── integration/            ← Integration tests (Flask smoke, regression)
 ```
 
 ---
@@ -257,6 +259,8 @@ Symulacja testuje parametry na wybranym zestawie pytań, poszukując najlepszej 
 │   │   └── sql/                ← Schematy i zapytania SQL (SQLite & Postgres)
 │   └── kb/                     ← Pliki bazy wiedzy (.json, .pdf)
 └── tests/                      ← Testy i weryfikacja
+    ├── unit/                   ← Testy jednostkowe (walidacja TOML, weryfikacja)
+    └── integration/            ← Testy integracyjne (smoke test Flask, regresja)
 ```
 
 ---

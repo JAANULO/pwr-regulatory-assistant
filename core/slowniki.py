@@ -50,7 +50,69 @@ def _wczytaj_slownik_toml(sciezka_pliku: str) -> dict[str, str]:
         )
 
 
-# Inicjalizacja globalnych słowników (ładowana jednorazowo przy imporcie modułu)
-SYNONIMY = _wczytaj_slownik_toml(PLIK_SYNONIMOW)
-ROZSZERZENIA = _wczytaj_slownik_toml(PLIK_ROZSZERZEN)
-ROZSZERZENIA_ZDAN = _wczytaj_slownik_toml(PLIK_ROZSZERZEN_ZDAN)
+class DynamicDictProxy(dict):
+    """
+    Proxy słownika automatycznie przeładowujące dane z pliku TOML
+    przy wykryciu zmiany czasu modyfikacji (mtime).
+    """
+
+    def __init__(self, sciezka_pliku: str):
+        super().__init__()
+        self.sciezka_pliku = sciezka_pliku
+        self._mtime = 0.0
+        self._sprawdz_i_przeladuj()
+
+    def _sprawdz_i_przeladuj(self) -> None:
+        if not os.path.exists(self.sciezka_pliku):
+            return
+        try:
+            current_mtime = os.path.getmtime(self.sciezka_pliku)
+            if current_mtime > self._mtime:
+                dane = _wczytaj_slownik_toml(self.sciezka_pliku)
+                self.clear()
+                self.update(dane)
+                self._mtime = current_mtime
+        except Exception:
+            pass
+
+    def __getitem__(self, key):
+        self._sprawdz_i_przeladuj()
+        return super().__getitem__(key)
+
+    def __contains__(self, item):
+        self._sprawdz_i_przeladuj()
+        return super().__contains__(item)
+
+    def get(self, key, default=None):
+        self._sprawdz_i_przeladuj()
+        return super().get(key, default)
+
+    def items(self):
+        self._sprawdz_i_przeladuj()
+        return super().items()
+
+    def keys(self):
+        self._sprawdz_i_przeladuj()
+        return super().keys()
+
+    def values(self):
+        self._sprawdz_i_przeladuj()
+        return super().values()
+
+    def __len__(self):
+        self._sprawdz_i_przeladuj()
+        return super().__len__()
+
+    def __iter__(self):
+        self._sprawdz_i_przeladuj()
+        return super().__iter__()
+
+    def __repr__(self):
+        self._sprawdz_i_przeladuj()
+        return super().__repr__()
+
+
+# Inicjalizacja globalnych słowników z dynamicznym ładowaniem
+SYNONIMY = DynamicDictProxy(PLIK_SYNONIMOW)
+ROZSZERZENIA = DynamicDictProxy(PLIK_ROZSZERZEN)
+ROZSZERZENIA_ZDAN = DynamicDictProxy(PLIK_ROZSZERZEN_ZDAN)

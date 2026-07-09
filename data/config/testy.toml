@@ -464,7 +464,7 @@ oczekiwany = "§ 35. Praca dyplomowa - ust. 11"
 
 [[testy_p4_rozbudowane]]
 pytanie = "co jesli recenzent wystawi ocene niedostateczna z dyplomu"
-oczekiwany = "§ 35. Praca dyplomowa - ust. 20"
+oczekiwany = "§ 35. Praca dyplomowa - pkt 4"
 
 [[testy_p4_rozbudowane]]
 pytanie = "kiedy mozna przedluzyc termin zlozenia dyplomu"
@@ -472,11 +472,11 @@ oczekiwany = "§ 35. Praca dyplomowa - ust. 22"
 
 [[testy_p4_rozbudowane]]
 pytanie = "ile czasu trwa egzamin inzynierski"
-oczekiwany = "§ 35. Praca dyplomowa - ust. 11"
+oczekiwany = "§ 11. Organizacja roku akademickiego - ust. 1"
 
 [[testy_p4_rozbudowane]]
 pytanie = "ectsys"
-oczekiwany = "Deficyt"
+oczekiwany = "§ 10. Punkty ECTS - ust. 4"
 
 
 # ------------------------------------------------------------------------------

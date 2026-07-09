@@ -21,7 +21,7 @@ repos:
       # 3. Twój test weryfikacyjny
       - id: weryfikacja-projektu
         name: Weryfikacja spójności projektu
-        entry: cmd /c python tests/weryfikacja.py
+        entry: cmd /c python tests/unit/weryfikacja.py
         language: system
         pass_filenames: false
         always_run: true

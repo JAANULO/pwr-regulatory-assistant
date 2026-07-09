@@ -13,7 +13,7 @@ import sys
 
 # Ustawienie PYTHONPATH dla katalogu głównego projektu
 skrypt_dir = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
@@ -22,7 +22,7 @@ from core.bd import inicjalizuj  # type: ignore
 from infrastructure.knowledge_loader import utworz_wyszukiwarke  # type: ignore
 
 try:
-    from tests.test import TESTY  # type: ignore
+    from tests.integration.test import TESTY  # type: ignore
 except ImportError:
     from test import TESTY  # type: ignore
 
@@ -77,7 +77,7 @@ def main():
 
     # Ustawienie ścieżek bezwzględnych
     SKRYPT_DIR = os.path.dirname(os.path.abspath(__file__))
-    BASE_DIR = os.path.dirname(SKRYPT_DIR)
+    BASE_DIR = os.path.dirname(os.path.dirname(SKRYPT_DIR))
     PLIK_BAZY = os.path.join(BASE_DIR, "data", "kb", "baza_wiedzy.json")
 
     if not os.path.exists(PLIK_BAZY):
