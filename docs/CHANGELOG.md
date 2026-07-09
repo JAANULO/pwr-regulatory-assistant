@@ -13,6 +13,9 @@ Wszystkie istotne zmiany w projekcie są odnotowywane w tym pliku zgodnie ze sta
 ### Zmieniono
 - **Reorganizacja Testów**: Uporządkowano katalog `tests/` dzieląc go na `tests/unit/` (testy jednostkowe i poprawności słowników) oraz `tests/integration/` (testy dymne Flask i regresja wyszukiwarki), z adaptacją potoku CI w GitHub Actions (`.github/workflows/testy.yml`) i schematem w `README.md`.
 
+### Naprawiono
+- **Bezpieczeństwo (Bandit)**: Usunięto ciche tłumienie wyjątków (`try-except-pass`) w mechanizmie automatycznego przeładowywania słowników TOML (`DynamicDictProxy`) w [slowniki.py](file:///c:/Users/atona/Documents/GitHub/pwr-regulatory-assistant/core/slowniki.py). Błędy są teraz rejestrowane jako ostrzeżenia w logach, co rozwiązuje podatność Bandit B110.
+
 ## [2.11.0] - 2026-06-25
 ### Dodano
 - **Wieloprocesowość w Optymalizacji**: Równoległe uruchamianie symulacji dopasowywania parametrów na wielu rdzeniach procesora z użyciem `ProcessPoolExecutor` w `scripts/symulacja.py`.
