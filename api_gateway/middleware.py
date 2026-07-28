@@ -29,7 +29,17 @@ def init_api_key_middleware(app, api_key_service, protected_routes=None):
 
         # Uzywamy nazwy endpointu z protected_routes jako scope
         scope = "ask" if request.path == "/api/zapytaj" else "all"
-        is_valid, msg, meta = api_key_service.validate_key(api_key, scope)
+        try:
+            is_valid, msg, meta = api_key_service.validate_key(api_key, scope)
+        except Exception as e:
+            import logging
+
+            logging.getLogger("asystent.api_gateway").error(f"Middleware DB Error: {e}")
+            return jsonify(
+                {
+                    "error": "Błąd serwera (np. awaria bazy danych). Spróbuj ponownie później."
+                }
+            ), 500
 
         if not is_valid:
             status_code = meta.get("status_code", 401)

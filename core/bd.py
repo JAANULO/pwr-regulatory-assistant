@@ -96,6 +96,18 @@ else:
 def polacz():
     if TRYB == "postgres" and pg_pool is not None:
         conn = pg_pool.getconn()
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT 1")
+            cur.close()
+        except Exception:
+            # Połączenie martwe (Software caused connection abort), pobierz nowe
+            try:
+                pg_pool.putconn(conn, close=True)
+            except Exception:
+                pass
+            conn = pg_pool.getconn()
+
         conn.cursor_factory = RealDictCursor
         try:
             yield conn
