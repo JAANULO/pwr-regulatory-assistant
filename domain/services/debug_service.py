@@ -51,17 +51,7 @@ def execute_debug_info(data_dir, db_path, admin_token, request_token):
         },
     }
 
-    # Próba połączenia z bazą
-    try:
-        conn = sqlite3.connect(db_path, timeout=1)
-        cursor = conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        info["database"]["tables"] = [row[0] for row in cursor.fetchall()]
-        conn.close()
-    except Exception as e:
-        info["database"]["error"] = str(e)
-
-    # Test połączenia z PostgreSQL, aby ułatwić debugowanie w Render
+    # Sprawdzenie bazy danych zależy od środowiska
     db_url = os.getenv("DATABASE_URL")
     if db_url:
         info["postgres_test"] = {"url_set": True}
@@ -69,12 +59,26 @@ def execute_debug_info(data_dir, db_path, admin_token, request_token):
             import psycopg2
 
             conn = psycopg2.connect(db_url, connect_timeout=15, sslmode="require")
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT table_name FROM information_schema.tables WHERE table_schema='public';"
+            )
+            info["database"]["tables"] = [row[0] for row in cursor.fetchall()]
             conn.close()
             info["postgres_test"]["status"] = "OK"
         except Exception as e:
             info["postgres_test"]["status"] = "ERROR"
             info["postgres_test"]["error"] = str(e)
             info["postgres_test"]["error_type"] = type(e).__name__
+    else:
+        try:
+            conn = sqlite3.connect(db_path, timeout=1)
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+            info["database"]["tables"] = [row[0] for row in cursor.fetchall()]
+            conn.close()
+        except Exception as e:
+            info["database"]["error"] = str(e)
 
     return info, 200
 

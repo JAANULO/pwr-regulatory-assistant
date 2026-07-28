@@ -21,6 +21,8 @@ def execute_health_check(
     if provided_token != admin_token:
         return {"error": "Brak dostępu (Nieprawidłowy token)"}, 403
 
+    start_time = time.time()
+
     status: Dict[str, Any] = {
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
         "status": "OK",
@@ -106,8 +108,13 @@ def execute_health_check(
     )
 
     # Ustalenie finalnego statusu HTTP
-    http_status = (
-        200 if status["status"] == "OK" else 500 if status["status"] == "ERROR" else 200
-    )
+    if status["status"] == "OK":
+        http_status = 200
+    elif status["status"] == "DEGRADED":
+        http_status = 503
+    else:
+        http_status = 500
+
+    status["latency_ms"] = int((time.time() - start_time) * 1000)
 
     return status, http_status

@@ -13,10 +13,15 @@ jobs:
         env:
           ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
         run: |
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://model-wp08.onrender.com/admin/health?token=${ADMIN_TOKEN}")
+          HTTP_STATUS=$(curl -s -o response.json -w "%{http_code}" "https://model-wp08.onrender.com/admin/health?token=${ADMIN_TOKEN}")
+          
           if [ "$HTTP_STATUS" -ne 200 ]; then
             echo "Serwer leży! Kod błędu: $HTTP_STATUS"
+            echo "Szczegóły diagnostyczne:"
+            cat response.json
             exit 1
           else
             echo "Wszystko w porządku. Kod: $HTTP_STATUS"
+            echo "Szczegóły diagnostyczne (w tym czas odpowiedzi):"
+            cat response.json
           fi

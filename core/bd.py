@@ -104,8 +104,8 @@ def polacz():
             # Połączenie martwe (Software caused connection abort), pobierz nowe
             try:
                 pg_pool.putconn(conn, close=True)
-            except Exception:
-                pass
+            except Exception as e:
+                _LOG.warning(f"Błąd przy zamykaniu martwego połączenia: {e}")
             conn = pg_pool.getconn()
 
         conn.cursor_factory = RealDictCursor
