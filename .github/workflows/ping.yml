@@ -1,0 +1,22 @@
+name: Codzienny Ping Serwera
+
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping_render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sprawdź status Asystenta
+        env:
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+        run: |
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://model-wp08.onrender.com/admin/health?token=${ADMIN_TOKEN}")
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Serwer leży! Kod błędu: $HTTP_STATUS"
+            exit 1
+          else
+            echo "Wszystko w porządku. Kod: $HTTP_STATUS"
+          fi
